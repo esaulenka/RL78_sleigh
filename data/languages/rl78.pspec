@@ -4,6 +4,17 @@
 
 <processor_spec>
   <programcounter register="PC"/>
+  <segmented_address space="ram" type="protected"/>
+  <segmentop space="ram" userop="segment" farpointer="yes">
+    <pcode>
+      <input name="seg" size="2"/>
+      <input name="addr" size="2"/>
+      <output name="res" size="4"/>
+      <body><![CDATA[
+        res = (zext(addr) << 16) + zext(seg);
+      ]]></body>
+    </pcode>
+  </segmentop>
   <volatile outputop="reg_write" inputop="reg_read">
     <range space="ram" first="0xe0000" last="0xe00ff"/> <!-- xcbase xdbase -->
   </volatile>

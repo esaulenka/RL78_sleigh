@@ -14,8 +14,7 @@
 define endian=little;
 define alignment=1;
 
-define space ram        type=ram_space      size=3 wordsize=1 default;
-define space stackarea  type=ram_space      size=2;
+define space ram        type=ram_space      size=4 default;
 define space register   type=register_space size=1;
 
 # General Purpose registers
@@ -128,6 +127,8 @@ define pcodeop mach;
 
 define pcodeop disable_interrupts;
 define pcodeop enable_interrupts;
+
+define pcodeop segment; # res:4 = segment(seg:1, addr:2);
 
 #########################################################################
 #
@@ -257,6 +258,50 @@ define token data24 (24)
 #
 #########################################################################
 
+# Section # Page # of RL78/G13 User Manual
+
+# Section 3.4.3 Page 157
+macro direct_addr(addr, res) {
+    res = segment(0xF:1, addr);
+}
+
+macro direct_addr_es(addr, res) {
+    res = segment(ES, addr);
+}
+
+macro direct_addrb(addr, res) {
+    direct_addr(addr, res);
+}
+
+macro direct_addrb_es(addr, res) {
+    direct_addr_es(addr, res);
+}
+
+# Section 3.4.4 Page 158
+macro short_direct_addr(addr, res) {
+    res = segment(0xF:1, zext(addr) + 0xFE20:2);
+}
+
+# Section 3.4.4 Page 158
+macro sfr_addr(addr, res) {
+    res = segment(0xF:1, zext(addr) + 0xFF00:2);
+}
+
+# Section 3.4.4 Page 158
+macro sfr_addrp(addr, res) {
+    sfr_addr(addr, res);
+}
+
+# Section 3.4.6 Page 160
+macro reg_ind(reg1, reg2, res) {
+    res = segment(0xF:1, (zext(reg1) << 8) | zext(reg2));
+}
+
+# Section 3.4.6 Page 160
+macro reg_ind_es(reg1, reg2, res) {
+    res = segment(ES, (zext(reg1) << 8) | zext(reg2));
+}
+
 macro inst_xch(dst, src) {
     local tmp:1 = dst;
     dst = src;
@@ -300,7 +345,7 @@ macro inst_addc(dst, src) {
 macro inst_sub(dst, src) {
     dst = dst - src;
     Z = (dst == 0);
-    CY = sborrow(dst, src);
+    CY = src < dst;
     AC = (dst & 0x08) >= (src & 0x08);
 }
 
@@ -358,13 +403,13 @@ macro inst_sarw(dst, n) {
     local msb:2 = dst & 0x8000;
     CY = dst:1 & 0x01;
     dst = dst >> n;
-    dst = dst & msb; 
+    dst = dst & msb;
 }
 
 macro inst_cmp(dst, src) {
-    Z = (dst - src) == 0;
+    Z = dst == src;
     AC = (dst & 0x08) >= (src & 0x08);
-    CY = sborrow(dst, src);
+    CY = src < dst;
 }
 
 macro inst_cmp0(dst) {
@@ -374,7 +419,7 @@ macro inst_cmp0(dst) {
 }
 
 macro inst_cmps(dst, src) {
-    Z = (dst - src) == 0;
+    Z = dst == src;
     CY = (Z != 0) | (A == 0) | (dst == 0);
     AC = (dst & 0x08) >= (src & 0x08);
 }
@@ -382,21 +427,21 @@ macro inst_cmps(dst, src) {
 macro inst_addw(dst, src) {
     CY = carry(dst, src);
     dst = dst + src;
-    Z = (dst == 0);
+    Z = dst == src;
     AC = 0;
 }
 
 macro inst_subw(dst, src) {
-    CY = sborrow(dst, src);
+    CY = src < dst;
     dst = dst - src;
-    Z = (dst == 0);
+    Z = dst == src;
     AC = 0;
 }
 
 macro inst_cmpw(dst, src) {
-    Z = (dst - src) == 0;
+    Z = dst == src;
     AC = 0;
-    CY = sborrow(dst, src);
+    CY = src < dst;
 }
 
 macro update_psw(data) {
@@ -455,28 +500,6 @@ macro inst_clr1(dst, bit) {
     dst = dst & (~dst & (0 << bit));
 }
 
-macro push_byte(src) {
-    SP = SP - 1;
-    *[stackarea]:1 SP = src;
-    SP = SP - 1;
-    *[stackarea]:1 SP = 0x00:1;
-}
-
-macro pop_byte(dst) {
-    SP = SP + 2;
-    dst = *[stackarea]:1 SP;
-}
-
-macro push_word(src) {
-    SP = SP - 2;
-    *[stackarea]:2 SP = src;
-}
-
-macro pop_word(dst) {
-    SP = SP + 2;
-    dst = *[stackarea]:2 SP;
-}
-
 macro branch(target) {
     PC = target;
     goto target;
@@ -503,10 +526,6 @@ macro inst_sk(test) {
     goto inst_next;
 }
 
-macro es_extend(addr) {
-    addr = addr | ((zext(ES) & 0xF) << 16);
-}
-
 #########################################################################
 #
 # Root table constructors
@@ -525,16 +544,21 @@ u16: "#"dataw is dataw {
     export tmp;
 }
 
-saddr: loc is uaddr8 [ loc = 0xFFE00 + uaddr8; ] {
+saddr: uaddr8 is uaddr8 {
+    local loc:4;
+    short_direct_addr(uaddr8:1, loc);
     export *:1 loc;
 }
 
 saddrp: uaddr8 is uaddr8 {
-    local loc:3 = (0xFFE00 + uaddr8) & 0x0FFFFE;
+    local loc:4;
+    short_direct_addr(uaddr8:1, loc);
     export *:2 loc;
 }
 
-addr16: "!"loc is es_prefix=0 & uaddr16 [ loc = 0xF0000 + uaddr16; ] {
+addr16: "!"uaddr16 is es_prefix=0 & uaddr16 {
+    local loc:4;
+    short_direct_addr(uaddr16:1, loc);
     export *:1 loc;
 }
 
@@ -543,14 +567,15 @@ addr16: a16_sfr_reg is es_prefix=0 & a16_sfr_reg & a16_sfr_offset=0x1fff {
 }
 
 addr16: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = uaddr16;
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(uaddr16:2, loc);
     export *:1 loc;
 }
 
 addr16w: "!"uaddr16 is es_prefix=0 & uaddr16 {
-    local tmp:3 = (0xF0000 + uaddr16) & 0xFFFFFE;
-    export *:2 tmp;
+    local loc:4;
+    direct_addr(uaddr16:2, loc);
+    export *:2 loc;
 }
 
 addr16w: a16w_sfr_reg is es_prefix=0 & a16w_sfr_reg & a16_sfr_offset=0x1fff {
@@ -558,16 +583,18 @@ addr16w: a16w_sfr_reg is es_prefix=0 & a16w_sfr_reg & a16_sfr_offset=0x1fff {
 }
 
 addr16w: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local tmp:3 = uaddr16;
-    es_extend(tmp);
-    export *:2 tmp;
+    local loc:4;
+    direct_addr_es(uaddr16:2, loc);
+    export *:2 loc;
 }
 
 addr20: "!!"uaddr20 is uaddr20 {
     export *:3 uaddr20;
 }
 
-sfrp: loc is sfr_byte [ loc = 0xFFF00 + sfr_byte; ] {
+sfrp: sfr_byte is sfr_byte {
+    local loc:4;
+    sfr_addr(sfr_byte, loc);
     export *:1 loc;
 }
 
@@ -575,12 +602,10 @@ sfrp: fixed_sfr is fixed_sfr & fixed_sfr_offset=0x1f {
     export fixed_sfr;
 }
 
-# TODO: Doesn't mask off on even addresses without complicating the
-# decompilation. Tried to calculate using the below:
-# local tmp:3 = (0xFFF00 + zext(sfr_byte)) & 0xFFFFFE;
 sfrpw: sfr_byte is sfr_byte {
-    local tmp:3 = zext(sfr_byte);
-    export *:2 tmp;
+    local loc:4;
+    sfr_addr(sfr_byte, loc);
+    export *:2 loc;
 }
 
 sfrpw: fixed_sfr_w is fixed_sfr_w & fixed_sfr_offset=0x1f {
@@ -591,7 +616,8 @@ jdisp8: "$"loc is saddr8 [ loc = inst_next + saddr8; ] {
     export *:3 loc;
 }
 
-jaddr16: "!"loc is uaddr16 [ loc = 0x0000 | uaddr16; ] {
+jaddr16: "!"uaddr16 is uaddr16 {
+    local loc:4 = segment(0:2, uaddr16:2);
     export *:3 loc;
 }
 
@@ -604,205 +630,236 @@ brk_addr: loc is opcode [ loc = 0x007F7E; ] {
 }
 
 ret_addr: opcode is opcode {
-    local tmp:3 = *[stackarea]:3 SP;
+    local loc:4 = segment(0:2, SP);
     SP = SP + 4;
-    export *:3 tmp;
-}
-
-# From page 21 of the RL78 ISA manual, CALL rp uses register
-# indirect addressing that uses CS along with the contents
-# of the register pair.
-call_reg_addr: call_rp is call_rp {
-    local loc:3 = zext(call_rp);
-    loc = loc | ((zext(CS) & 0x0f) << 16);
     export *:3 loc;
 }
 
 # Register Ponter tokens - [r]
 
 AddrDE: [DE] is es_prefix=0 & DE {
-    local loc:3 = 0xF0000 | zext(DE);
+    local loc:4;
+    direct_addr(DE, loc);
     export *:1 loc;
 }
 
 AddrDE: ES:[DE] is es_prefix=1 & DE & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = zext(DE);
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(DE, loc);
     export *:1 loc;
 }
 
 AddrDEW: [DE] is es_prefix=0 & DE {
-    local loc:3 = 0xF0000 | zext(DE);
+    local loc:4;
+    direct_addr(DE, loc);
     export *:2 loc;
 }
 
 AddrDEW: ES:[DE] is es_prefix=1 & DE & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = zext(DE);
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(DE, loc);
     export *:2 loc;
 }
 
 AddrDEOffset: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
-    local loc:3 = 0xF0000 | (zext(DE) + uaddr8);
+    local loc:4;
+    direct_addr(DE, loc);
+    loc = loc + uaddr8;
     export *:1 loc;
 }
 
 AddrDEOffset: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = zext(DE) + uaddr8;
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(DE, loc);
+    loc = loc + uaddr8;
     export *:1 loc;
 }
 
 AddrDEOffsetW: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
-    local loc:3 = 0xF0000 | (zext(DE) + uaddr8);
+    local loc:4;
+    direct_addr(DE, loc);
+    loc = loc + uaddr8;
     export *:2 loc;
 }
 
 AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ]{
-    local loc:3 = zext(DE) + uaddr8;
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(DE, loc);
+    loc = loc + uaddr8;
     export *:2 loc;
 }
 
 AddrHL: [HL] is HL & es_prefix=0 {
-    local loc:3 = 0xF0000 | zext(HL);
+    local loc:4;
+    direct_addr(HL, loc);
     export *:1 loc;
 }
 
 AddrHL: ES:[HL] is HL & es_prefix=1 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = zext(HL);
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(HL, loc);
     export *:1 loc;
 }
 
 AddrHLW: [HL] is es_prefix=0 & HL {
-    local loc:3 = 0xF0000 | zext(HL);
+    local loc:4;
+    direct_addr(HL, loc);
     export *:2 loc;
 }
 
 AddrHLW: ES:[HL] is es_prefix=1 & HL & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = zext(HL);
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(HL, loc);
     export *:2 loc;
 }
 
 AddrHLOffset: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
-    local loc:3 = 0xF0000 | (zext(HL) + uaddr8);
+    local loc:4;
+    direct_addr(HL, loc);
+    loc = loc + uaddr8;
     export *:1 loc;
 }
 
 AddrHLOffset: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ]{
-    local loc:3 = zext(HL) + uaddr8;
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(HL, loc);
+    loc = loc + uaddr8;
     export *:1 loc;
 }
 
 AddrHLOffsetW: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
-    local loc:3 = 0xF0000 | (zext(HL) + uaddr8);
+    local loc:4;
+    direct_addr(HL, loc);
+    loc = loc + uaddr8;
     export *:2 loc;
 }
 
 AddrHLOffsetW: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = zext(HL) + uaddr8;
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(HL, loc);
+    loc = loc + uaddr8;
     export *:2 loc;
 }
 
 AddrHLOffsetB: [HL+B] is es_prefix=0 & HL & B {
-    local loc:3 = 0xF0000 | (zext(HL) + zext(B));
+    local loc:4;
+    direct_addr(HL, loc);
+    loc = loc + zext(B);
     export *:1 loc;
 }
 
 AddrHLOffsetB: ES:[HL+B] is es_prefix=1 & HL & B & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = zext(HL) + zext(B);
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(HL, loc);
+    loc = loc + zext(B);
     export *:1 loc;
 }
 
 AddrHLOffsetC: [HL+C] is es_prefix=0 & HL & C {
-    local loc:3 = 0xF0000 | (zext(HL) + zext(C));
+    local loc:4;
+    direct_addr(HL, loc);
+    loc = loc + zext(C);
     export *:1 loc;
 }
 
 AddrHLOffsetC: ES:[HL+C] is es_prefix=1 & HL & C & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = zext(HL) + zext(C);
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(HL, loc);
+    loc = loc + zext(C);
     export *:1 loc;
 }
 
 AddrWordOffsetB: uaddr16[B] is es_prefix=0 & uaddr16 & B {
-    local loc:3 = 0xF0000 | (uaddr16 + zext(B));
+    local loc:4;
+    direct_addrb(B, loc);
+    loc = loc + uaddr16;
     export *:1 loc;
 }
 
 AddrWordOffsetB: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = uaddr16 + zext(B);
-    es_extend(loc);
+    local loc:4;
+    direct_addrb_es(B, loc);
+    loc = loc + uaddr16;
     export *:1 loc;
 }
 
 AddrWordOffsetBW: uaddr16[B] is es_prefix=0 & uaddr16 & B {
-    local loc:3 = (0xF0000 | (uaddr16 + zext(B))) & 0x0FFFFE;
+    local loc:4;
+    direct_addrb(B, loc);
+    loc = loc + uaddr16;
     export *:2 loc;
 }
 
 AddrWordOffsetBW: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = (uaddr16 + zext(B)) & 0xFFFFFE;
-    es_extend(loc);
+    local loc:4;
+    direct_addrb_es(B, loc);
+    loc = loc + uaddr16;
     export *:2 loc;
 }
 
 AddrWordOffsetC: uaddr16[C] is es_prefix=0 & uaddr16 & C {
-    local loc:3 = 0xF0000 | (uaddr16 + zext(C));
+    local loc:4;
+    direct_addrb(C, loc);
+    loc = loc + uaddr16;
     export *:1 loc;
 }
 
 AddrWordOffsetC: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = uaddr16 + zext(C);
-    es_extend(loc);
+    local loc:4;
+    direct_addrb_es(C, loc);
+    loc = loc + uaddr16;
     export *:1 loc;
 }
 
 AddrWordOffsetCW: uaddr16[C] is es_prefix=0 & uaddr16 & C {
-    local loc:3 = (0xF0000 | (uaddr16 + zext(C))) & 0xFFFFE;
+    local loc:4;
+    direct_addrb(C, loc);
+    loc = loc + uaddr16;
     export *:2 loc;
 }
 
 AddrWordOffsetCW: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = (uaddr16 + zext(C)) & 0xFFFFFE;
-    es_extend(loc);
+    local loc:4;
+    direct_addrb_es(C, loc);
+    loc = loc + uaddr16;
     export *:2 loc;
 }
 
 AddrWordOffsetBC: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
-    local loc:3 = 0xF0000 | (uaddr16 + zext(BC));
+    local loc:4;
+    direct_addr(BC, loc);
+    loc = loc + uaddr16;
     export *:1 loc;
 }
 
 AddrWordOffsetBC: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = uaddr16 + zext(BC);
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(BC, loc);
+    loc = loc + uaddr16;
     export *:1 loc;
 }
 
 AddrWordOffsetBCW: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
-    local loc:3 = (0xF0000 | (uaddr16 + zext(BC))) & 0xFFFFFE;
+    local loc:4;
+    direct_addr(BC, loc);
+    loc = loc + uaddr16;
     export *:2 loc;
 }
 
 AddrWordOffsetBCW: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
-    local loc:3 = (uaddr16 + zext(BC)) & 0xFFFFFE;
-    es_extend(loc);
+    local loc:4;
+    direct_addr_es(BC, loc);
+    loc = loc + uaddr16;
     export *:2 loc;
 }
 
 AddrSPOffset: [SP+uaddr8] is SP & uaddr8 {
-    local loc:3 = 0xF0000 | (zext(SP) + uaddr8);
+    local loc:4 = zext(SP) + uaddr8;
     export *:1 loc;
 }
 
 AddrSPOffsetW: [SP+uaddr8] is SP & uaddr8 {
-    local loc:3 = 0xF0000 | (zext(SP) + uaddr8);
+    local loc:4 = zext(SP) + uaddr8;
     export *:2 loc;
 }
 
@@ -1058,7 +1115,7 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 # MOV A, [SP+byte]
 :MOV A, AddrSPOffset is opcode=0x88 & A; AddrSPOffset {
     A = AddrSPOffset;
-} 
+}
 
 # MOV [SP+byte], A
 :MOV AddrSPOffset, A is opcode=0x98 & A; AddrSPOffset {
@@ -1165,7 +1222,7 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # ONEB saddr
 :ONEB saddr is opcode=0xE4; saddr {
-    saddr = 1; 
+    saddr = 1;
 }
 
 # ONEB !addr16
@@ -1946,7 +2003,7 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
     axdw = (res & 0x0000FFFF);
 
     BC = bcdw:2;
-    AX = axdw:2; 
+    AX = axdw:2;
 }
 
 # DIVHU
@@ -2395,70 +2452,68 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 # Table 25/30
 #
 
-#
-# TODO: Don't display PC as part of the disassembly,
-# but removing it from the expression before "is opcode"
-# means it can't be used for calling.
-#
-
 # CALL rp
-:CALL call_reg_addr is opcode=0x61; call_reg_addr & op_l=0xA & mov1_sreg=1 {
-    local ret_pc:3 = inst_next;
-
-    SP = SP - 1;
-    *[stackarea]:1 SP = 0x00:1;
-    SP = SP - 3;
-    *[stackarea]:3 SP = ret_pc;
-
-    call call_reg_addr;
+:CALL call_rp is opcode=0x61; call_rp & op_l=0xA & mov1_sreg=1 {
+    local ret_pc:4 = inst_next;
+    SP = SP - 4;
+    local loc:4 = segment(0:2, SP);
+    *loc = ret_pc;
+    loc = segment(CS, call_rp);
+    PC = loc:3;
+    call [loc];
 }
 
 # CALL $!addr20
 :CALL jdisp16 is opcode=0xFE; jdisp16 {
-    SP = SP - 1;
-    *[stackarea]:1 SP = 0x00:1;
-    SP = SP - 3;
-    *[stackarea]:3 SP = inst_next;
-
+    local ret_pc:4 = inst_next;
+    SP = SP - 4;
+    local loc:4 = segment(0:2, SP);
+    *loc = ret_pc;
+    PC = loc:3;
     call jdisp16;
 }
 
 # CALL !addr16
 :CALL jaddr16 is opcode=0xFD; jaddr16 {
-    SP = SP - 1;
-    *[stackarea]:1 SP = 0x00:1;
-    SP = SP - 3;
-    *[stackarea]:3 SP = inst_next;
+    local ret_pc:4 = inst_next;
+    SP = SP - 4;
+    local loc:4 = segment(0:2, SP);
+    *loc = ret_pc;
 
     call jaddr16;
 }
 
 # CALL !!addr20
 :CALL addr20 is opcode=0xFC; addr20 {
-    SP = SP - 1;
-    *[stackarea]:1 SP = 0x00:1;
-    SP = SP - 3;
-    *[stackarea]:3 SP = inst_next;
+    local ret_pc:4 = inst_next;
+    SP = SP - 4;
+    local loc:4 = segment(0:2, SP);
+    *loc = ret_pc;
 
     call addr20;
 }
 
 # CALLT [CALLT]
 :CALLT CALLT_Entry is opcode=0x61; CALLT_Entry & op2_callt_hi & op2_callt_low & op2_b7=1 & op2_b23=0x1 {
-    SP = SP - 1;
-    *[stackarea]:1 SP = 0x00:1;
-    SP = SP - 3;
-    *[stackarea]:3 SP = inst_next;
+    local ret_pc:4 = inst_next;
+    SP = SP - 4;
+    local loc:4 = segment(0:2, SP);
+    *loc = ret_pc;
 
     call CALLT_Entry;
-} 
+}
 
 # BRK
 :BRK is opcode=0x61; opcode=0xCC & brk_addr {
     SP = SP - 1;
-    *[stackarea]:1 SP = PSW;
+    local ret_pc:4 = inst_next;
+    local loc:4 = segment(0:2, SP);
+    *loc = ret_pc;
+    SP = SP - 1;
+    *:1 loc = PSW;
     SP = SP - 3;
-    *[stackarea]:3 SP = inst_next;
+    loc = segment(0:2, SP);
+    *:3 loc = inst_next;
 
     IE = 0;
     PSW = PSW & 0x7f;
@@ -2474,9 +2529,11 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # RETI
 :RETI (PC) is opcode=0x61; opcode=0xFC & PC {
-    PC = *[stackarea]:3 SP;
+    local loc:4 = segment(0:2, SP);
+    PC = *:3 loc;
     SP = SP + 3;
-    update_psw(*[stackarea]:1 SP);
+    loc = segment(0:2, SP);
+    update_psw(*:1 loc);
     SP = SP + 1;
 
     return [PC];
@@ -2484,9 +2541,11 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # RETB
 :RETB (PC) is opcode=0x61; opcode=0xEC & PC {
-    PC = *[stackarea]:3 SP;
+    local loc:4 = segment(0:2, SP);
+    PC = *:3 loc;
     SP = SP + 3;
-    update_psw(*[stackarea]:1 SP);
+    loc = segment(0:2, SP);
+    update_psw(*:1 loc);
     SP = SP + 1;
 
     return [PC];
@@ -2498,22 +2557,31 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # PUSH PSW
 :PUSH PSW is opcode=0x61 & PSW; opcode=0xDD {
-    push_byte(PSW);
+    SP = SP - 2;
+    local loc:4 = segment(0:2, SP);
+    *:2 loc = zext(PSW);
 }
 
 # PUSH rp
 :PUSH dreg_word is op_h=0xC & dreg_word & rp_source=1 {
-    push_word(dreg_word);
+    SP = SP - 2;
+    local loc:4 = segment(0:2, SP);
+    *:2 loc = dreg_word;
 }
 
 # POP PSW
 :POP PSW is opcode=0x61 & PSW; opcode=0xCD {
-    pop_byte(PSW);
+    local loc:4 = segment(0:2, SP);
+    local status:2 = *:2 loc;
+    SP = SP + 2;
+    update_psw(status:1);
 }
 
 # POP rp
 :POP dreg_word is op_h=0xC & dreg_word & rp_source=0 {
-    pop_word(dreg_word);
+    local loc:4 = segment(0:2, SP);
+    SP = SP + 2;
+    dreg_word = *:2 loc;
 }
 
 # MOVW SP, #word
@@ -2563,7 +2631,9 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # BR AX
 :BR AX is opcode=0x61 & AX; opcode=0xCB {
-    branch(zext(AX));
+    local addr:4 = segment(CS, AX);
+    PC = addr:3;
+    goto [PC];
 }
 
 # BR $addr20
