@@ -282,16 +282,6 @@ macro short_direct_addr(addr, res) {
     res = segment(0xF:1, zext(addr) + 0xFE20:2);
 }
 
-# Section 3.4.4 Page 158
-macro sfr_addr(addr, res) {
-    res = segment(0xF:1, zext(addr) + 0xFF00:2);
-}
-
-# Section 3.4.4 Page 158
-macro sfr_addrp(addr, res) {
-    sfr_addr(addr, res);
-}
-
 # Section 3.4.6 Page 160
 macro reg_ind(reg1, reg2, res) {
     res = segment(0xF:1, (zext(reg1) << 8) | zext(reg2));
@@ -593,9 +583,7 @@ addr20: "!!"uaddr20 is uaddr20 {
 }
 
 sfrp: sfr_byte is sfr_byte {
-    local loc:4;
-    sfr_addr(sfr_byte, loc);
-    export *:1 loc;
+    export *:1 sfr_byte;
 }
 
 sfrp: fixed_sfr is fixed_sfr & fixed_sfr_offset=0x1f {
@@ -603,9 +591,7 @@ sfrp: fixed_sfr is fixed_sfr & fixed_sfr_offset=0x1f {
 }
 
 sfrpw: sfr_byte is sfr_byte {
-    local loc:4;
-    sfr_addr(sfr_byte, loc);
-    export *:2 loc;
+    export *:2 sfr_byte;
 }
 
 sfrpw: fixed_sfr_w is fixed_sfr_w & fixed_sfr_offset=0x1f {
