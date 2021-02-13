@@ -17,15 +17,29 @@ define alignment=1;
 define space ram        type=ram_space      size=4 default;
 define space register   type=register_space size=1;
 
-# General Purpose registers
-define register offset=0x00 size=1 [X3 A3 C3 B3 E3 D3 L3 H3];  # 8-bit-mode bank3
-define register offset=0x00 size=2 [AX3   BC3   DE3   HL3  ];  #16-bit-mode bank3
-define register offset=0x08 size=1 [X2 A2 C2 B2 E2 D2 L2 H2];  # 8-bit-mode bank2
-define register offset=0x08 size=2 [AX2   BC2   DE2   HL2  ];  #16-bit-mode bank2
-define register offset=0x10 size=1 [X1 A1 C1 B1 E1 D1 L1 H1];  # 8-bit-mode bank1
-define register offset=0x10 size=2 [AX1   BC1   DE1   HL1  ];  #16-bit-mode bank1
-define register offset=0x18 size=1 [X  A  C  B  E  D  L  H ];  # 8-bit-mode bank0
-define register offset=0x18 size=2 [AX    BC    DE    HL   ];  #16-bit-mode bank0
+# Bank 0 - General Purpose
+define register offset=0x18 size=1 [X0 A0 C0 B0 E0 D0 L0 H0];  # 8-bit
+define register offset=0x18 size=2 [AX0 BC0 DE0 HL0];  #16-bit
+define register offset=0x18 size=4 [BCAX0 HLDE0];  #emulated 32-bit
+define register offset=0x18 size=8 [HLDEBCAX0];  #emulated 64-bit
+
+# Bank 1 - General Purpose
+define register offset=0x10 size=1 [X1 A1 C1 B1 E1 D1 L1 H1];  # 8-bit
+define register offset=0x10 size=2 [AX1 BC1 DE1 HL1];  #16-bit
+define register offset=0x10 size=4 [BCAX1 HLDE1];  #emulated 32-bit
+define register offset=0x10 size=8 [HLDEBCAX1];  #emulated 64-bit
+
+# Bank 2 - Callee Preserved
+define register offset=0x8 size=1 [X2 A2 C2 B2 E2 D2 L2 H2];  # 8-bit
+define register offset=0x8 size=2 [AX2 BC2 DE2 HL2];  #16-bit
+define register offset=0x8 size=4 [BCAX2 HLDE2];  #emulated 32-bit
+define register offset=0x8 size=8 [HLDEBCAX2];  #emulated 64-bit
+
+# Bank 3 - Reserved for Interrupt Handlers
+define register offset=0 size=1 [X3 A3 C3 B3 E3 D3 L3 H3];  # 8-bit
+define register offset=0 size=2 [AX3 BC3 DE3 HL3];  #16-bit
+define register offset=0 size=4 [BCAX3 HLDE3];  #emulated 32-bit
+define register offset=0 size=8 [HLDEBCAX3];  #emulated 64-bit
 
 # Special purpose registers
 define register offset=0x40 size=3 [PC];
@@ -39,10 +53,73 @@ define register offset=0x70 size=1 [IE Z PSW_RBS1 AC PSW_RBS0 ISP1 ISP0 CY];
 define register offset=0x80 size=4 contextreg;
 
 define context contextreg
-    es_prefix=(0, 0);
+    es_prefix=(0, 0)
+    rsb=(1,4);
 
-# Bank Selection
-define register offset=0x90 size=1 [ RBS0 RBS1 RBS2 RBS3 ];
+BANK0: is rsb=0 {}
+BANK1: is rsb=1 {}
+BANK2: is rsb=2 {}
+BANK3: is rsb=3 {}
+
+X:"X" is BANK0 { export X0; }
+X:"X" is BANK1 { export X1; }
+X:"X" is BANK2 { export X2; }
+X:"X" is BANK3 { export X3; }
+
+A:"A" is BANK0 { export A0; }
+A:"A" is BANK1 { export A1; }
+A:"A" is BANK2 { export A2; }
+A:"A" is BANK3 { export A3; }
+
+C:"C" is BANK0 { export C0; }
+C:"C" is BANK1 { export C1; }
+C:"C" is BANK2 { export C2; }
+C:"C" is BANK3 { export C3; }
+
+B:"B" is BANK0 { export B0; }
+B:"B" is BANK1 { export B1; }
+B:"B" is BANK2 { export B2; }
+B:"B" is BANK3 { export B3; }
+
+E:"E" is BANK0 { export E0; }
+E:"E" is BANK1 { export E1; }
+E:"E" is BANK2 { export E2; }
+E:"E" is BANK3 { export E3; }
+
+D:"D" is BANK0 { export D0; }
+D:"D" is BANK1 { export D1; }
+D:"D" is BANK2 { export D2; }
+D:"D" is BANK3 { export D3; }
+
+L:"L" is BANK0 { export L0; }
+L:"L" is BANK1 { export L1; }
+L:"L" is BANK2 { export L2; }
+L:"L" is BANK3 { export L3; }
+
+H:"H" is BANK0 { export H0; }
+H:"H" is BANK1 { export H1; }
+H:"H" is BANK2 { export H2; }
+H:"H" is BANK3 { export H3; }
+
+AX:"AX" is BANK0 { export AX0; }
+AX:"AX" is BANK1 { export AX1; }
+AX:"AX" is BANK2 { export AX2; }
+AX:"AX" is BANK3 { export AX3; }
+
+BC:"BC" is BANK0 { export BC0; }
+BC:"BC" is BANK1 { export BC1; }
+BC:"BC" is BANK2 { export BC2; }
+BC:"BC" is BANK3 { export BC3; }
+
+DE:"DE" is BANK0 { export DE0; }
+DE:"DE" is BANK1 { export DE1; }
+DE:"DE" is BANK2 { export DE2; }
+DE:"DE" is BANK3 { export DE3; }
+
+HL:"HL" is BANK0 { export HL0; }
+HL:"HL" is BANK1 { export HL1; }
+HL:"HL" is BANK2 { export HL2; }
+HL:"HL" is BANK3 { export HL3; }
 
 # CALL Table entries
 define ram offset=0x80 size=2 [
@@ -156,11 +233,32 @@ define token base (8)
     dreg_byte = (0, 2)
     dreg_axbc = (0, 1)
     sreg_byte = (0, 2);
-attach variables [ dreg_byte sreg_byte ] [X A C B E D L H];
-attach variables [ dreg_axbc ] [X A C B];
-attach variables [ dreg_word ] [AX BC DE HL];
-attach variables [ call_rp ] [ _ _ _ _ AX BC DE HL];
-attach variables [ rbs_op_n ] [ RBS0 RBS1 RBS2 RBS3 ];
+
+DREG_BYTE:^X is X & dreg_byte=0 { export X; }
+DREG_BYTE:^A is A & dreg_byte=1 { export A; }
+DREG_BYTE:^C is C & dreg_byte=2 { export C; }
+DREG_BYTE:^B is B & dreg_byte=3 { export B; }
+DREG_BYTE:^E is E & dreg_byte=4 { export E; }
+DREG_BYTE:^D is D & dreg_byte=5 { export D; }
+DREG_BYTE:^L is L & dreg_byte=6 { export L; }
+DREG_BYTE:^H is H & dreg_byte=7 { export H; }
+
+DREG_AXBC:^X is X & dreg_axbc=0 { export X; }
+DREG_AXBC:^A is A & dreg_axbc=1 { export A; }
+DREG_AXBC:^C is C & dreg_axbc=2 { export C; }
+DREG_AXBC:^B is B & dreg_axbc=3 { export B; }
+
+DREG_WORD:^AX is AX & dreg_word=0 { export AX; }
+DREG_WORD:^BC is BC & dreg_word=1 { export BC; }
+DREG_WORD:^DE is DE & dreg_word=2 { export DE; }
+DREG_WORD:^HL is HL & dreg_word=3 { export HL; }
+
+CALL_RP:^AX is AX & call_rp=4 { export AX; }
+CALL_RP:^BC is BC & call_rp=5 { export BC; }
+CALL_RP:^DE is DE & call_rp=6 { export DE; }
+CALL_RP:^HL is HL & call_rp=7 { export HL; }
+
+attach names [ rbs_op_n ] [ RBS0 RBS1 RBS2 RBS3 ];
 
 define token base2 (8)
     # Bits 2, 7 is set and Bit 3 is unset for CALLT instructions
@@ -177,7 +275,15 @@ define token base2 (8)
     op2_l       = (0, 3)
     shift_n     = (4, 7)
     sreg2_byte  = (0, 2);
-attach variables [ sreg2_byte ] [X A C B E D L H];
+
+SREG2_BYTE:^X is X & sreg2_byte=0 { export X; }
+SREG2_BYTE:^A is A & sreg2_byte=1 { export A; }
+SREG2_BYTE:^C is C & sreg2_byte=2 { export C; }
+SREG2_BYTE:^B is B & sreg2_byte=3 { export B; }
+SREG2_BYTE:^E is E & sreg2_byte=4 { export E; }
+SREG2_BYTE:^D is D & sreg2_byte=5 { export D; }
+SREG2_BYTE:^L is L & sreg2_byte=6 { export L; }
+SREG2_BYTE:^H is H & sreg2_byte=7 { export H; }
 
 define token data8 (8)
     data        = (0, 7)
@@ -187,6 +293,7 @@ define token data8 (8)
     fixed_sfr_offset = (3, 7)
     fixed_sfr   = (0, 2)
     fixed_sfr_w   = (0, 2);
+
 attach variables [ sfr_byte ] [
     SFR00 SFR01 SFR02 SFR03 SFR04 SFR05 SFR06 SFR07
     SFR08 SFR09 SFR0A SFR0B SFR0C SFR0D SFR0E SFR0F
@@ -314,12 +421,6 @@ macro inst_dec(dst) {
     AC = (dst == 0x7);
 }
 
-macro inst_movs(dst) {
-    dst = X;
-    Z = (X == 0);
-    CY = (X == 0) | (A == 0);
-}
-
 macro inst_add(dst, src) {
     dst = dst + src;
     Z = (dst == 0);
@@ -406,12 +507,6 @@ macro inst_cmp0(dst) {
     Z = dst == 0;
     AC = 0;
     CY = 0;
-}
-
-macro inst_cmps(dst, src) {
-    Z = dst == src;
-    CY = (Z != 0) | (A == 0) | (dst == 0);
-    AC = (dst & 0x08) >= (src & 0x08);
 }
 
 macro inst_addw(dst, src) {
@@ -865,18 +960,18 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # MOV r, #byte
-:MOV dreg_byte, "#"data is op_h=0x5 & dreg_byte; data {
-    dreg_byte = data;
+:MOV DREG_BYTE, "#"data is op_h=0x5 & DREG_BYTE; data {
+    DREG_BYTE = data;
 }
 
 # MOV r, A
-:MOV dreg_byte, A is op_h=0x7 & A & dreg_byte {
-    dreg_byte = A;
+:MOV DREG_BYTE, A is op_h=0x7 & A & DREG_BYTE & dreg_byte!=1 {
+    DREG_BYTE = A;
 }
 
 # MOV A, r
-:MOV A, sreg_byte is op_h=0x6 & A & sreg_byte {
-    A = sreg_byte;
+:MOV A, DREG_BYTE is op_h=0x6 & A & DREG_BYTE & dreg_byte!=1 {
+    A = DREG_BYTE;
 }
 
 # MOV saddr, #byte
@@ -1148,8 +1243,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # XCH A, r
-:XCH A, sreg2_byte is opcode=0x61; op2_h=0x11 & sreg2_byte & A {
-    inst_xch(A, sreg2_byte);
+:XCH A, SREG2_BYTE is opcode=0x61; op2_h=0x11 & SREG2_BYTE & sreg2_byte!=1 & A {
+    inst_xch(A, SREG2_BYTE);
 }
 
 # XCH A, saddr
@@ -1202,8 +1297,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # ONEB r
-:ONEB dreg_axbc is op_h=0xE & dreg_axbc {
-    dreg_axbc = 1;
+:ONEB DREG_AXBC is op_h=0xE & op_l<4 & DREG_AXBC {
+    DREG_AXBC = 1;
 }
 
 # ONEB saddr
@@ -1217,8 +1312,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # CLRB r
-:CLRB dreg_axbc is op_h=0xF & dreg_axbc & clrb_unused=0  {
-    dreg_axbc = 0;
+:CLRB DREG_AXBC is op_h=0xF & DREG_AXBC & clrb_unused=0  {
+    DREG_AXBC = 0;
 }
 
 # CLRB saddr
@@ -1233,12 +1328,14 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # MOVS [HL+byte], X
 :MOVS X, AddrHLOffset ("Check "A" if zero")is opcode=0x61 & X & A; opcode=0xCE; AddrHLOffset {
-    inst_movs(AddrHLOffset);
+    AddrHLOffset = X;
+    Z = (X == 0);
+    CY = (X == 0) | (A == 0);
 }
 
 # MOVW rp, #word
-:MOVW dreg_word, u16 is op_h=0x3 & dreg_word; u16 {
-    dreg_word = u16;
+:MOVW DREG_WORD, u16 is op_h=0x3 & DREG_WORD; u16 {
+    DREG_WORD = u16;
 }
 
 # MOVW saddrp, #word
@@ -1272,13 +1369,13 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # MOVW AX, rp
-:MOVW AX, dreg_word is op_h=0x1 & AX & dreg_word & rp_source=1 {
-    AX = dreg_word;
+:MOVW AX, DREG_WORD is op_h=0x1 & AX & DREG_WORD & dreg_word!=0 & rp_source=1 {
+    AX = DREG_WORD;
 }
 
 # MOVW rp, AX
-:MOVW dreg_word, AX is op_h=0x1 & AX & dreg_word & rp_source=0 {
-    dreg_word = AX;
+:MOVW DREG_WORD, AX is op_h=0x1 & AX & DREG_WORD & dreg_word!=0 & rp_source=0 {
+    DREG_WORD = AX;
 }
 
 # MOVW AX, !addr16
@@ -1401,10 +1498,10 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # XCHW AX, rp
-:XCHW AX, dreg_word is op_h=0x3 & rp_source=1 & dreg_word & AX {
+:XCHW AX, DREG_WORD is op_h=0x3 & rp_source=1 & DREG_WORD & dreg_word!=0 & AX {
     local tmp = AX;
-    AX = dreg_word;
-    dreg_word = tmp;
+    AX = DREG_WORD;
+    DREG_WORD = tmp;
 }
 
 # ONEW AX
@@ -1442,13 +1539,13 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # ADD A, r
-:ADD A, sreg2_byte is opcode=0x61 & A; op2_h=0x01 & sreg2_byte {
-    inst_add(A, sreg2_byte);
+:ADD A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x01 & SREG2_BYTE & sreg2_byte!=1 {
+    inst_add(A, SREG2_BYTE);
 }
 
 # ADD r, A
-:ADD sreg2_byte, A is opcode=0x61 & A; op2_h=0x00 & sreg2_byte {
-    inst_add(sreg2_byte, A);
+:ADD SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x00 & SREG2_BYTE & sreg2_byte!=1 {
+    inst_add(SREG2_BYTE, A);
 }
 
 # ADD A, saddr
@@ -1492,13 +1589,13 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # ADDC A, r
-:ADDC A, sreg2_byte is opcode=0x61 & A; op2_h=0x3 & sreg2_byte {
-    inst_addc(A, sreg2_byte);
+:ADDC A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x3 & SREG2_BYTE & sreg2_byte!=1 {
+    inst_addc(A, SREG2_BYTE);
 }
 
 # ADDC r, A
-:ADDC sreg2_byte, A is opcode=0x61 & A; op2_h=0x2 & sreg2_byte {
-    inst_addc(A, sreg2_byte);
+:ADDC SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x2 & SREG2_BYTE & sreg2_byte!=1 {
+    inst_addc(A, SREG2_BYTE);
 }
 
 #
@@ -1546,13 +1643,13 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # SUB A, r
-:SUB A, sreg2_byte is opcode=0x61 & A; op2_h=0x5 & sreg2_byte {
-    inst_sub(A, sreg2_byte);
+:SUB A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x5 & SREG2_BYTE & sreg2_byte!=1 {
+    inst_sub(A, SREG2_BYTE);
 }
 
 # SUB r, A
-:SUB sreg2_byte, A is opcode=0x61 & A; op2_h=0x4 & sreg2_byte {
-    inst_sub(sreg2_byte, A);
+:SUB SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x4 & SREG2_BYTE & sreg2_byte!=1 {
+    inst_sub(SREG2_BYTE, A);
 }
 
 # SUB A, saddr
@@ -1600,13 +1697,13 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # SUBC A, r
-:SUBC A, sreg2_byte is opcode=0x61 & A; op2_h=0x7 & sreg2_byte {
-    inst_subc(A, sreg2_byte);
+:SUBC A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x7 & SREG2_BYTE & sreg2_byte!=1 {
+    inst_subc(A, SREG2_BYTE);
 }
 
 # SUBC r, A
-:SUBC sreg2_byte, A is opcode=0x61 & A; op2_h=0x6 & sreg2_byte {
-    inst_subc(sreg2_byte, A);
+:SUBC SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x6 & SREG2_BYTE & sreg2_byte!=1 {
+    inst_subc(SREG2_BYTE, A);
 }
 
 # SUBC A, saddr
@@ -1650,13 +1747,13 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # AND A, r
-:AND A, sreg2_byte is opcode=0x61 & A; op2_h=0xB & sreg2_byte {
-    inst_and(A, sreg2_byte);
+:AND A, SREG2_BYTE is opcode=0x61 & A; op2_h=0xB & SREG2_BYTE & sreg2_byte!=1 {
+    inst_and(A, SREG2_BYTE);
 }
 
 # AND r, A
-:AND sreg2_byte, A is opcode=0x61 & A; op2_h=0xA & sreg2_byte {
-    inst_and(sreg2_byte, A);
+:AND SREG2_BYTE, A is opcode=0x61 & A; op2_h=0xA & SREG2_BYTE & sreg2_byte!=1 {
+    inst_and(SREG2_BYTE, A);
 }
 
 #
@@ -1704,13 +1801,13 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # OR A, r
-:OR A, sreg2_byte is opcode=0x61 & A; op2_h=0xD & sreg2_byte {
-    inst_or(A, sreg2_byte);
+:OR A, SREG2_BYTE is opcode=0x61 & A; op2_h=0xD & SREG2_BYTE & sreg2_byte!=1 {
+    inst_or(A, SREG2_BYTE);
 }
 
 # OR r, A
-:OR sreg2_byte, A is opcode=0x61 & A; op2_h=0xC & sreg2_byte {
-    inst_or(sreg2_byte, A);
+:OR SREG2_BYTE, A is opcode=0x61 & A; op2_h=0xC & SREG2_BYTE & sreg2_byte!=1 {
+    inst_or(SREG2_BYTE, A);
 }
 
 # OR A, saddr
@@ -1758,13 +1855,13 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # XOR A, r
-:XOR A, sreg2_byte is opcode=0x61 & A; op2_h=0xf & sreg2_byte {
-    inst_xor(A, sreg2_byte);
+:XOR A, SREG2_BYTE is opcode=0x61 & A; op2_h=0xf & SREG2_BYTE & sreg2_byte!=1 {
+    inst_xor(A, SREG2_BYTE);
 }
 
 # XOR r, A
-:XOR sreg2_byte, A is opcode=0x61 & A; op2_h=0xe & sreg2_byte {
-    inst_xor(sreg2_byte, A);
+:XOR SREG2_BYTE, A is opcode=0x61 & A; op2_h=0xe & SREG2_BYTE & sreg2_byte!=1 {
+    inst_xor(SREG2_BYTE, A);
 }
 
 # XOR A, saddr
@@ -1812,13 +1909,13 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 # 0x48 -> 0x9
 
 # CMP A, r
-:CMP A, sreg2_byte is opcode=0x61 & A; op2_h=0x9 & sreg2_byte {
-    inst_cmp(A, sreg2_byte);
+:CMP A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x9 & SREG2_BYTE & sreg2_byte!=1 {
+    inst_cmp(A, SREG2_BYTE);
 }
 
 # CMP r, A
-:CMP sreg2_byte, A is opcode=0x61 & A; op2_h=0x8 & sreg2_byte {
-    inst_cmp(sreg2_byte, A);
+:CMP SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x8 & SREG2_BYTE & sreg2_byte!=1 {
+    inst_cmp(SREG2_BYTE, A);
 }
 
 #
@@ -1861,8 +1958,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # CMP0, r
-:CMP0 dreg_axbc is op_h=0xD & dreg_axbc {
-    inst_cmp0(dreg_axbc);
+:CMP0 DREG_AXBC is op_h=0xD & op_l<4 & DREG_AXBC {
+    inst_cmp0(DREG_AXBC);
 }
 
 # CMP0 saddr
@@ -1877,7 +1974,9 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # CMPS X, [HL+byte]
 :CMPS X, AddrHLOffset is opcode=0x61 & X; opcode=0xDE; AddrHLOffset {
-    inst_cmps(X, AddrHLOffset);
+    Z = X == AddrHLOffset;
+    CY = (Z != 0) | (AddrHLOffset == 0) | (X == 0);
+    AC = (X & 0x08) >= (AddrHLOffset & 0x08);
 }
 
 # ADDW AX, #word
@@ -1886,8 +1985,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # ADDW AX, rp
-:ADDW AX, dreg_word is op_h=0x0 & AX & rp_source=1 & movw_op=0 & dreg_word {
-    inst_addw(AX, dreg_word);
+:ADDW AX, DREG_WORD is op_h=0x0 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
+    inst_addw(AX, DREG_WORD);
 }
 
 # ADDW AX, saddrp
@@ -1911,8 +2010,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # SUBW AX, rp
-:SUBW AX, dreg_word is op_h=0x2 & AX & rp_source=1 & movw_op=0 & dreg_word {
-    inst_subw(AX, dreg_word);
+:SUBW AX, DREG_WORD is op_h=0x2 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
+    inst_subw(AX, DREG_WORD);
 }
 
 # SUBW AX, saddrp
@@ -1940,8 +2039,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # CMPW AX, rp
-:CMPW AX, dreg_word is op_h=0x4 & AX & rp_source=1 & movw_op=0 & dreg_word {
-    inst_cmpw(AX, dreg_word);
+:CMPW AX, DREG_WORD is op_h=0x4 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
+    inst_cmpw(AX, DREG_WORD);
 }
 
 # CMPW AX, saddrp
@@ -2018,8 +2117,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 :MACH is opcode=0xCE; opcode=0xFB; opcode=0x06 { mach(); }
 
 # INC r
-:INC dreg_byte is op_h=0x8 & dreg_byte {
-    inst_inc(dreg_byte);
+:INC DREG_BYTE is op_h=0x8 & DREG_BYTE {
+    inst_inc(DREG_BYTE);
 }
 
 # INC saddr
@@ -2038,8 +2137,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # DEC r
-:DEC dreg_byte is op_h=0x9 & dreg_byte {
-    inst_dec(dreg_byte);
+:DEC DREG_BYTE is op_h=0x9 & DREG_BYTE {
+    inst_dec(DREG_BYTE);
 }
 
 # DEC saddr
@@ -2062,8 +2161,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # INCW rp
-:INCW dreg_word is op_h=0xA & dreg_word {
-    inst_incw(dreg_word);
+:INCW DREG_WORD is op_h=0xA & DREG_WORD {
+    inst_incw(DREG_WORD);
 }
 
 # INCW saddrp
@@ -2082,8 +2181,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # DECW rp
-:DECW dreg_word is op_h=0xB & dreg_word {
-    inst_decw(dreg_word);
+:DECW DREG_WORD is op_h=0xB & DREG_WORD {
+    inst_decw(DREG_WORD);
 }
 
 # DECW saddrp
@@ -2439,12 +2538,12 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # CALL rp
-:CALL call_rp is opcode=0x61; call_rp & op_l=0xA & mov1_sreg=1 {
+:CALL CALL_RP is opcode=0x61; CALL_RP & op_l=0xA & mov1_sreg=1 {
     local ret_pc:4 = inst_next;
     SP = SP - 4;
     local loc:4 = segment(0:2, SP);
     *loc = ret_pc;
-    loc = segment(CS, call_rp);
+    loc = segment(CS, CALL_RP);
     PC = loc:3;
     call [loc];
 }
@@ -2549,10 +2648,10 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # PUSH rp
-:PUSH dreg_word is op_h=0xC & dreg_word & rp_source=1 {
+:PUSH DREG_WORD is op_h=0xC & DREG_WORD & rp_source=1 {
     SP = SP - 2;
     local loc:4 = segment(0:2, SP);
-    *:2 loc = dreg_word;
+    *:2 loc = DREG_WORD;
 }
 
 # POP PSW
@@ -2564,10 +2663,10 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # POP rp
-:POP dreg_word is op_h=0xC & dreg_word & rp_source=0 {
+:POP DREG_WORD is op_h=0xC & DREG_WORD & rp_source=0 {
     local loc:4 = segment(0:2, SP);
     SP = SP + 2;
-    dreg_word = *:2 loc;
+    DREG_WORD = *:2 loc;
 }
 
 # MOVW SP, #word
@@ -2647,6 +2746,7 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 # Only a conditional goto
 :BC jdisp8 is opcode=0xDC; jdisp8 {
     if (CY) goto jdisp8;
+    goto inst_next;
 }
 
 # BNC $addr20
@@ -2797,14 +2897,10 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # SEL RBn
-:SEL rbs_op_n is opcode=0x61; op_l=0xF & rbs_op_n & mov1_sreg=1 {
-    # Update all RBS registers to make sure only one
-    # is active at a time.
-    RBS0 = (rbs_op_n == 0);
-    RBS1 = (rbs_op_n == 1);
-    RBS2 = (rbs_op_n == 2);
-    RBS3 = (rbs_op_n == 3);
-}
+:SEL rbs_op_n is opcode=0x61; op_l=0xF & rbs_op_n & mov1_sreg=1 [
+    rsb = rbs_op_n;
+    globalset(inst_next, rsb);
+] {}
 
 # NOP
 :NOP is opcode=0x00 {}

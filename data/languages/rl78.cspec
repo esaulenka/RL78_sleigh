@@ -4,10 +4,11 @@
 
 <compiler_spec>
   <data_organization>
+    <!-- char has an alignment of 2 -->
     <absolute_max_alignment value="0" />
-    <machine_alignment value="1" />
-    <default_alignment value="1" />
-    <default_pointer_alignment value="1" />
+    <machine_alignment value="2" />
+    <default_alignment value="2" />
+    <default_pointer_alignment value="2" />
     <pointer_size value="2" />
     <wchar_size value="2" />
     <short_size value="2" />
@@ -25,32 +26,172 @@
   <returnaddress>
     <varnode space="stack" offset="0" size="4"/>
   </returnaddress>
+  <prototype name="__v1_call" extrapop="4" stackshift="4">
+  <input>
+    <pentry minsize="1" maxsize="1">
+      <register name="A0"/>
+    </pentry>
+    <pentry minsize="1" maxsize="1">
+      <register name="B0"/>
+    </pentry>
+    <pentry minsize="1" maxsize="1">
+      <register name="C0"/>
+    </pentry>
+    <pentry minsize="1" maxsize="1">
+      <register name="X0"/>
+    </pentry>
+    <pentry minsize="1" maxsize="1">
+      <register name="D0"/>
+    </pentry>
+    <pentry minsize="1" maxsize="1">
+      <register name="E0"/>
+    </pentry>
+    <pentry minsize="2" maxsize="2">
+      <register name="AX0"/>
+    </pentry>
+    <pentry minsize="2" maxsize="2">
+      <register name="BC0"/>
+    </pentry>
+    <pentry minsize="2" maxsize="2">
+      <register name="DE0"/>
+    </pentry>
+    <!-- 24-bit on stack -->
+    <!-- Size restrictions should make it work correctly -->
+    <pentry minsize="4" maxsize="4">
+      <addr space="join" piece1="BC0" piece2="AX0"/>
+    </pentry>
+    <pentry minsize="1" maxsize="500" align="2">
+      <addr offset="2" space="stack"/>
+    </pentry>
+  </input>
+  <output>
+    <pentry minsize="1" maxsize="1">
+      <register name="A0"/>
+    </pentry>
+    <pentry minsize="2" maxsize="2">
+      <register name="AX0"/>
+    </pentry>
+    <pentry minsize="3" maxsize="3">
+      <addr space="join" piece1="A0" piece2="HL0"/>
+    </pentry>
+    <pentry minsize="4" maxsize="4">
+      <addr space="join" piece1="BC0" piece2="AX0"/>
+    </pentry>
+  </output>
+  <killedbycall>
+    <register name="AX0"/>
+    <register name="HL0"/>
+    <register name="ES"/>
+    <register name="CS"/>
+  </killedbycall>
+  <unaffected>
+    <register name="BC0"/>
+    <register name="DE0"/>
+    <register name="SP"/>
+  </unaffected>
+  </prototype>
   <default_proto>
-    <prototype name="rl78_proto" extrapop="4" stackshift="4">
+    <prototype name="__v2_call" extrapop="4" stackshift="4">
       <input>
         <pentry minsize="1" maxsize="1">
-          <register name="X"/>
+          <register name="A0"/>
         </pentry>
-        <pentry minsize="1" maxsize="400">
-          <addr space="stack" offset="4"/>
+        <pentry minsize="1" maxsize="1">
+          <register name="B0"/>
+        </pentry>
+        <pentry minsize="1" maxsize="1">
+          <register name="C0"/>
+        </pentry>
+        <pentry minsize="1" maxsize="1">
+          <register name="X0"/>
+        </pentry>
+        <pentry minsize="1" maxsize="1">
+          <register name="D0"/>
+        </pentry>
+        <pentry minsize="1" maxsize="1">
+          <register name="E0"/>
+        </pentry>
+        <pentry minsize="2" maxsize="2">
+          <register name="AX0"/>
+        </pentry>
+        <pentry minsize="2" maxsize="2">
+          <register name="BC0"/>
+        </pentry>
+        <pentry minsize="2" maxsize="2">
+          <register name="DE0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3">
+          <addr space="join" piece1="C0" piece2="AX0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3">
+          <addr space="join" piece1="X0" piece2="BC0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3">
+          <addr space="join" piece1="E0" piece2="BC0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3">
+          <addr space="join" piece1="X0" piece2="DE0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3" metatype="struct">
+          <!-- struct only -->
+          <addr space="join" piece1="B0" piece2="DE0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3">
+          <addr space="join" piece1="A0" piece2="DE0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3">
+          <addr space="join" piece1="X0" piece2="DE0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3">
+          <addr space="join" piece1="C0" piece2="DE0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3">
+          <addr space="join" piece1="B0" piece2="DE0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3" metatype="ptr">
+          <!-- far pointer only -->
+          <addr space="join" piece1="X0" piece2="BC0"/>
+        </pentry>
+        <pentry minsize="4" maxsize="4">
+          <addr space="join" piece1="BC0" piece2="AX0"/>
+        </pentry>
+        <pentry minsize="4" maxsize="4">
+          <addr space="join" piece1="DE0" piece2="BC0"/>
+        </pentry>
+        <pentry minsize="1" maxsize="500" align="2">
+          <addr offset="2" space="stack"/>
         </pentry>
       </input>
       <output>
         <pentry minsize="1" maxsize="1">
-          <register name="C"/>
+          <register name="A0"/>
+        </pentry>
+        <pentry minsize="2" maxsize="2">
+          <register name="AX0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3" metatype="struct">
+          <addr space="join" piece1="C0" piece2="AX0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3" metatype="ptr">
+          <addr space="join" piece1="A0" piece2="DE0"/>
+        </pentry>
+        <pentry minsize="4" maxsize="4">
+          <addr space="join" piece1="BC0" piece2="AX0"/>
         </pentry>
       </output>
+      <killedbycall>
+        <register name="AX0"/>
+        <register name="BC0"/>
+        <register name="DE0"/>
+        <register name="HL0"/>
+        <register name="ES"/>
+        <register name="CS"/>
+      </killedbycall>
       <unaffected>
         <register name="SP"/>
-        <register name="B"/>
-        <register name="H"/>
-        <register name="D"/>
-        <register name="E"/>
-        <register name="A"/>
-        <register name="L"/>
       </unaffected>
       <localrange>
-       <range space="stack"/>
+        <range space="stack"/>
       </localrange>
     </prototype>
   </default_proto>

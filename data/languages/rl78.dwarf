@@ -1,13 +1,13 @@
 <dwarf>
 	<register_mappings>
-		<register_mapping dwarf="0" ghidra="X"/>
-		<register_mapping dwarf="1" ghidra="A"/>
-		<register_mapping dwarf="2" ghidra="C"/>
-		<register_mapping dwarf="3" ghidra="B"/>
-		<register_mapping dwarf="4" ghidra="E"/>
-		<register_mapping dwarf="5" ghidra="D"/>
-		<register_mapping dwarf="6" ghidra="L"/>
-		<register_mapping dwarf="7" ghidra="H"/>
+		<register_mapping dwarf="0" ghidra="X0"/>
+		<register_mapping dwarf="1" ghidra="A0"/>
+		<register_mapping dwarf="2" ghidra="C0"/>
+		<register_mapping dwarf="3" ghidra="B0"/>
+		<register_mapping dwarf="4" ghidra="E0"/>
+		<register_mapping dwarf="5" ghidra="D0"/>
+		<register_mapping dwarf="6" ghidra="L0"/>
+		<register_mapping dwarf="7" ghidra="H0"/>
 		<register_mapping dwarf="8" ghidra="X1"/>
 		<register_mapping dwarf="9" ghidra="A1"/>
 		<register_mapping dwarf="10" ghidra="C1"/>
