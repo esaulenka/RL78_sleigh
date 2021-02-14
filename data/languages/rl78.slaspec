@@ -14,32 +14,24 @@
 define endian=little;
 define alignment=1;
 
-define space ram        type=ram_space      size=4 default;
+define space ram        type=ram_space      size=3 default;
 define space register   type=register_space size=1;
 
 # Bank 0 - General Purpose
 define register offset=0x18 size=1 [X0 A0 C0 B0 E0 D0 L0 H0];  # 8-bit
 define register offset=0x18 size=2 [AX0 BC0 DE0 HL0];  #16-bit
-define register offset=0x18 size=4 [BCAX0 HLDE0];  #emulated 32-bit
-define register offset=0x18 size=8 [HLDEBCAX0];  #emulated 64-bit
 
 # Bank 1 - General Purpose
 define register offset=0x10 size=1 [X1 A1 C1 B1 E1 D1 L1 H1];  # 8-bit
 define register offset=0x10 size=2 [AX1 BC1 DE1 HL1];  #16-bit
-define register offset=0x10 size=4 [BCAX1 HLDE1];  #emulated 32-bit
-define register offset=0x10 size=8 [HLDEBCAX1];  #emulated 64-bit
 
 # Bank 2 - Callee Preserved
 define register offset=0x8 size=1 [X2 A2 C2 B2 E2 D2 L2 H2];  # 8-bit
 define register offset=0x8 size=2 [AX2 BC2 DE2 HL2];  #16-bit
-define register offset=0x8 size=4 [BCAX2 HLDE2];  #emulated 32-bit
-define register offset=0x8 size=8 [HLDEBCAX2];  #emulated 64-bit
 
 # Bank 3 - Reserved for Interrupt Handlers
 define register offset=0 size=1 [X3 A3 C3 B3 E3 D3 L3 H3];  # 8-bit
 define register offset=0 size=2 [AX3 BC3 DE3 HL3];  #16-bit
-define register offset=0 size=4 [BCAX3 HLDE3];  #emulated 32-bit
-define register offset=0 size=8 [HLDEBCAX3];  #emulated 64-bit
 
 # Special purpose registers
 define register offset=0x40 size=3 [PC];
@@ -52,9 +44,12 @@ define register offset=0x70 size=1 [IE Z PSW_RBS1 AC PSW_RBS0 ISP1 ISP0 CY];
 # For storing processor context
 define register offset=0x80 size=4 contextreg;
 
+# Fake segment register for the stack
+define register offset=0x84 size=1 SS;
+
 define context contextreg
     es_prefix=(0, 0)
-    rsb=(1,4);
+    rsb=(1,2);
 
 BANK0: is rsb=0 {}
 BANK1: is rsb=1 {}
@@ -205,7 +200,7 @@ define pcodeop mach;
 define pcodeop disable_interrupts;
 define pcodeop enable_interrupts;
 
-define pcodeop segment; # res:4 = segment(seg:1, addr:2);
+define pcodeop segment; # res:3 = segment(seg:1, addr:2);
 
 #########################################################################
 #
@@ -386,7 +381,7 @@ macro direct_addrb_es(addr, res) {
 
 # Section 3.4.4 Page 158
 macro short_direct_addr(addr, res) {
-    res = segment(0xF:1, zext(addr) + 0xFE20:2);
+    res = segment(0xF:1, zext(addr) + 0xFE00:2);
 }
 
 # Section 3.4.6 Page 160
@@ -643,7 +638,7 @@ saddrp: uaddr8 is uaddr8 {
 
 addr16: "!"uaddr16 is es_prefix=0 & uaddr16 {
     local loc:4;
-    short_direct_addr(uaddr16:1, loc);
+    direct_addr(uaddr16:2, loc);
     export *:1 loc;
 }
 
@@ -698,7 +693,7 @@ jdisp8: "$"loc is saddr8 [ loc = inst_next + saddr8; ] {
 }
 
 jaddr16: "!"uaddr16 is uaddr16 {
-    local loc:4 = segment(0:2, uaddr16:2);
+    local loc:3 = segment(0:1, uaddr16:2);
     export *:3 loc;
 }
 
@@ -711,7 +706,7 @@ brk_addr: loc is opcode [ loc = 0x007F7E; ] {
 }
 
 ret_addr: opcode is opcode {
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     SP = SP + 4;
     export *:3 loc;
 }
@@ -935,12 +930,12 @@ AddrWordOffsetBCW: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES [ es_prefix
 }
 
 AddrSPOffset: [SP+uaddr8] is SP & uaddr8 {
-    local loc:4 = zext(SP) + uaddr8;
+    local loc:3 = zext(SP) + uaddr8;
     export *:1 loc;
 }
 
 AddrSPOffsetW: [SP+uaddr8] is SP & uaddr8 {
-    local loc:4 = zext(SP) + uaddr8;
+    local loc:3 = zext(SP) + uaddr8;
     export *:2 loc;
 }
 
@@ -1110,7 +1105,7 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # MOV [HL+byte], #byte
 :MOV AddrHLOffset, u8 is opcode=0xCC; AddrHLOffset; u8 {
-    AddrHLOFfset = u8;
+    AddrHLOffset = u8;
 }
 
 # MOV A, [HL+byte]
@@ -2541,10 +2536,10 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 :CALL CALL_RP is opcode=0x61; CALL_RP & op_l=0xA & mov1_sreg=1 {
     local ret_pc:4 = inst_next;
     SP = SP - 4;
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     *loc = ret_pc;
     loc = segment(CS, CALL_RP);
-    PC = loc:3;
+    PC = loc;
     call [loc];
 }
 
@@ -2552,9 +2547,9 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 :CALL jdisp16 is opcode=0xFE; jdisp16 {
     local ret_pc:4 = inst_next;
     SP = SP - 4;
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     *loc = ret_pc;
-    PC = loc:3;
+    PC = loc;
     call jdisp16;
 }
 
@@ -2562,7 +2557,7 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 :CALL jaddr16 is opcode=0xFD; jaddr16 {
     local ret_pc:4 = inst_next;
     SP = SP - 4;
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     *loc = ret_pc;
 
     call jaddr16;
@@ -2572,7 +2567,7 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 :CALL addr20 is opcode=0xFC; addr20 {
     local ret_pc:4 = inst_next;
     SP = SP - 4;
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     *loc = ret_pc;
 
     call addr20;
@@ -2582,7 +2577,7 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 :CALLT CALLT_Entry is opcode=0x61; CALLT_Entry & op2_callt_hi & op2_callt_low & op2_b7=1 & op2_b23=0x1 {
     local ret_pc:4 = inst_next;
     SP = SP - 4;
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     *loc = ret_pc;
 
     call CALLT_Entry;
@@ -2592,12 +2587,12 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 :BRK is opcode=0x61; opcode=0xCC & brk_addr {
     SP = SP - 1;
     local ret_pc:4 = inst_next;
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     *loc = ret_pc;
     SP = SP - 1;
     *:1 loc = PSW;
     SP = SP - 3;
-    loc = segment(0:2, SP);
+    loc = segment(SS, SP);
     *:3 loc = inst_next;
 
     IE = 0;
@@ -2614,10 +2609,10 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # RETI
 :RETI (PC) is opcode=0x61; opcode=0xFC & PC {
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     PC = *:3 loc;
     SP = SP + 3;
-    loc = segment(0:2, SP);
+    loc = segment(SS, SP);
     update_psw(*:1 loc);
     SP = SP + 1;
 
@@ -2626,10 +2621,10 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # RETB
 :RETB (PC) is opcode=0x61; opcode=0xEC & PC {
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     PC = *:3 loc;
     SP = SP + 3;
-    loc = segment(0:2, SP);
+    loc = segment(SS, SP);
     update_psw(*:1 loc);
     SP = SP + 1;
 
@@ -2643,20 +2638,20 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 # PUSH PSW
 :PUSH PSW is opcode=0x61 & PSW; opcode=0xDD {
     SP = SP - 2;
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     *:2 loc = zext(PSW);
 }
 
 # PUSH rp
 :PUSH DREG_WORD is op_h=0xC & DREG_WORD & rp_source=1 {
     SP = SP - 2;
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     *:2 loc = DREG_WORD;
 }
 
 # POP PSW
 :POP PSW is opcode=0x61 & PSW; opcode=0xCD {
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     local status:2 = *:2 loc;
     SP = SP + 2;
     update_psw(status:1);
@@ -2664,7 +2659,7 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # POP rp
 :POP DREG_WORD is op_h=0xC & DREG_WORD & rp_source=0 {
-    local loc:4 = segment(0:2, SP);
+    local loc:3 = segment(SS, SP);
     SP = SP + 2;
     DREG_WORD = *:2 loc;
 }

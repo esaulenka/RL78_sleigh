@@ -21,13 +21,15 @@
  </data_organization>
   <global>
     <range space="ram"/>
+    <!-- this prevents the decompiler from creating the in_SS local-->
+    <register name="SS"/>
   </global>
   <stackpointer register="SP" space="ram" growth="negative"/>
   <returnaddress>
     <varnode space="stack" offset="0" size="4"/>
   </returnaddress>
-  <prototype name="__v1_call" extrapop="4" stackshift="4">
-  <input>
+  <prototype name="__v1_call" strategy="register" extrapop="4" stackshift="4">
+  <input killedbycall="true" pointermax="4">
     <pentry minsize="1" maxsize="1">
       <register name="A0"/>
     </pentry>
@@ -64,7 +66,7 @@
       <addr offset="2" space="stack"/>
     </pentry>
   </input>
-  <output>
+  <output killedbycall="true">
     <pentry minsize="1" maxsize="1">
       <register name="A0"/>
     </pentry>
@@ -79,20 +81,25 @@
     </pentry>
   </output>
   <killedbycall>
-    <register name="AX0"/>
-    <register name="HL0"/>
     <register name="ES"/>
     <register name="CS"/>
   </killedbycall>
   <unaffected>
     <register name="BC0"/>
     <register name="DE0"/>
+    <register name="PSW"/>
     <register name="SP"/>
   </unaffected>
+  <localrange>
+    <range space="stack"/>
+  </localrange>
+  <returnaddress>
+    <varnode space="stack" offset="0" size="4"/>
+  </returnaddress>
   </prototype>
   <default_proto>
-    <prototype name="__v2_call" extrapop="4" stackshift="4">
-      <input>
+    <prototype name="__v2_call" strategy="register" extrapop="4" stackshift="4">
+      <input killedbycall="true" pointermax="4">
         <pentry minsize="1" maxsize="1">
           <register name="A0"/>
         </pentry>
@@ -162,7 +169,7 @@
           <addr offset="2" space="stack"/>
         </pentry>
       </input>
-      <output>
+      <output killedbycall="true">
         <pentry minsize="1" maxsize="1">
           <register name="A0"/>
         </pentry>
@@ -180,19 +187,19 @@
         </pentry>
       </output>
       <killedbycall>
-        <register name="AX0"/>
-        <register name="BC0"/>
-        <register name="DE0"/>
-        <register name="HL0"/>
         <register name="ES"/>
         <register name="CS"/>
       </killedbycall>
       <unaffected>
         <register name="SP"/>
+        <register name="PSW"/>
       </unaffected>
       <localrange>
         <range space="stack"/>
       </localrange>
+      <returnaddress>
+        <varnode space="stack" offset="0" size="4"/>
+      </returnaddress>
     </prototype>
   </default_proto>
 </compiler_spec>
