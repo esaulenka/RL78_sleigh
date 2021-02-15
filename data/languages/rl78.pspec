@@ -22,6 +22,7 @@
     <register name="SS" hidden="true"/>
     <register name="es_prefix" hidden="true"/>
     <register name="rsb" hidden="true"/>
+    <register name="skip_mode" hidden="true"/>
   </register_data>
   <context_data>
     <tracked_set space="register">

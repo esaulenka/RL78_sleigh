@@ -49,7 +49,8 @@ define register offset=0x84 size=1 SS;
 
 define context contextreg
     es_prefix=(0, 0)
-    rsb=(1,2);
+    rsb=(1,2)
+    skip_mode=(3,5);
 
 BANK0: is rsb=0 {}
 BANK1: is rsb=1 {}
@@ -600,12 +601,6 @@ macro inst_btclr(src, bit, target) {
     src = (~src & (0 << bit));
 }
 
-macro inst_sk(test) {
-    if (test) goto inst_next;
-    delayslot(1);
-    goto inst_next;
-}
-
 #########################################################################
 #
 # Root table constructors
@@ -944,6 +939,18 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
     export *:2 ct_entry;
 }
 
+# method derived from ARMinstructions.sinc
+
+skip_cond: is skip_mode=1 [ skip_mode=0; globalset(inst_next, skip_mode); ] { export CY; }
+skip_cond: is skip_mode=2 [ skip_mode=0; globalset(inst_next, skip_mode); ] { local tmp:1 = !CY; export tmp; }
+skip_cond: is skip_mode=3 [ skip_mode=0; globalset(inst_next, skip_mode); ] { export Z; }
+skip_cond: is skip_mode=4 [ skip_mode=0; globalset(inst_next, skip_mode); ] { local tmp:1 = !Z; export tmp; }
+skip_cond: is skip_mode=5 [ skip_mode=0; globalset(inst_next, skip_mode); ] { local tmp:1 = Z | CY; export tmp; }
+skip_cond: is skip_mode=6 [ skip_mode=0; globalset(inst_next, skip_mode); ] { local tmp:1 = !(Z | CY); export tmp; }
+
+SKIP_CHECK: is skip_mode=0 { } # always execute by default
+SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
+
 #########################################################################
 #
 # Root table instructions
@@ -955,102 +962,122 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # MOV r, #byte
-:MOV DREG_BYTE, "#"data is op_h=0x5 & DREG_BYTE; data {
+:MOV DREG_BYTE, "#"data is SKIP_CHECK & op_h=0x5 & DREG_BYTE; data {
+    build SKIP_CHECK;
     DREG_BYTE = data;
 }
 
 # MOV r, A
-:MOV DREG_BYTE, A is op_h=0x7 & A & DREG_BYTE & dreg_byte!=1 {
+:MOV DREG_BYTE, A is SKIP_CHECK & op_h=0x7 & A & DREG_BYTE & dreg_byte!=1 {
+    build SKIP_CHECK;
     DREG_BYTE = A;
 }
 
 # MOV A, r
-:MOV A, DREG_BYTE is op_h=0x6 & A & DREG_BYTE & dreg_byte!=1 {
+:MOV A, DREG_BYTE is SKIP_CHECK & op_h=0x6 & A & DREG_BYTE & dreg_byte!=1 {
+    build SKIP_CHECK;
     A = DREG_BYTE;
 }
 
 # MOV saddr, #byte
-:MOV saddr, "#"data is opcode=0xCD; saddr; data {
+:MOV saddr, "#"data is SKIP_CHECK & opcode=0xCD; saddr; data {
+    build SKIP_CHECK;
     saddr = data;
 }
 
 # MOV sfr, #byte
-:MOV sfr_byte, "#"data is opcode=0xCE; sfr_byte; data {
+:MOV sfr_byte, "#"data is SKIP_CHECK & opcode=0xCE; sfr_byte; data {
+    build SKIP_CHECK;
     sfr_byte = data;
 }
 
 # MOV !addr16, #byte
-:MOV addr16, "#"data is opcode=0xCF; addr16; data {
+:MOV addr16, "#"data is SKIP_CHECK & opcode=0xCF; addr16; data {
+    build SKIP_CHECK;
     addr16 = data;
 }
 
 # MOV A, saddr
-:MOV A, saddr is opcode=0x8D & A; saddr {
+:MOV A, saddr is SKIP_CHECK & opcode=0x8D & A; saddr {
+    build SKIP_CHECK;
     A = saddr;
 }
 
 # MOV saddr, A
-:MOV saddr, A is opcode=0x9D & A; saddr {
+:MOV saddr, A is SKIP_CHECK & opcode=0x9D & A; saddr {
+    build SKIP_CHECK;
     saddr = A;
 }
 
 # MOV A, sfr
-:MOV A, sfrp is opcode=0x8E & A; sfrp {
+:MOV A, sfrp is SKIP_CHECK & opcode=0x8E & A; sfrp {
+    build SKIP_CHECK;
     A = sfrp;
 }
 
 # MOV sfr, A
-:MOV sfrp, A is opcode=0x9E & A; sfrp {
+:MOV sfrp, A is SKIP_CHECK & opcode=0x9E & A; sfrp {
+    build SKIP_CHECK;
     sfrp = A;
 }
 
 # MOV A, !addr16
-:MOV A, addr16 is opcode=0x8F & A; addr16 {
+:MOV A, addr16 is SKIP_CHECK & opcode=0x8F & A; addr16 {
+    build SKIP_CHECK;
     A = addr16;
 }
 
 # MOV !addr16, A
-:MOV addr16, A is opcode=0x9F & A; addr16 {
+:MOV addr16, A is SKIP_CHECK & opcode=0x9F & A; addr16 {
+    build SKIP_CHECK;
     addr16 = A;
 }
 
 # MOV PSW, #byte
-:MOV PSW, "#"data is opcode=0x9F & PSW; opcode=0xFA; data {
+:MOV PSW, "#"data is SKIP_CHECK & opcode=0x9F & PSW; opcode=0xFA; data {
+    build SKIP_CHECK;
     update_psw(data);
 }
 
 # MOV A, PSW
-:MOV A, PSW is opcode=0x8E & A & PSW; opcode=0xFA {
+:MOV A, PSW is SKIP_CHECK & opcode=0x8E & A & PSW; opcode=0xFA {
+    build SKIP_CHECK;
     A = PSW;
 }
 
 # MOV PSW, A
-:MOV PSW, A is opcode=0x9E & A & PSW; opcode=0xFA {
+:MOV PSW, A is SKIP_CHECK & opcode=0x9E & A & PSW; opcode=0xFA {
+    build SKIP_CHECK;
     update_psw(A);
 }
 
 # MOV ES, #byte
-:MOV ES, "#"data is opcode=0x41 & ES; data {
+:MOV ES, "#"data is SKIP_CHECK & opcode=0x41 & ES; data {
+    build SKIP_CHECK;
     ES = data;
 }
 
 # MOV ES, saddr
-:MOV ES, saddr is opcode=0x61 & ES; opcode=0xB8; saddr {
+:MOV ES, saddr is SKIP_CHECK & opcode=0x61 & ES; opcode=0xB8; saddr {
+    build SKIP_CHECK;
     ES = saddr;
 }
 
 # MOV A, ES
-:MOV A, ES is opcode=0x8E & A & ES; opcode=0xFD {
+:MOV A, ES is SKIP_CHECK & opcode=0x8E & A & ES; opcode=0xFD {
+    build SKIP_CHECK;
     A = ES;
 }
 
 # MOV ES = A
-:MOV ES, A is opcode=0x9E & A & ES; opcode=0xFD {
+:MOV ES, A is SKIP_CHECK & opcode=0x9E & A & ES; opcode=0xFD {
+    build SKIP_CHECK;
     ES = A;
 }
 
 # MOV CS, #byte
-:MOV CS, "#"data is opcode=0xCE & CS; opcode=0xFC; data {
+:MOV CS, "#"data is SKIP_CHECK & opcode=0xCE & CS; opcode=0xFC; data {
+    build SKIP_CHECK;
     CS = data;
 }
 
@@ -1059,172 +1086,206 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # MOV A, CS
-:MOV A, CS is opcode=0x8E & A & CS; opcode=0xFC {
+:MOV A, CS is SKIP_CHECK & opcode=0x8E & A & CS; opcode=0xFC {
+    build SKIP_CHECK;
     A = CS;
 }
 
 # MOV CS, A
-:MOV CS, A is opcode=0x9E & A & CS; opcode=0xFC {
+:MOV CS, A is SKIP_CHECK & opcode=0x9E & A & CS; opcode=0xFC {
+    build SKIP_CHECK;
     CS = A;
 }
 
 # MOV A, [DE]
-:MOV A, AddrDE is opcode=0x89 & A & AddrDE {
+:MOV A, AddrDE is SKIP_CHECK & opcode=0x89 & A & AddrDE {
+    build SKIP_CHECK;
     A = AddrDE;
 }
 
 # MOV [DE], A
-:MOV AddrDE, A is opcode=0x99 & A & AddrDE {
+:MOV AddrDE, A is SKIP_CHECK & opcode=0x99 & A & AddrDE {
+    build SKIP_CHECK;
     AddrDE = A;
 }
 
 # MOV [DE+byte], #byte
-:MOV AddrDEOffset, "#"data is opcode=0xCA; AddrDEOffset; data {
+:MOV AddrDEOffset, "#"data is SKIP_CHECK & opcode=0xCA; AddrDEOffset; data {
+    build SKIP_CHECK;
     AddrDEOffset = data;
 }
 
 # MOV A, [DE+byte]
-:MOV A, AddrDEOffset is opcode=0x8A & A; AddrDEOffset {
+:MOV A, AddrDEOffset is SKIP_CHECK & opcode=0x8A & A; AddrDEOffset {
+    build SKIP_CHECK;
     A = AddrDEOffset;
 }
 
 # MOV [DE+byte], A
-:MOV AddrDEOffset, A is opcode=0x9A & A; AddrDEOffset {
+:MOV AddrDEOffset, A is SKIP_CHECK & opcode=0x9A & A; AddrDEOffset {
+    build SKIP_CHECK;
     AddrDEOffset = A;
 }
 
 # MOV A, [HL]
-:MOV A, AddrHL is opcode=0x8B & A & AddrHL {
+:MOV A, AddrHL is SKIP_CHECK & opcode=0x8B & A & AddrHL {
+    build SKIP_CHECK;
     A = AddrHL;
 }
 
 # MOV [HL], A
-:MOV AddrHL, A is opcode=0x9B & A & AddrHL {
+:MOV AddrHL, A is SKIP_CHECK & opcode=0x9B & A & AddrHL {
+    build SKIP_CHECK;
     AddrHL = A;
 }
 
 # MOV [HL+byte], #byte
-:MOV AddrHLOffset, u8 is opcode=0xCC; AddrHLOffset; u8 {
+:MOV AddrHLOffset, u8 is SKIP_CHECK & opcode=0xCC; AddrHLOffset; u8 {
+    build SKIP_CHECK;
     AddrHLOffset = u8;
 }
 
 # MOV A, [HL+byte]
-:MOV A, AddrHLOffset is opcode=0x8C & A; AddrHLOffset {
+:MOV A, AddrHLOffset is SKIP_CHECK & opcode=0x8C & A; AddrHLOffset {
+    build SKIP_CHECK;
     A = AddrHLOffset;
 }
 
 # MOV [HL+byte], A
-:MOV AddrHLOffset, A is opcode=0x9C & A; AddrHLOffset {
+:MOV AddrHLOffset, A is SKIP_CHECK & opcode=0x9C & A; AddrHLOffset {
+    build SKIP_CHECK;
     AddrHLOffset = A;
 }
 
 # MOV A, [HL+B]
-:MOV A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xC9 & AddrHLOffsetB {
+:MOV A, AddrHLOffsetB is SKIP_CHECK & opcode=0x61 & A; opcode=0xC9 & AddrHLOffsetB {
+    build SKIP_CHECK;
     A = AddrHLOffsetB;
 }
 
 # MOV [HL+B], A
-:MOV AddrHLOffsetB, A is opcode=0x61 & A; opcode=0xD9 & AddrHLOffsetB {
+:MOV AddrHLOffsetB, A is SKIP_CHECK & opcode=0x61 & A; opcode=0xD9 & AddrHLOffsetB {
+    build SKIP_CHECK;
     AddrHLOffsetB = A;
 }
 
 # MOV A, [HL+C]
-:MOV A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xE9 & AddrHLOffsetC {
+:MOV A, AddrHLOffsetC is SKIP_CHECK & opcode=0x61 & A; opcode=0xE9 & AddrHLOffsetC {
+    build SKIP_CHECK;
     A = AddrHLOffsetC;
 }
 
 # MOV [HL+C], A
-:MOV AddrHLOffsetC, A is opcode=0x61 & A; opcode=0xF9 & AddrHLOffsetC {
+:MOV AddrHLOffsetC, A is SKIP_CHECK & opcode=0x61 & A; opcode=0xF9 & AddrHLOffsetC {
+    build SKIP_CHECK;
     AddrHLOffsetC = A;
 }
 
 # MOV word[B], #byte
-:MOV AddrWordOffsetB, u8 is opcode=0x19; AddrWordOffsetB; u8 {
+:MOV AddrWordOffsetB, u8 is SKIP_CHECK & opcode=0x19; AddrWordOffsetB; u8 {
+    build SKIP_CHECK;
     AddrWordOffsetB = u8;
 }
 
 # MOV A, word[B]
-:MOV A, AddrWordOffsetB is opcode=0x09 & A; AddrWordOffsetB {
+:MOV A, AddrWordOffsetB is SKIP_CHECK & opcode=0x09 & A; AddrWordOffsetB {
+    build SKIP_CHECK;
     A = AddrWordOffsetB;
 }
 
 # MOV word[B], A
-:MOV AddrWordOffsetB, A is opcode=0x18 & A; AddrWordOffsetB {
+:MOV AddrWordOffsetB, A is SKIP_CHECK & opcode=0x18 & A; AddrWordOffsetB {
+    build SKIP_CHECK;
     AddrWordOffsetB = A;
 }
 
 # MOV word[C], #byte
-:MOV AddrWordOffsetC, u8 is opcode=0x38; AddrWordOffsetC; u8 {
+:MOV AddrWordOffsetC, u8 is SKIP_CHECK & opcode=0x38; AddrWordOffsetC; u8 {
+    build SKIP_CHECK;
     AddrWordOffsetC = u8;
 }
 
 # MOV A, word[C]
-:MOV A, AddrWordOffsetC is opcode=0x29 & A; AddrWordOffsetC {
+:MOV A, AddrWordOffsetC is SKIP_CHECK & opcode=0x29 & A; AddrWordOffsetC {
+    build SKIP_CHECK;
     A = AddrWordOffsetC;
 }
 
 # MOV word[C], A
-:MOV AddrWordOffsetC, A is opcode=0x28 & A; AddrWordOffsetC {
+:MOV AddrWordOffsetC, A is SKIP_CHECK & opcode=0x28 & A; AddrWordOffsetC {
+    build SKIP_CHECK;
     AddrWordOffsetC = A;
 }
 
 # MOV word[BC], #byte
-:MOV AddrWordOffsetBC, u8 is opcode=0x39; AddrWordOffsetBC; u8 {
+:MOV AddrWordOffsetBC, u8 is SKIP_CHECK & opcode=0x39; AddrWordOffsetBC; u8 {
+    build SKIP_CHECK;
     AddrWordOffsetBC = u8;
 }
 
 # MOV A, word[BC]
-:MOV A, AddrWordOffsetBC is opcode=0x49 & A; AddrWordOffsetBC {
+:MOV A, AddrWordOffsetBC is SKIP_CHECK & opcode=0x49 & A; AddrWordOffsetBC {
+    build SKIP_CHECK;
     A = AddrWordOffsetBC;
 }
 
 # MOV word[BC], A
-:MOV AddrWordOffsetBC, A is opcode=0x48 & A; AddrWordOffsetBC {
+:MOV AddrWordOffsetBC, A is SKIP_CHECK & opcode=0x48 & A; AddrWordOffsetBC {
+    build SKIP_CHECK;
     AddrWordOffsetBC = A;
 }
 
 # MOV [SP+byte], #byte
-:MOV AddrSPOffset, u8 is opcode=0xC8; AddrSPOffset; u8 {
+:MOV AddrSPOffset, u8 is SKIP_CHECK & opcode=0xC8; AddrSPOffset; u8 {
+    build SKIP_CHECK;
     AddrSPOffset = u8;
 }
 
 # MOV A, [SP+byte]
-:MOV A, AddrSPOffset is opcode=0x88 & A; AddrSPOffset {
+:MOV A, AddrSPOffset is SKIP_CHECK & opcode=0x88 & A; AddrSPOffset {
+    build SKIP_CHECK;
     A = AddrSPOffset;
 }
 
 # MOV [SP+byte], A
-:MOV AddrSPOffset, A is opcode=0x98 & A; AddrSPOffset {
+:MOV AddrSPOffset, A is SKIP_CHECK & opcode=0x98 & A; AddrSPOffset {
+    build SKIP_CHECK;
     AddrSPOffset = A;
 }
 
 # MOV B, saddr
-:MOV B, saddr is opcode=0xE8 & B; saddr {
+:MOV B, saddr is SKIP_CHECK & opcode=0xE8 & B; saddr {
+    build SKIP_CHECK;
     B = saddr;
 }
 
 # MOV B, !addr16
-:MOV B, addr16 is opcode=0xE9 & B; addr16 {
+:MOV B, addr16 is SKIP_CHECK & opcode=0xE9 & B; addr16 {
+    build SKIP_CHECK;
     B = addr16;
 }
 
 # MOV C, saddr
-:MOV C, saddr is opcode=0xF8 & C; saddr {
+:MOV C, saddr is SKIP_CHECK & opcode=0xF8 & C; saddr {
+    build SKIP_CHECK;
     C = saddr;
 }
 
 # MOV C, !addr16
-:MOV C, addr16 is opcode=0xF9 & C; addr16 {
+:MOV C, addr16 is SKIP_CHECK & opcode=0xF9 & C; addr16 {
+    build SKIP_CHECK;
     C = addr16;
 }
 
 # MOV X, saddr
-:MOV X, saddr is opcode=0xD8 & X; saddr {
+:MOV X, saddr is SKIP_CHECK & opcode=0xD8 & X; saddr {
+    build SKIP_CHECK;
     X = saddr;
 }
 
 # MOV X, !addr16
-:MOV X, addr16 is opcode=0xD9 & X; addr16 {
+:MOV X, addr16 is SKIP_CHECK & opcode=0xD9 & X; addr16 {
+    build SKIP_CHECK;
     X = addr16;
 }
 
@@ -1233,57 +1294,68 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # XCH A, X
-:XCH A, X is opcode=0x08 & A & X {
+:XCH A, X is SKIP_CHECK & opcode=0x08 & A & X {
+    build SKIP_CHECK;
     inst_xch(A, X);
 }
 
 # XCH A, r
-:XCH A, SREG2_BYTE is opcode=0x61; op2_h=0x11 & SREG2_BYTE & sreg2_byte!=1 & A {
+:XCH A, SREG2_BYTE is SKIP_CHECK & opcode=0x61; op2_h=0x11 & SREG2_BYTE & sreg2_byte!=1 & A {
+    build SKIP_CHECK;
     inst_xch(A, SREG2_BYTE);
 }
 
 # XCH A, saddr
-:XCH A, saddr is opcode=0x61 & A; opcode=0xA8; saddr {
+:XCH A, saddr is SKIP_CHECK & opcode=0x61 & A; opcode=0xA8; saddr {
+    build SKIP_CHECK;
     inst_xch(A, saddr);
 }
 
 # XCH A, sfr
-:XCH A, sfr_byte is opcode=0x61 & A; opcode=0xAB; sfr_byte {
+:XCH A, sfr_byte is SKIP_CHECK & opcode=0x61 & A; opcode=0xAB; sfr_byte {
+    build SKIP_CHECK;
     inst_xch(A, sfr_byte);
 }
 
 # XCH A, !addr16
-:XCH A, addr16 is opcode=0x61 & A; opcode=0xAA; addr16 {
+:XCH A, addr16 is SKIP_CHECK & opcode=0x61 & A; opcode=0xAA; addr16 {
+    build SKIP_CHECK;
     inst_xch(A, addr16);
 }
 
 # XCH A, [DE]
-:XCH A, AddrDE is opcode=0x61 & A; opcode=0xAE & AddrDE {
+:XCH A, AddrDE is SKIP_CHECK & opcode=0x61 & A; opcode=0xAE & AddrDE {
+    build SKIP_CHECK;
     inst_xch(A, AddrDE);
 }
 
 # XCH A, [DE+byte]
-:XCH A, AddrDEOffset is opcode=0x61 & A; opcode=0xAF; AddrDEOffset {
+:XCH A, AddrDEOffset is SKIP_CHECK & opcode=0x61 & A; opcode=0xAF; AddrDEOffset {
+    build SKIP_CHECK;
     inst_xch(A, AddrDEOffset);
 }
 
 # XCH A, [HL]
-:XCH A, AddrHL is opcode=0x61 & A; opcode=0xAC & AddrHL {
+:XCH A, AddrHL is SKIP_CHECK & opcode=0x61 & A; opcode=0xAC & AddrHL {
+    build SKIP_CHECK;
     inst_xch(A, AddrHL);
 }
 
 # XCH A, [HL+byte]
-:XCH A, AddrHLOffset is opcode=0x61 & A; opcode=0xAD; AddrHLOffset {
+:XCH A, AddrHLOffset is SKIP_CHECK & opcode=0x61 & A; opcode=0xAD; AddrHLOffset {
+    build SKIP_CHECK;
     inst_xch(A, AddrHLOffset);
 }
 
 # XCH A, [HL+B]
-:XCH A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xB9 & AddrHLOffsetB {
+:XCH A, AddrHLOffsetB is SKIP_CHECK & opcode=0x61 & A; opcode=0xB9 & AddrHLOffsetB {
+    build SKIP_CHECK;
     inst_xch(A, AddrHLOffsetB);
 }
 
 # XCH A, [HL+C]
-:XCH A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xA9 & AddrHLOffsetC {
+:XCH A, AddrHLOffsetC is SKIP_CHECK & opcode=0x61 & A; opcode=0xA9 & AddrHLOffsetC {
+    build SKIP_CHECK;
     inst_xch(A, AddrHLOffsetC);
 }
 
@@ -1292,139 +1364,166 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # ONEB r
-:ONEB DREG_AXBC is op_h=0xE & op_l<4 & DREG_AXBC {
+:ONEB DREG_AXBC is SKIP_CHECK & op_h=0xE & op_l<4 & DREG_AXBC {
+    build SKIP_CHECK;
     DREG_AXBC = 1;
 }
 
 # ONEB saddr
-:ONEB saddr is opcode=0xE4; saddr {
+:ONEB saddr is SKIP_CHECK & opcode=0xE4; saddr {
+    build SKIP_CHECK;
     saddr = 1;
 }
 
 # ONEB !addr16
-:ONEB addr16 is opcode=0xE5; addr16 {
+:ONEB addr16 is SKIP_CHECK & opcode=0xE5; addr16 {
+    build SKIP_CHECK;
     addr16 = 1;
 }
 
 # CLRB r
-:CLRB DREG_AXBC is op_h=0xF & DREG_AXBC & clrb_unused=0  {
+:CLRB DREG_AXBC is SKIP_CHECK & op_h=0xF & DREG_AXBC & clrb_unused=0  {
+    build SKIP_CHECK;
     DREG_AXBC = 0;
 }
 
 # CLRB saddr
-:CLRB saddr is opcode=0xF4; saddr {
+:CLRB saddr is SKIP_CHECK & opcode=0xF4; saddr {
+    build SKIP_CHECK;
     saddr = 0;
 }
 
 # CLRB !addr16
-:CLRB addr16 is opcode=0xF5; addr16 {
+:CLRB addr16 is SKIP_CHECK & opcode=0xF5; addr16 {
+    build SKIP_CHECK;
     addr16 = 0;
 }
 
 # MOVS [HL+byte], X
-:MOVS X, AddrHLOffset ("Check "A" if zero")is opcode=0x61 & X & A; opcode=0xCE; AddrHLOffset {
+:MOVS X, AddrHLOffset ("Check "A" if zero")is SKIP_CHECK & opcode=0x61 & X & A; opcode=0xCE; AddrHLOffset {
+    build SKIP_CHECK;
     AddrHLOffset = X;
     Z = (X == 0);
     CY = (X == 0) | (A == 0);
 }
 
 # MOVW rp, #word
-:MOVW DREG_WORD, u16 is op_h=0x3 & DREG_WORD; u16 {
+:MOVW DREG_WORD, u16 is SKIP_CHECK & op_h=0x3 & DREG_WORD; u16 {
+    build SKIP_CHECK;
     DREG_WORD = u16;
 }
 
 # MOVW saddrp, #word
-:MOVW saddrp, u16 is opcode=0xC9; saddrp; u16 {
+:MOVW saddrp, u16 is SKIP_CHECK & opcode=0xC9; saddrp; u16 {
+    build SKIP_CHECK;
     saddrp = u16;
 }
 
 # MOVW sfr, #word
-:MOVW sfrpw, u16 is opcode=0xCB; sfrpw; u16 {
+:MOVW sfrpw, u16 is SKIP_CHECK & opcode=0xCB; sfrpw; u16 {
+    build SKIP_CHECK;
     sfrpw = u16;
 }
 
 # MOVW AX, saddrp
-:MOVW AX, saddrp is opcode=0xAD & AX; saddrp {
+:MOVW AX, saddrp is SKIP_CHECK & opcode=0xAD & AX; saddrp {
+    build SKIP_CHECK;
     AX = saddrp;
 }
 
 # MOVW saddrp, AX
-:MOVW saddrp, AX is opcode=0xBD & AX; saddrp {
+:MOVW saddrp, AX is SKIP_CHECK & opcode=0xBD & AX; saddrp {
+    build SKIP_CHECK;
     saddrp = AX;
 }
 
 # MOVW AX, sfrp
-:MOVW AX, sfrpw is opcode=0xAE & AX; sfrpw {
+:MOVW AX, sfrpw is SKIP_CHECK & opcode=0xAE & AX; sfrpw {
+    build SKIP_CHECK;
     AX = sfrpw;
 }
 
 # MOVW sfrp, AX
-:MOVW sfrpw, AX is opcode=0xBE & AX; sfrpw {
+:MOVW sfrpw, AX is SKIP_CHECK & opcode=0xBE & AX; sfrpw {
+    build SKIP_CHECK;
     sfrpw = AX;
 }
 
 # MOVW AX, rp
-:MOVW AX, DREG_WORD is op_h=0x1 & AX & DREG_WORD & dreg_word!=0 & rp_source=1 {
+:MOVW AX, DREG_WORD is SKIP_CHECK & op_h=0x1 & AX & DREG_WORD & dreg_word!=0 & rp_source=1 {
+    build SKIP_CHECK;
     AX = DREG_WORD;
 }
 
 # MOVW rp, AX
-:MOVW DREG_WORD, AX is op_h=0x1 & AX & DREG_WORD & dreg_word!=0 & rp_source=0 {
+:MOVW DREG_WORD, AX is SKIP_CHECK & op_h=0x1 & AX & DREG_WORD & dreg_word!=0 & rp_source=0 {
+    build SKIP_CHECK;
     DREG_WORD = AX;
 }
 
 # MOVW AX, !addr16
-:MOVW AX, addr16w is opcode=0xAF & AX; addr16w {
+:MOVW AX, addr16w is SKIP_CHECK & opcode=0xAF & AX; addr16w {
+    build SKIP_CHECK;
     AX = addr16w;
 }
 
 # MOVW !addr16, AX
-:MOVW addr16w, AX is opcode=0xBF & AX; addr16w {
+:MOVW addr16w, AX is SKIP_CHECK & opcode=0xBF & AX; addr16w {
+    build SKIP_CHECK;
     addr16w = AX;
 }
 
 # MOVW AX, [DE]
-:MOVW AX, AddrDEW is opcode=0xA9 & AX & AddrDEW {
+:MOVW AX, AddrDEW is SKIP_CHECK & opcode=0xA9 & AX & AddrDEW {
+    build SKIP_CHECK;
     AX = AddrDEW;
 }
 
 # MOVW [DE], AX
-:MOVW AddrDEW, AX is opcode=0xB9 & AX & AddrDEW {
+:MOVW AddrDEW, AX is SKIP_CHECK & opcode=0xB9 & AX & AddrDEW {
+    build SKIP_CHECK;
     AddrDEW = AX;
 }
 
 # MOVW AX, [DE+byte]
-:MOVW AX, AddrDEOffsetW is opcode=0xAA & AX; AddrDEOffsetW {
+:MOVW AX, AddrDEOffsetW is SKIP_CHECK & opcode=0xAA & AX; AddrDEOffsetW {
+    build SKIP_CHECK;
     AX = AddrDEOffsetW;
 }
 
 # MOVW [DE+byte], AX
-:MOVW AddrDEOffsetW, AX is opcode=0xBA & AX; AddrDEOffsetW {
+:MOVW AddrDEOffsetW, AX is SKIP_CHECK & opcode=0xBA & AX; AddrDEOffsetW {
+    build SKIP_CHECK;
     AddrDEOffsetW = AX;
 }
 
 # MOVW AX, [HL]
-:MOVW AX, AddrHLW is opcode=0xAB & AX & AddrHLW {
+:MOVW AX, AddrHLW is SKIP_CHECK & opcode=0xAB & AX & AddrHLW {
+    build SKIP_CHECK;
     AX = AddrHLW;
 }
 
 # MOVW [HL], AX
-:MOVW AddrHLW, AX is opcode=0xBB & AX & AddrHLW {
+:MOVW AddrHLW, AX is SKIP_CHECK & opcode=0xBB & AX & AddrHLW {
+    build SKIP_CHECK;
     AddrHLW = AX;
 }
 
 # MOVW AX, [HL+byte]
-:MOVW AX, AddrHLOffsetW is opcode=0xAC & AX; AddrHLOffsetW {
+:MOVW AX, AddrHLOffsetW is SKIP_CHECK & opcode=0xAC & AX; AddrHLOffsetW {
+    build SKIP_CHECK;
     AX = AddrHLOffsetW;
 }
 
 # MOVW [HL+byte], AX
-:MOVW AddrHLOffsetW, AX is opcode=0xBC & AX; AddrHLOffsetW {
+:MOVW AddrHLOffsetW, AX is SKIP_CHECK & opcode=0xBC & AX; AddrHLOffsetW {
+    build SKIP_CHECK;
     AddrHLOffsetW = AX;
 }
 
 # MOVW AX, word[B]
-:MOVW AX, AddrWordOffsetBW is opcode=0x59 & AX; AddrWordOffsetBW {
+:MOVW AX, AddrWordOffsetBW is SKIP_CHECK & opcode=0x59 & AX; AddrWordOffsetBW {
+    build SKIP_CHECK;
     AX = AddrWordOffsetBW;
 }
 
@@ -1433,89 +1532,106 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # MOVW word[B], AX
-:MOVW AddrWordOffsetBW, AX is opcode=0x58 & AX; AddrWordOffsetBW {
+:MOVW AddrWordOffsetBW, AX is SKIP_CHECK & opcode=0x58 & AX; AddrWordOffsetBW {
+    build SKIP_CHECK;
     AddrWordOffsetBW = AX;
 }
 
 # MOVW AX, word[C]
-:MOVW AX, AddrWordOffsetCW is opcode=0x69 & AX; AddrWordOffsetCW {
+:MOVW AX, AddrWordOffsetCW is SKIP_CHECK & opcode=0x69 & AX; AddrWordOffsetCW {
+    build SKIP_CHECK;
     AX = AddrWordOffsetCW;
 }
 
 # MOVW word[C], AX
-:MOVW AddrWordOffsetCW, AX is opcode=0x68 & AX; AddrWordOffsetCW {
+:MOVW AddrWordOffsetCW, AX is SKIP_CHECK & opcode=0x68 & AX; AddrWordOffsetCW {
+    build SKIP_CHECK;
     AddrWordOffsetCW = AX;
 }
 
 # MOVW AX, word[BC]
-:MOVW AX, AddrWordOffsetBCW is opcode=0x79 & AX; AddrWordOffsetBCW {
+:MOVW AX, AddrWordOffsetBCW is SKIP_CHECK & opcode=0x79 & AX; AddrWordOffsetBCW {
+    build SKIP_CHECK;
     AX = AddrWordOffsetBCW;
 }
 
 # MOVW AX, [SP+byte]
-:MOVW AX, AddrSPOffsetW is opcode=0xA8 & AX; AddrSPOffsetW {
+:MOVW AX, AddrSPOffsetW is SKIP_CHECK & opcode=0xA8 & AX; AddrSPOffsetW {
+    build SKIP_CHECK;
     AX = AddrSPOffsetW;
 }
 
 # MOVW [SP+byte], AX
-:MOVW AddrSPOffsetW, AX is opcode=0xB8 & AX; AddrSPOffsetW {
+:MOVW AddrSPOffsetW, AX is SKIP_CHECK & opcode=0xB8 & AX; AddrSPOffsetW {
+    build SKIP_CHECK;
     AddrSPOffsetW = AX;
 }
 
 # MOVW BC, saddrp
-:MOVW BC, saddrp is opcode=0xDA & BC; saddrp {
+:MOVW BC, saddrp is SKIP_CHECK & opcode=0xDA & BC; saddrp {
+    build SKIP_CHECK;
     BC = saddrp;
 }
 
 # MOVW BC, !addr16
-:MOVW BC, addr16w is opcode=0xDB & BC; addr16w {
+:MOVW BC, addr16w is SKIP_CHECK & opcode=0xDB & BC; addr16w {
+    build SKIP_CHECK;
     BC = addr16w;
 }
 
 # MOVW DE, saddrp
-:MOVW DE, saddrp is opcode=0xEA & DE; saddrp {
+:MOVW DE, saddrp is SKIP_CHECK & opcode=0xEA & DE; saddrp {
+    build SKIP_CHECK;
     DE = saddrp;
 }
 
 # MOVW DE, !addr16
-:MOVW DE, addr16w is opcode=0xEB & DE; addr16w {
+:MOVW DE, addr16w is SKIP_CHECK & opcode=0xEB & DE; addr16w {
+    build SKIP_CHECK;
     DE = addr16w;
 }
 
 # MOVW HL, saddrp
-:MOVW HL, saddrp is opcode=0xFA & HL; saddrp {
+:MOVW HL, saddrp is SKIP_CHECK & opcode=0xFA & HL; saddrp {
+    build SKIP_CHECK;
     HL = saddrp;
 }
 
 # MOVW HL, !addr16
-:MOVW HL, addr16w is opcode=0xFB & HL; addr16w {
+:MOVW HL, addr16w is SKIP_CHECK & opcode=0xFB & HL; addr16w {
+    build SKIP_CHECK;
     HL = addr16w;
 }
 
 # XCHW AX, rp
-:XCHW AX, DREG_WORD is op_h=0x3 & rp_source=1 & DREG_WORD & dreg_word!=0 & AX {
+:XCHW AX, DREG_WORD is SKIP_CHECK & op_h=0x3 & rp_source=1 & DREG_WORD & dreg_word!=0 & AX {
+    build SKIP_CHECK;
     local tmp = AX;
     AX = DREG_WORD;
     DREG_WORD = tmp;
 }
 
 # ONEW AX
-:ONEW AX is opcode=0xE6 & AX {
+:ONEW AX is SKIP_CHECK & opcode=0xE6 & AX {
+    build SKIP_CHECK;
     AX = 1;
 }
 
 # ONEW BC
-:ONEW BC is opcode=0xE7 & BC {
+:ONEW BC is SKIP_CHECK & opcode=0xE7 & BC {
+    build SKIP_CHECK;
     BC = 1;
 }
 
 # CLRW AX
-:CLRW AX is opcode=0xF6 & AX {
+:CLRW AX is SKIP_CHECK & opcode=0xF6 & AX {
+    build SKIP_CHECK;
     AX = 0;
 }
 
 # CLRW BC
-:CLRW BC is opcode=0xF7 & BC {
+:CLRW BC is SKIP_CHECK & opcode=0xF7 & BC {
+    build SKIP_CHECK;
     BC = 0;
 }
 
@@ -1524,72 +1640,92 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # ADD A, #byte
-:ADD A, u8 is opcode=0x0C & A; u8 {
+:ADD A, u8 is SKIP_CHECK & opcode=0x0C & A; u8 {
+    build SKIP_CHECK;
     inst_add(A, u8);
 }
 
 # ADD saddr, #byte
-:ADD saddr, u8 is opcode=0x0A; saddr; u8 {
+:ADD saddr, u8 is SKIP_CHECK & opcode=0x0A; saddr; u8 {
+    build SKIP_CHECK;
     inst_add(saddr, u8);
 }
 
 # ADD A, r
-:ADD A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x01 & SREG2_BYTE & sreg2_byte!=1 {
+:ADD A, "A" is SKIP_CHECK & opcode=0x61 & A; opcode=0x1 {
+    build SKIP_CHECK;
+    inst_add(A, A);
+}
+
+# ADD A, r
+:ADD A, SREG2_BYTE is SKIP_CHECK & opcode=0x61 & A; op2_h=0x01 & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_add(A, SREG2_BYTE);
 }
 
 # ADD r, A
-:ADD SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x00 & SREG2_BYTE & sreg2_byte!=1 {
+:ADD SREG2_BYTE, A is SKIP_CHECK & opcode=0x61 & A; op2_h=0x00 & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_add(SREG2_BYTE, A);
 }
 
 # ADD A, saddr
-:ADD A, saddr is opcode=0x0B & A; saddr {
+:ADD A, saddr is SKIP_CHECK & opcode=0x0B & A; saddr {
+    build SKIP_CHECK;
     inst_add(A, saddr);
 }
 
 # ADD A, !addr16
-:ADD A, addr16 is opcode=0x0F & A; addr16 {
+:ADD A, addr16 is SKIP_CHECK & opcode=0x0F & A; addr16 {
+    build SKIP_CHECK;
     inst_add(A, addr16);
 }
 
 # ADD A, [HL]
-:ADD A, AddrHL is opcode=0x0D & A & AddrHL {
+:ADD A, AddrHL is SKIP_CHECK & opcode=0x0D & A & AddrHL {
+    build SKIP_CHECK;
     inst_add(A, AddrHL);
 }
 
 # ADD A, [HL+byte]
-:ADD A, AddrHLOffset is opcode=0x0E & A; AddrHLOffset {
+:ADD A, AddrHLOffset is SKIP_CHECK & opcode=0x0E & A; AddrHLOffset {
+    build SKIP_CHECK;
     inst_add(A, AddrHLOffset);
 }
 
 # ADD A, [HL+B]
-:ADD A, AddrHLOffsetB is opcode=0x61 & A; opcode=0x80 & AddrHLOffsetB {
+:ADD A, AddrHLOffsetB is SKIP_CHECK & opcode=0x61 & A; opcode=0x80 & AddrHLOffsetB {
+    build SKIP_CHECK;
     inst_add(A, AddrHLOffsetB);
 }
 
 # ADD A, [HL+C]
-:ADD A, AddrHLOffsetC is opcode=0x61 & A; opcode=0x82 & AddrHLOffsetC {
+:ADD A, AddrHLOffsetC is SKIP_CHECK & opcode=0x61 & A; opcode=0x82 & AddrHLOffsetC {
+    build SKIP_CHECK;
     inst_add(A, AddrHLOffsetC);
 }
 
 # ADDC A, #byte
-:ADDC A, u8 is opcode=0x1C & A; u8 {
+:ADDC A, u8 is SKIP_CHECK & opcode=0x1C & A; u8 {
+    build SKIP_CHECK;
     inst_addc(A, u8);
 }
 
 # ADDC saddr, #byte
-:ADDC saddr, u8 is opcode=0x1A; saddr; u8 {
+:ADDC saddr, u8 is SKIP_CHECK & opcode=0x1A; saddr; u8 {
+    build SKIP_CHECK;
     inst_addc(saddr, u8);
 }
 
 # ADDC A, r
-:ADDC A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x3 & SREG2_BYTE & sreg2_byte!=1 {
+:ADDC A, SREG2_BYTE is SKIP_CHECK & opcode=0x61 & A; op2_h=0x3 & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_addc(A, SREG2_BYTE);
 }
 
 # ADDC r, A
-:ADDC SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x2 & SREG2_BYTE & sreg2_byte!=1 {
+:ADDC SREG2_BYTE, A is SKIP_CHECK & opcode=0x61 & A; op2_h=0x2 & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_addc(A, SREG2_BYTE);
 }
 
@@ -1598,82 +1734,98 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # ADDC A, saddr
-:ADDC A, saddr is opcode=0x1B & A; saddr {
+:ADDC A, saddr is SKIP_CHECK & opcode=0x1B & A; saddr {
+    build SKIP_CHECK;
     inst_addc(A, saddr);
 }
 
 # ADDC A, !uint16
-:ADDC A, addr16 is opcode=0x1F & A; addr16 {
+:ADDC A, addr16 is SKIP_CHECK & opcode=0x1F & A; addr16 {
+    build SKIP_CHECK;
     inst_addc(A, addr16);
 }
 
 # ADDC A, [HL]
-:ADDC A, AddrHL is opcode=0x1D & A & AddrHL {
+:ADDC A, AddrHL is SKIP_CHECK & opcode=0x1D & A & AddrHL {
+    build SKIP_CHECK;
     inst_addc(A, AddrHL);
 }
 
 # ADDC A, [HL+byte]
-:ADDC A, AddrHLOffset is opcode=0x1E & A; AddrHLOffset {
+:ADDC A, AddrHLOffset is SKIP_CHECK & opcode=0x1E & A; AddrHLOffset {
+    build SKIP_CHECK;
     inst_addc(A, AddrHLOffset);
 }
 
 # ADDC A, [HL+B]
-:ADDC A, AddrHLOffsetB is opcode=0x61 & A; opcode=0x90 & AddrHLOffsetB {
+:ADDC A, AddrHLOffsetB is SKIP_CHECK & opcode=0x61 & A; opcode=0x90 & AddrHLOffsetB {
+    build SKIP_CHECK;
     inst_addc(A, AddrHLOffsetB);
 }
 
 # ADDC A, [HL+C]
-:ADDC A, AddrHLOffsetC is opcode=0x61 & A; opcode=0x92 & AddrHLOffsetC {
+:ADDC A, AddrHLOffsetC is SKIP_CHECK & opcode=0x61 & A; opcode=0x92 & AddrHLOffsetC {
+    build SKIP_CHECK;
     inst_addc(A, AddrHLOffsetC);
 }
 
 # SUB A, #byte
-:SUB A, u8 is opcode=0x2C & A; u8 {
+:SUB A, u8 is SKIP_CHECK & opcode=0x2C & A; u8 {
+    build SKIP_CHECK;
     inst_sub(A, u8);
 }
 
 # SUB saddr, #byte
-:SUB saddr, u8 is opcode=0x2A; saddr; u8 {
+:SUB saddr, u8 is SKIP_CHECK & opcode=0x2A; saddr; u8 {
+    build SKIP_CHECK;
     inst_sub(saddr, u8);
 }
 
 # SUB A, r
-:SUB A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x5 & SREG2_BYTE & sreg2_byte!=1 {
+:SUB A, SREG2_BYTE is SKIP_CHECK & opcode=0x61 & A; op2_h=0x5 & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_sub(A, SREG2_BYTE);
 }
 
 # SUB r, A
-:SUB SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x4 & SREG2_BYTE & sreg2_byte!=1 {
+:SUB SREG2_BYTE, A is SKIP_CHECK & opcode=0x61 & A; op2_h=0x4 & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_sub(SREG2_BYTE, A);
 }
 
 # SUB A, saddr
-:SUB A, saddr is opcode=0x2B & A; saddr {
+:SUB A, saddr is SKIP_CHECK & opcode=0x2B & A; saddr {
+    build SKIP_CHECK;
     inst_sub(A, saddr);
 }
 
 # SUB A, !addr16
-:SUB A, addr16 is opcode=0x2F & A; addr16 {
+:SUB A, addr16 is SKIP_CHECK & opcode=0x2F & A; addr16 {
+    build SKIP_CHECK;
     inst_sub(A, addr16);
 }
 
 # SUB A, [HL]
-:SUB A, AddrHL is opcode=0x2D & A & AddrHL {
+:SUB A, AddrHL is SKIP_CHECK & opcode=0x2D & A & AddrHL {
+    build SKIP_CHECK;
     inst_sub(A, AddrHL);
 }
 
 # SUB A, [HL+byte]
-:SUB A, AddrHLOffset is opcode=0x2E & A; AddrHLOffset {
+:SUB A, AddrHLOffset is SKIP_CHECK & opcode=0x2E & A; AddrHLOffset {
+    build SKIP_CHECK;
     inst_sub(A, AddrHLOffset);
 }
 
 # SUB A, [HL+B]
-:SUB A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xA0 & AddrHLOffsetB {
+:SUB A, AddrHLOffsetB is SKIP_CHECK & opcode=0x61 & A; opcode=0xA0 & AddrHLOffsetB {
+    build SKIP_CHECK;
     inst_sub(A, AddrHLOffsetB);
 }
 
 # SUB A, [HL+C]
-:SUB A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xA2 & AddrHLOffsetC {
+:SUB A, AddrHLOffsetC is SKIP_CHECK & opcode=0x61 & A; opcode=0xA2 & AddrHLOffsetC {
+    build SKIP_CHECK;
     inst_sub(A, AddrHLOffsetC);
 }
 
@@ -1682,72 +1834,86 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # SUBC A, #byte
-:SUBC A, u8 is opcode=0x3C & A; u8 {
+:SUBC A, u8 is SKIP_CHECK & opcode=0x3C & A; u8 {
+    build SKIP_CHECK;
     inst_subc(A, u8);
 }
 
 # SUBC saddr, #byte
-:SUBC saddr, u8 is opcode=0x3A; saddr; u8 {
+:SUBC saddr, u8 is SKIP_CHECK & opcode=0x3A; saddr; u8 {
+    build SKIP_CHECK;
     inst_subc(saddr, u8);
 }
 
 # SUBC A, r
-:SUBC A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x7 & SREG2_BYTE & sreg2_byte!=1 {
+:SUBC A, SREG2_BYTE is SKIP_CHECK & opcode=0x61 & A; op2_h=0x7 & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_subc(A, SREG2_BYTE);
 }
 
 # SUBC r, A
-:SUBC SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x6 & SREG2_BYTE & sreg2_byte!=1 {
+:SUBC SREG2_BYTE, A is SKIP_CHECK & opcode=0x61 & A; op2_h=0x6 & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_subc(SREG2_BYTE, A);
 }
 
 # SUBC A, saddr
-:SUBC A, saddr is opcode=0x3B & A; saddr {
+:SUBC A, saddr is SKIP_CHECK & opcode=0x3B & A; saddr {
+    build SKIP_CHECK;
     inst_subc(A, saddr);
 }
 
 # SUBC A, !addr16
-:SUBC A, addr16 is opcode=0x3F & A; addr16 {
+:SUBC A, addr16 is SKIP_CHECK & opcode=0x3F & A; addr16 {
+    build SKIP_CHECK;
     inst_subc(A, addr16);
 }
 
 # SUBC A, [HL]
-:SUBC A, AddrHL is opcode=0x3D & A & AddrHL {
+:SUBC A, AddrHL is SKIP_CHECK & opcode=0x3D & A & AddrHL {
+    build SKIP_CHECK;
     inst_subc(A, AddrHL);
 }
 
 # SUBC A, [HL+byte]
-:SUBC A, AddrHLOffset is opcode=0x3E & A; AddrHLOffset {
+:SUBC A, AddrHLOffset is SKIP_CHECK & opcode=0x3E & A; AddrHLOffset {
+    build SKIP_CHECK;
     inst_subc(A, AddrHLOffset);
 }
 
 # SUBC A, [HL+B]
-:SUBC A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xB0 & AddrHLOffsetB {
+:SUBC A, AddrHLOffsetB is SKIP_CHECK & opcode=0x61 & A; opcode=0xB0 & AddrHLOffsetB {
+    build SKIP_CHECK;
     inst_subc(A, AddrHLOffsetB);
 }
 
 # SUBC A, [HL+C]
-:SUBC A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xB2 & AddrHLOffsetC {
+:SUBC A, AddrHLOffsetC is SKIP_CHECK & opcode=0x61 & A; opcode=0xB2 & AddrHLOffsetC {
+    build SKIP_CHECK;
     inst_subc(A, AddrHLOffsetC);
 }
 
 # AND A, #byte
-:AND A, u8 is opcode=0x5C & A; u8 {
+:AND A, u8 is SKIP_CHECK & opcode=0x5C & A; u8 {
+    build SKIP_CHECK;
     inst_and(A, u8);
 }
 
 # AND saddr, #byte
-:AND saddr, u8 is opcode=0x5A; saddr; u8 {
+:AND saddr, u8 is SKIP_CHECK & opcode=0x5A; saddr; u8 {
+    build SKIP_CHECK;
     inst_and(saddr, u8);
 }
 
 # AND A, r
-:AND A, SREG2_BYTE is opcode=0x61 & A; op2_h=0xB & SREG2_BYTE & sreg2_byte!=1 {
+:AND A, SREG2_BYTE is SKIP_CHECK & opcode=0x61 & A; op2_h=0xB & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_and(A, SREG2_BYTE);
 }
 
 # AND r, A
-:AND SREG2_BYTE, A is opcode=0x61 & A; op2_h=0xA & SREG2_BYTE & sreg2_byte!=1 {
+:AND SREG2_BYTE, A is SKIP_CHECK & opcode=0x61 & A; op2_h=0xA & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_and(SREG2_BYTE, A);
 }
 
@@ -1756,82 +1922,98 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # AND A, saddr
-:AND A, saddr is opcode=0x5B & A; saddr {
+:AND A, saddr is SKIP_CHECK & opcode=0x5B & A; saddr {
+    build SKIP_CHECK;
     inst_and(A, saddr);
 }
 
 # AND A, !addr16
-:AND A, addr16 is opcode=0x5F & A; addr16 {
+:AND A, addr16 is SKIP_CHECK & opcode=0x5F & A; addr16 {
+    build SKIP_CHECK;
     inst_and(A, addr16);
 }
 
 # AND A, [HL]
-:AND A, AddrHL is opcode=0x5D & A & AddrHL {
+:AND A, AddrHL is SKIP_CHECK & opcode=0x5D & A & AddrHL {
+    build SKIP_CHECK;
     inst_and(A, AddrHL);
 }
 
 # AND A, [HL+byte]
-:AND A, AddrHLOffset is opcode=0x5E & A; AddrHLOffset {
+:AND A, AddrHLOffset is SKIP_CHECK & opcode=0x5E & A; AddrHLOffset {
+    build SKIP_CHECK;
     inst_and(A, AddrHLOffset);
 }
 
 # AND A, [HL+B]
-:AND A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xD0 & AddrHLOffsetB {
+:AND A, AddrHLOffsetB is SKIP_CHECK & opcode=0x61 & A; opcode=0xD0 & AddrHLOffsetB {
+    build SKIP_CHECK;
     inst_and(A, AddrHLOffsetB);
 }
 
 # AND A, [HL+C]
-:AND A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xD2 & AddrHLOffsetC {
+:AND A, AddrHLOffsetC is SKIP_CHECK & opcode=0x61 & A; opcode=0xD2 & AddrHLOffsetC {
+    build SKIP_CHECK;
     inst_and(A, AddrHLOffsetC);
 }
 
 # OR A, #byte
-:OR A, u8 is opcode=0x6C & A; u8 {
+:OR A, u8 is SKIP_CHECK & opcode=0x6C & A; u8 {
+    build SKIP_CHECK;
     inst_or(A, u8);
 }
 
 # OR saddr, #byte
-:OR saddr, u8 is opcode=0x6A; saddr; u8 {
+:OR saddr, u8 is SKIP_CHECK & opcode=0x6A; saddr; u8 {
+    build SKIP_CHECK;
     inst_or(saddr, u8);
 }
 
 # OR A, r
-:OR A, SREG2_BYTE is opcode=0x61 & A; op2_h=0xD & SREG2_BYTE & sreg2_byte!=1 {
+:OR A, SREG2_BYTE is SKIP_CHECK & opcode=0x61 & A; op2_h=0xD & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_or(A, SREG2_BYTE);
 }
 
 # OR r, A
-:OR SREG2_BYTE, A is opcode=0x61 & A; op2_h=0xC & SREG2_BYTE & sreg2_byte!=1 {
+:OR SREG2_BYTE, A is SKIP_CHECK & opcode=0x61 & A; op2_h=0xC & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_or(SREG2_BYTE, A);
 }
 
 # OR A, saddr
-:OR A, saddr is opcode=0x6B & A; saddr {
+:OR A, saddr is SKIP_CHECK & opcode=0x6B & A; saddr {
+    build SKIP_CHECK;
     inst_or(A, saddr);
 }
 
 # OR A, !addr16
-:OR A, addr16 is opcode=0x6F & A; addr16 {
+:OR A, addr16 is SKIP_CHECK & opcode=0x6F & A; addr16 {
+    build SKIP_CHECK;
     inst_or(A, addr16);
 }
 
 # OR A, [HL]
-:OR A, AddrHL is opcode=0x6D & A & AddrHL {
+:OR A, AddrHL is SKIP_CHECK & opcode=0x6D & A & AddrHL {
+    build SKIP_CHECK;
     inst_or(A, AddrHL);
 }
 
 # OR A, [HL+byte]
-:OR A, AddrHLOffset is opcode=0x6E & A; AddrHLOffset {
+:OR A, AddrHLOffset is SKIP_CHECK & opcode=0x6E & A; AddrHLOffset {
+    build SKIP_CHECK;
     inst_or(A, AddrHLOffset);
 }
 
 # OR A, [HL+B]
-:OR A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xE0 & AddrHLOffsetB {
+:OR A, AddrHLOffsetB is SKIP_CHECK & opcode=0x61 & A; opcode=0xE0 & AddrHLOffsetB {
+    build SKIP_CHECK;
     inst_or(A, AddrHLOffsetB);
 }
 
 # OR A, [HL+C]
-:OR A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xE2 & AddrHLOffsetC {
+:OR A, AddrHLOffsetC is SKIP_CHECK & opcode=0x61 & A; opcode=0xE2 & AddrHLOffsetC {
+    build SKIP_CHECK;
     inst_or(A, AddrHLOffsetC);
 }
 
@@ -1840,62 +2022,74 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # XOR A, #byte
-:XOR A, u8 is opcode=0x7C & A; u8 {
+:XOR A, u8 is SKIP_CHECK & opcode=0x7C & A; u8 {
+    build SKIP_CHECK;
     inst_xor(A, u8);
 }
 
 # XOR saddr, #byte
-:XOR saddr, u8 is opcode=0x7A; saddr; u8 {
+:XOR saddr, u8 is SKIP_CHECK & opcode=0x7A; saddr; u8 {
+    build SKIP_CHECK;
     inst_xor(saddr, u8);
 }
 
 # XOR A, r
-:XOR A, SREG2_BYTE is opcode=0x61 & A; op2_h=0xf & SREG2_BYTE & sreg2_byte!=1 {
+:XOR A, SREG2_BYTE is SKIP_CHECK & opcode=0x61 & A; op2_h=0xf & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_xor(A, SREG2_BYTE);
 }
 
 # XOR r, A
-:XOR SREG2_BYTE, A is opcode=0x61 & A; op2_h=0xe & SREG2_BYTE & sreg2_byte!=1 {
+:XOR SREG2_BYTE, A is SKIP_CHECK & opcode=0x61 & A; op2_h=0xe & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_xor(SREG2_BYTE, A);
 }
 
 # XOR A, saddr
-:XOR A, saddr is opcode=0x7B & A; saddr {
+:XOR A, saddr is SKIP_CHECK & opcode=0x7B & A; saddr {
+    build SKIP_CHECK;
     inst_xor(A, saddr);
 }
 
 # XOR A, !addr16
-:XOR A, addr16 is opcode=0x7f & A; addr16 {
+:XOR A, addr16 is SKIP_CHECK & opcode=0x7f & A; addr16 {
+    build SKIP_CHECK;
     inst_xor(A, addr16);
 }
 
 # XOR A, [HL]
-:XOR A, AddrHL is opcode=0x7D & A & AddrHL {
+:XOR A, AddrHL is SKIP_CHECK & opcode=0x7D & A & AddrHL {
+    build SKIP_CHECK;
     inst_xor(A, AddrHL);
 }
 
 # XOR A, [HL+byte]
-:XOR A, AddrHLOffset is opcode=0x7E & A; AddrHLOffset {
+:XOR A, AddrHLOffset is SKIP_CHECK & opcode=0x7E & A; AddrHLOffset {
+    build SKIP_CHECK;
     inst_xor(A, AddrHLOffset);
 }
 
 # XOR A, [HL+B]
-:XOR A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xF0 & AddrHLOffsetB {
+:XOR A, AddrHLOffsetB is SKIP_CHECK & opcode=0x61 & A; opcode=0xF0 & AddrHLOffsetB {
+    build SKIP_CHECK;
     inst_xor(A, AddrHLOffsetB);
 }
 
 # XOR A, [HL+C]
-:XOR A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xF2 & AddrHLOffsetC {
+:XOR A, AddrHLOffsetC is SKIP_CHECK & opcode=0x61 & A; opcode=0xF2 & AddrHLOffsetC {
+    build SKIP_CHECK;
     inst_xor(A, AddrHLOffsetC);
 }
 
 # CMP A, #byte
-:CMP A, u8 is opcode=0x4C & A; u8 {
+:CMP A, u8 is SKIP_CHECK & opcode=0x4C & A; u8 {
+    build SKIP_CHECK;
     inst_cmp(A, u8);
 }
 
 # CMP saddr, #byte
-:CMP saddr, u8 is opcode=0x4A; saddr; u8 {
+:CMP saddr, u8 is SKIP_CHECK & opcode=0x4A; saddr; u8 {
+    build SKIP_CHECK;
     inst_cmp(saddr, u8);
 }
 
@@ -1904,12 +2098,14 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 # 0x48 -> 0x9
 
 # CMP A, r
-:CMP A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x9 & SREG2_BYTE & sreg2_byte!=1 {
+:CMP A, SREG2_BYTE is SKIP_CHECK & opcode=0x61 & A; op2_h=0x9 & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_cmp(A, SREG2_BYTE);
 }
 
 # CMP r, A
-:CMP SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x8 & SREG2_BYTE & sreg2_byte!=1 {
+:CMP SREG2_BYTE, A is SKIP_CHECK & opcode=0x61 & A; op2_h=0x8 & SREG2_BYTE & sreg2_byte!=1 {
+    build SKIP_CHECK;
     inst_cmp(SREG2_BYTE, A);
 }
 
@@ -1918,109 +2114,136 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # CMP A, saddr
-:CMP A, saddr is opcode=0x4B & A; saddr {
+:CMP A, saddr is SKIP_CHECK & opcode=0x4B & A; saddr {
+    build SKIP_CHECK;
     inst_cmp(A, saddr);
 }
 
 # CMP A, !addr16
-:CMP A, addr16 is opcode=0x4F & A; addr16 {
+:CMP A, addr16 is SKIP_CHECK & opcode=0x4F & A; addr16 {
+    build SKIP_CHECK;
     inst_cmp(A, addr16);
 }
 
 # CMP A, [HL]
-:CMP A, AddrHL is opcode=0x4D & A & AddrHL {
+:CMP A, AddrHL is SKIP_CHECK & opcode=0x4D & A & AddrHL {
+    build SKIP_CHECK;
     inst_cmp(A, AddrHL);
 }
 
 # CMP A, [HL+byte]
-:CMP A, AddrHLOffset is opcode=0x4E & A; AddrHLOffset {
+:CMP A, AddrHLOffset is SKIP_CHECK & opcode=0x4E & A; AddrHLOffset {
+    build SKIP_CHECK;
     inst_cmp(A, AddrHLOffset);
 }
 
 # CMP A, [HL+B]
-:CMP A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xC0 & AddrHLOffsetB {
+:CMP A, AddrHLOffsetB is SKIP_CHECK & opcode=0x61 & A; opcode=0xC0 & AddrHLOffsetB {
+    build SKIP_CHECK;
     inst_cmp(A, AddrHLOffsetB);
 }
 
 # CMP A, [HL+C]
-:CMP A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xC2 & AddrHLOffsetC {
+:CMP A, AddrHLOffsetC is SKIP_CHECK & opcode=0x61 & A; opcode=0xC2 & AddrHLOffsetC {
+    build SKIP_CHECK;
     inst_cmp(A, AddrHLOffsetC);
 }
 
 # CMP !addr16, #byte
-:CMP addr16, u8 is opcode=0x40; addr16; u8 {
+:CMP addr16, u8 is SKIP_CHECK & opcode=0x40; addr16; u8 {
+    build SKIP_CHECK;
     inst_cmp(addr16, u8);
 }
 
 # CMP0, r
-:CMP0 DREG_AXBC is op_h=0xD & op_l<4 & DREG_AXBC {
+:CMP0 DREG_AXBC is SKIP_CHECK & op_h=0xD & op_l<4 & DREG_AXBC {
+    build SKIP_CHECK;
     inst_cmp0(DREG_AXBC);
 }
 
 # CMP0 saddr
-:CMP0 saddr is opcode=0xD4; saddr {
+:CMP0 saddr is SKIP_CHECK & opcode=0xD4; saddr {
+    build SKIP_CHECK;
     inst_cmp0(saddr);
 }
 
 # CMP0 !addr16
-:CMP0 addr16 is opcode=0xD5; addr16 {
+:CMP0 addr16 is SKIP_CHECK & opcode=0xD5; addr16 {
+    build SKIP_CHECK;
     inst_cmp0(addr16);
 }
 
 # CMPS X, [HL+byte]
-:CMPS X, AddrHLOffset is opcode=0x61 & X; opcode=0xDE; AddrHLOffset {
+:CMPS X, AddrHLOffset is SKIP_CHECK & opcode=0x61 & X; opcode=0xDE; AddrHLOffset {
+    build SKIP_CHECK;
     Z = X == AddrHLOffset;
     CY = (Z != 0) | (AddrHLOffset == 0) | (X == 0);
     AC = (X & 0x08) >= (AddrHLOffset & 0x08);
 }
 
 # ADDW AX, #word
-:ADDW AX, u16 is opcode=0x04 & AX; u16 {
+:ADDW AX, u16 is SKIP_CHECK & opcode=0x04 & AX; u16 {
+    build SKIP_CHECK;
     inst_addw(AX, u16);
 }
 
+# ADDW AX, AX
+:ADDW "AX", "AX" is SKIP_CHECK & AX & opcode=0x1 {
+    build SKIP_CHECK;
+    inst_addw(AX, AX);
+}
+
 # ADDW AX, rp
-:ADDW AX, DREG_WORD is op_h=0x0 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
+:ADDW AX, DREG_WORD is SKIP_CHECK & op_h=0x0 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
+    build SKIP_CHECK;
     inst_addw(AX, DREG_WORD);
 }
 
 # ADDW AX, saddrp
-:ADDW AX, saddrp is opcode=0x06 & AX; saddrp {
+:ADDW AX, saddrp is SKIP_CHECK & opcode=0x06 & AX; saddrp {
+    build SKIP_CHECK;
     inst_addw(AX, saddrp);
 }
 
 # ADDW AX, !addr16
-:ADDW AX, addr16w is opcode=0x02 & AX; addr16w {
+:ADDW AX, addr16w is SKIP_CHECK & opcode=0x02 & AX; addr16w {
+    build SKIP_CHECK;
     inst_addw(AX, addr16w);
 }
 
 # ADDW AX, [HL+byte]
-:ADDW AX, AddrHLOffsetW is opcode=0x61 & AX; opcode=0x09; AddrHLOffsetW {
+:ADDW AX, AddrHLOffsetW is SKIP_CHECK & opcode=0x61 & AX; opcode=0x09; AddrHLOffsetW {
+    build SKIP_CHECK;
     inst_addw(AX, AddrHLOffsetW);
 }
 
 # SUBW AX, #word
-:SUBW AX, u16 is opcode=0x24 & AX; u16 {
+:SUBW AX, u16 is SKIP_CHECK & opcode=0x24 & AX; u16 {
+    build SKIP_CHECK;
     inst_subw(AX, u16);
 }
 
 # SUBW AX, rp
-:SUBW AX, DREG_WORD is op_h=0x2 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
+:SUBW AX, DREG_WORD is SKIP_CHECK & op_h=0x2 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
+    build SKIP_CHECK;
     inst_subw(AX, DREG_WORD);
 }
 
 # SUBW AX, saddrp
-:SUBW AX, saddrp is opcode=0x26 & AX; saddrp {
+:SUBW AX, saddrp is SKIP_CHECK & opcode=0x26 & AX; saddrp {
+    build SKIP_CHECK;
     inst_subw(AX, saddrp);
 }
 
 # SUBW AX, !addr16
-:SUBW AX, addr16w is opcode=0x22 & AX; addr16w {
+:SUBW AX, addr16w is SKIP_CHECK & opcode=0x22 & AX; addr16w {
+    build SKIP_CHECK;
     inst_subw(AX, addr16w);
 }
 
 # SUBW AX, [HL+byte]
-:SUBW AX, AddrHLOffsetW is opcode=0x61 & AX; opcode=0x29; AddrHLOffsetW {
+:SUBW AX, AddrHLOffsetW is SKIP_CHECK & opcode=0x61 & AX; opcode=0x29; AddrHLOffsetW {
+    build SKIP_CHECK;
     inst_subw(AX, AddrHLOffsetW);
 }
 
@@ -2029,39 +2252,46 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # CMPW AX, #word
-:CMPW AX, u16 is opcode=0x44 & AX; u16 {
+:CMPW AX, u16 is SKIP_CHECK & opcode=0x44 & AX; u16 {
+    build SKIP_CHECK;
     inst_cmpw(AX, u16);
 }
 
 # CMPW AX, rp
-:CMPW AX, DREG_WORD is op_h=0x4 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
+:CMPW AX, DREG_WORD is SKIP_CHECK & op_h=0x4 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
+    build SKIP_CHECK;
     inst_cmpw(AX, DREG_WORD);
 }
 
 # CMPW AX, saddrp
-:CMPW AX, saddrp is opcode=0x46 & AX; saddrp {
+:CMPW AX, saddrp is SKIP_CHECK & opcode=0x46 & AX; saddrp {
+    build SKIP_CHECK;
     inst_cmpw(AX, saddrp);
 }
 
 # CMPW AX, !addr16
-:CMPW AX, addr16w is opcode=0x42 & AX; addr16w {
+:CMPW AX, addr16w is SKIP_CHECK & opcode=0x42 & AX; addr16w {
+    build SKIP_CHECK;
     inst_cmpw(AX, addr16w);
 }
 
 # CMPW AX, [HL+byte]
-:CMPW AX, AddrHLOffsetW is opcode=0x61 & AX; opcode=0x49; AddrHLOffsetW {
+:CMPW AX, AddrHLOffsetW is SKIP_CHECK & opcode=0x61 & AX; opcode=0x49; AddrHLOffsetW {
+    build SKIP_CHECK;
     inst_cmpw(AX, AddrHLOffsetW);
 }
 
 # MULU X
-:MULU X (AX"="A"*X") is opcode=0xD6 & AX & X & A {
+:MULU X (AX"="A"*X") is SKIP_CHECK & opcode=0xD6 & AX & X & A {
+    build SKIP_CHECK;
     local aw:2 = zext(A:1);
     local xw:2 = zext(X:1);
     AX = aw * xw;
 }
 
 # MULHU
-:MULHU ("AXBC="AX"*"BC) is opcode=0xCE; opcode=0xFB; opcode=0x01 & AX & BC {
+:MULHU ("AXBC="AX"*"BC) is SKIP_CHECK & opcode=0xCE; opcode=0xFB; opcode=0x01 & AX & BC {
+    build SKIP_CHECK;
     local axdw:4 = zext(AX:2);
     local bcdw:4 = zext(BC:2);
     local res:4 = axdw * bcdw;
@@ -2074,7 +2304,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # MULH
-:MULH ("AXBC="AX"*"BC) is opcode=0xCE; opcode=0xFB; opcode=0x02 & AX & BC {
+:MULH ("AXBC="AX"*"BC) is SKIP_CHECK & opcode=0xCE; opcode=0xFB; opcode=0x02 & AX & BC {
+    build SKIP_CHECK;
     local axdw:4 = sext(AX:2);
     local bcdw:4 = sext(BC:2);
     local res:4 = axdw * bcdw;
@@ -2087,11 +2318,12 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # DIVHU
-:DIVHU ("AXDE="AX"/"DE) is opcode=0xCE; opcode=0xFB; opcode=0x03 & AX & DE {
+:DIVHU ("AXDE="AX"/"DE) is SKIP_CHECK & opcode=0xCE; opcode=0xFB; opcode=0x03 & AX & DE {
+    build SKIP_CHECK;
     local axdw:4 = zext(AX:2);
     local dedw:4 = zext(DE:2);
 
-    # Doesn't handle the case where DE is 0
+    # Doesn't handle the case where DE is SKIP_CHECK & 0
     local div:4 = axdw / dedw;
     local rem:4 = axdw % dedw;
 
@@ -2103,51 +2335,59 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # DIVWU
-:DIVWU is opcode=0xCE; opcode=0xFB; opcode=0x04 { divwu(); }
+:DIVWU is SKIP_CHECK & opcode=0xCE; opcode=0xFB; opcode=0x04 { divwu(); }
 
 # MACHU
-:MACHU is opcode=0xCE; opcode=0xFB; opcode=0x05 { machu(); }
+:MACHU is SKIP_CHECK & opcode=0xCE; opcode=0xFB; opcode=0x05 { machu(); }
 
 # MACH
-:MACH is opcode=0xCE; opcode=0xFB; opcode=0x06 { mach(); }
+:MACH is SKIP_CHECK & opcode=0xCE; opcode=0xFB; opcode=0x06 { mach(); }
 
 # INC r
-:INC DREG_BYTE is op_h=0x8 & DREG_BYTE {
+:INC DREG_BYTE is SKIP_CHECK & op_h=0x8 & DREG_BYTE {
+    build SKIP_CHECK;
     inst_inc(DREG_BYTE);
 }
 
 # INC saddr
-:INC saddr is opcode=0xA4; saddr {
+:INC saddr is SKIP_CHECK & opcode=0xA4; saddr {
+    build SKIP_CHECK;
     inst_inc(saddr);
 }
 
 # INC !addr16
-:INC addr16 is opcode=0xA0; addr16 {
+:INC addr16 is SKIP_CHECK & opcode=0xA0; addr16 {
+    build SKIP_CHECK;
     inst_inc(addr16);
 }
 
 # INC [HL+byte]
-:INC AddrHLOffset is opcode=0x61; opcode=0x59; AddrHLOffset {
+:INC AddrHLOffset is SKIP_CHECK & opcode=0x61; opcode=0x59; AddrHLOffset {
+    build SKIP_CHECK;
     inst_inc(AddrHLOffset);
 }
 
 # DEC r
-:DEC DREG_BYTE is op_h=0x9 & DREG_BYTE {
+:DEC DREG_BYTE is SKIP_CHECK & op_h=0x9 & DREG_BYTE {
+    build SKIP_CHECK;
     inst_dec(DREG_BYTE);
 }
 
 # DEC saddr
-:DEC saddr is opcode=0xB4; saddr {
+:DEC saddr is SKIP_CHECK & opcode=0xB4; saddr {
+    build SKIP_CHECK;
     inst_dec(saddr);
 }
 
 # DEC !addr16
-:DEC addr16 is opcode=0xB0; addr16 {
+:DEC addr16 is SKIP_CHECK & opcode=0xB0; addr16 {
+    build SKIP_CHECK;
     inst_dec(addr16);
 }
 
 # DEC [HL+byte]
-:DEC AddrHLOffset is opcode=0x61; opcode=0x69; AddrHLOffset {
+:DEC AddrHLOffset is SKIP_CHECK & opcode=0x61; opcode=0x69; AddrHLOffset {
+    build SKIP_CHECK;
     inst_dec(AddrHLOffset);
 }
 
@@ -2156,52 +2396,62 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # INCW rp
-:INCW DREG_WORD is op_h=0xA & DREG_WORD {
+:INCW DREG_WORD is SKIP_CHECK & op_h=0xA & DREG_WORD {
+    build SKIP_CHECK;
     inst_incw(DREG_WORD);
 }
 
 # INCW saddrp
-:INCW saddrp is opcode=0xA6; saddrp {
+:INCW saddrp is SKIP_CHECK & opcode=0xA6; saddrp {
+    build SKIP_CHECK;
     inst_incw(saddrp);
 }
 
 # INCW !addr16
-:INCW addr16w is opcode=0xA2; addr16w {
+:INCW addr16w is SKIP_CHECK & opcode=0xA2; addr16w {
+    build SKIP_CHECK;
     inst_incw(addr16w);
 }
 
 # INCW [HL+byte]
-:INCW AddrHLOffsetW is opcode=0x61; opcode=0x79; AddrHLOffsetW {
+:INCW AddrHLOffsetW is SKIP_CHECK & opcode=0x61; opcode=0x79; AddrHLOffsetW {
+    build SKIP_CHECK;
     inst_incw(AddrHLOffsetW);
 }
 
 # DECW rp
-:DECW DREG_WORD is op_h=0xB & DREG_WORD {
+:DECW DREG_WORD is SKIP_CHECK & op_h=0xB & DREG_WORD {
+    build SKIP_CHECK;
     inst_decw(DREG_WORD);
 }
 
 # DECW saddrp
-:DECW saddrp is opcode=0xB6; saddrp {
+:DECW saddrp is SKIP_CHECK & opcode=0xB6; saddrp {
+    build SKIP_CHECK;
     inst_decw(saddrp);
 }
 
 # DECW !addr16
-:DECW addr16w is opcode=0xB2; addr16w {
+:DECW addr16w is SKIP_CHECK & opcode=0xB2; addr16w {
+    build SKIP_CHECK;
     inst_decw(addr16w);
 }
 
 # DECW [HL+byte]
-:DECW AddrHLOffset is opcode=0x61; opcode=0x89; AddrHLOffset {
+:DECW AddrHLOffset is SKIP_CHECK & opcode=0x61; opcode=0x89; AddrHLOffset {
+    build SKIP_CHECK;
     inst_decw(AddrHLOffset);
 }
 
 # SHR A, n
-:SHR A, shift_n is opcode=0x31 & A; op2_l=0xA & shift_n {
+:SHR A, shift_n is SKIP_CHECK & opcode=0x31 & A; op2_l=0xA & shift_n {
+    build SKIP_CHECK;
     inst_shr(A, shift_n);
 }
 
 # SHRW AX, n
-:SHRW AX, shift_n is opcode=0x31 & AX; op2_l=0xE & shift_n {
+:SHRW AX, shift_n is SKIP_CHECK & opcode=0x31 & AX; op2_l=0xE & shift_n {
+    build SKIP_CHECK;
     inst_shr(AX, shift_n);
 }
 
@@ -2210,27 +2460,32 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # SHL A, n
-:SHL A, shift_n is opcode=0x31 & A; op2_l=0x9 & shift_n {
+:SHL A, shift_n is SKIP_CHECK & opcode=0x31 & A; op2_l=0x9 & shift_n {
+    build SKIP_CHECK;
     inst_shl(A, shift_n);
 }
 
 # SHL B, n
-:SHL B, shift_n is opcode=0x31 & B; op2_l=0x8 & shift_n {
+:SHL B, shift_n is SKIP_CHECK & opcode=0x31 & B; op2_l=0x8 & shift_n {
+    build SKIP_CHECK;
     inst_shl(B, shift_n);
 }
 
 # SHL C, n
-:SHL C, shift_n is opcode=0x31 & C; op2_l=0x7 & shift_n {
+:SHL C, shift_n is SKIP_CHECK & opcode=0x31 & C; op2_l=0x7 & shift_n {
+    build SKIP_CHECK;
     inst_shl(C, shift_n);
 }
 
 # SHLW AX, n
-:SHLW AX, shift_n is opcode=0x31 & AX; op2_l=0xD & shift_n {
+:SHLW AX, shift_n is SKIP_CHECK & opcode=0x31 & AX; op2_l=0xD & shift_n {
+    build SKIP_CHECK;
     inst_shlw(AX, shift_n);
 }
 
 # SHLW BC, n
-:SHLW BC, shift_n is opcode=0x31 & BC; op2_l=0xC & shift_n {
+:SHLW BC, shift_n is SKIP_CHECK & opcode=0x31 & BC; op2_l=0xC & shift_n {
+    build SKIP_CHECK;
     inst_shlw(BC, shift_n);
 }
 
@@ -2239,17 +2494,20 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # SAR A, n
-:SAR A, shift_n is opcode=0x31 & A; op2_l=0xB & shift_n {
+:SAR A, shift_n is SKIP_CHECK & opcode=0x31 & A; op2_l=0xB & shift_n {
+    build SKIP_CHECK;
     inst_sar(A, shift_n);
 }
 
 # SARW AX, n
-:SARW AX, shift_n is opcode=0x31 & AX; op2_l=0xF & shift_n {
+:SARW AX, shift_n is SKIP_CHECK & opcode=0x31 & AX; op2_l=0xF & shift_n {
+    build SKIP_CHECK;
     inst_sarw(AX, shift_n);
 }
 
 # ROR A, 1
-:ROR A, 1 is opcode=0x61 & A; opcode=0xDB {
+:ROR A, 1 is SKIP_CHECK & opcode=0x61 & A; opcode=0xDB {
+    build SKIP_CHECK;
     local lsb:1 = A & 0x1;
     CY = (lsb != 0);
     A = A >> 1;
@@ -2257,7 +2515,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # ROL A, 1
-:ROL A, 1 is opcode=0x61 & A; opcode=0xEB {
+:ROL A, 1 is SKIP_CHECK & opcode=0x61 & A; opcode=0xEB {
+    build SKIP_CHECK;
     local msb:1 = A & 0x80;
     CY = (msb != 0);
     A = A << 1;
@@ -2265,7 +2524,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # RORC A, 1
-:RORC A, 1 is opcode=0x61 & A; opcode=0xFB {
+:RORC A, 1 is SKIP_CHECK & opcode=0x61 & A; opcode=0xFB {
+    build SKIP_CHECK;
     local lsb:1 = A & 1;
     A = A >> 1;
     A = (CY << 7);
@@ -2273,7 +2533,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # ROLC A, 1
-:ROLC A, 1 is opcode=0x61 & A; opcode=0xDC {
+:ROLC A, 1 is SKIP_CHECK & opcode=0x61 & A; opcode=0xDC {
+    build SKIP_CHECK;
     local msb:1 = (A & 0x80) != 0;
     A = A << 1;
     A = A | CY;
@@ -2281,17 +2542,20 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # ROLWC AX, 1
-:ROLWC AX, 1 is opcode=0x61 & AX; opcode=0xEE {
+:ROLWC AX, 1 is SKIP_CHECK & opcode=0x61 & AX; opcode=0xEE {
+    build SKIP_CHECK;
     inst_rolwc(AX);
 }
 
 # ROLWC BC, 1
-:ROLWC BC, 1 is opcode=0x61 & BC; opcode=0xBC {
+:ROLWC BC, 1 is SKIP_CHECK & opcode=0x61 & BC; opcode=0xBC {
+    build SKIP_CHECK;
     inst_rolwc(BC);
 }
 
 # MOV1 CY, saddr.n
-:MOV1 CY, saddr"."bit_op_n is opcode=0x71 & CY; op_l=0x4 & bit_op_n & mov1_sreg=0; saddr {
+:MOV1 CY, saddr"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0x4 & bit_op_n & mov1_sreg=0; saddr {
+    build SKIP_CHECK;
     mov1_read(CY, saddr, bit_op_n);
 }
 
@@ -2300,27 +2564,32 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # MOV1 CY, sfr.n
-:MOV1 CY, sfrp"."bit_op_n is opcode=0x71 & CY; op_l=0xC & bit_op_n & mov1_sreg=0; sfrp {
+:MOV1 CY, sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0xC & bit_op_n & mov1_sreg=0; sfrp {
+    build SKIP_CHECK;
     mov1_read(CY, sfrp, bit_op_n);
 }
 
 # MOV1 CY, A.n
-:MOV1 CY, A"."bit_op_n is opcode=0x71 & CY & A; op_l=0xC & bit_op_n & mov1_sreg=1 {
+:MOV1 CY, A"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & A; op_l=0xC & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     mov1_read(CY, A, bit_op_n);
 }
 
 # MOV1 CY, PSW.n
-:MOV1 CY, PSW"."bit_op_n is opcode=0x71 & CY & PSW; op_l=0xC & bit_op_n; opcode=0xFA {
+:MOV1 CY, PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & PSW; op_l=0xC & bit_op_n; opcode=0xFA {
+    build SKIP_CHECK;
     mov1_read(CY, PSW, bit_op_n);
 }
 
 # MOV1 CY, [HL].0
-:MOV1 CY, AddrHL"."bit_op_n is opcode=0x71 & CY & AddrHL; op_l=0x4 & bit_op_n & mov1_sreg=1 {
+:MOV1 CY, AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & AddrHL; op_l=0x4 & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     mov1_read(CY, AddrHL, bit_op_n);
 }
 
 # MOV1 saddr.n, CY
-:MOV1 saddr"."bit_op_n, CY is opcode=0x71 & CY; op_l=0x1 & bit_op_n & mov1_sreg=0; saddr {
+:MOV1 saddr"."bit_op_n, CY is SKIP_CHECK & opcode=0x71 & CY; op_l=0x1 & bit_op_n & mov1_sreg=0; saddr {
+    build SKIP_CHECK;
     mov1_write(saddr, CY, bit_op_n);
 }
 
@@ -2329,22 +2598,26 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # MOV1 sfr.n, CY
-:MOV1 sfrp"."bit_op_n, CY is opcode=0x71 & CY; op_l=0x9 & bit_op_n & mov1_sreg=0; sfrp {
+:MOV1 sfrp"."bit_op_n, CY is SKIP_CHECK & opcode=0x71 & CY; op_l=0x9 & bit_op_n & mov1_sreg=0; sfrp {
+    build SKIP_CHECK;
     mov1_write(sfrp, CY, bit_op_n);
 }
 
 # MOV1 A.n, CY
-:MOV1 A"."bit_op_n & 0x7, CY is opcode=0x71 & CY & A; op_l=0x9 & bit_op_n & mov1_sreg=1 {
+:MOV1 A"."bit_op_n & 0x7, CY is SKIP_CHECK & opcode=0x71 & CY & A; op_l=0x9 & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     mov1_write(A, CY, bit_op_n);
 }
 
 # MOV1 PSW.n, CY
-:MOV1 PSW"."bit_op_n, CY is opcode=0x71 & CY & PSW; op_l=0x9 & bit_op_n & mov1_sreg=0; opcode=0xFA {
+:MOV1 PSW"."bit_op_n, CY is SKIP_CHECK & opcode=0x71 & CY & PSW; op_l=0x9 & bit_op_n & mov1_sreg=0; opcode=0xFA {
+    build SKIP_CHECK;
     mov1_write(PSW, CY, bit_op_n);
 }
 
 # MOV1 [HL].n, CY
-:MOV1 AddrHL"."bit_op_n, CY is opcode=0x71 & CY & AddrHL; op_l=0x1 & bit_op_n & mov1_sreg=1 {
+:MOV1 AddrHL"."bit_op_n, CY is SKIP_CHECK & opcode=0x71 & CY & AddrHL; op_l=0x1 & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     mov1_write(AddrHL, CY, bit_op_n);
 }
 
@@ -2353,22 +2626,26 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # AND1 CY, saddr.n
-:AND1 CY, saddr"."bit_op_n is opcode=0x71 & CY; op_l=0x5 & bit_op_n & mov1_sreg=0; saddr {
+:AND1 CY, saddr"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0x5 & bit_op_n & mov1_sreg=0; saddr {
+    build SKIP_CHECK;
     inst_and1(saddr, bit_op_n);
 }
 
 # AND1 CY, sfr.n
-:AND1 CY, sfrp"."bit_op_n is opcode=0x71 & CY; op_l=0xD & bit_op_n & mov1_sreg=0; sfrp {
+:AND1 CY, sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0xD & bit_op_n & mov1_sreg=0; sfrp {
+    build SKIP_CHECK;
     inst_and1(sfrp, bit_op_n);
 }
 
 # AND1 CY, A.n
-:AND1 CY, A"."bit_op_n is opcode=0x71 & CY & A; op_l=0xD & bit_op_n & mov1_sreg=1 {
+:AND1 CY, A"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & A; op_l=0xD & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     inst_and1(A, bit_op_n);
 }
 
 # AND1 CY, PSW.n
-:AND1 CY, PSW"."bit_op_n is opcode=0x71 & CY & PSW; op_l=0xD & bit_op_n & mov1_sreg=0; opcode=0xFA {
+:AND1 CY, PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & PSW; op_l=0xD & bit_op_n & mov1_sreg=0; opcode=0xFA {
+    build SKIP_CHECK;
     inst_and1(PSW, bit_op_n);
 }
 
@@ -2377,22 +2654,26 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # AND1 CY, [HL].n
-:AND1 CY, AddrHL"."bit_op_n is opcode=0x71 & CY & AddrHL; op_l=0x5 & bit_op_n & mov1_sreg=1 {
+:AND1 CY, AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & AddrHL; op_l=0x5 & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     inst_and1(AddrHL, bit_op_n);
 }
 
 # OR1 CY, saddr.n
-:OR1 CY, saddr"."bit_op_n is opcode=0x71 & CY; op_l=0x6 & bit_op_n & mov1_sreg=0; saddr {
+:OR1 CY, saddr"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0x6 & bit_op_n & mov1_sreg=0; saddr {
+    build SKIP_CHECK;
     inst_or1(saddr, bit_op_n);
 }
 
 # OR1 CY, sfr.n
-:OR1 CY, sfrp"."bit_op_n is opcode=0x71 & CY; op_l=0xE & bit_op_n & mov1_sreg=0; sfrp {
+:OR1 CY, sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0xE & bit_op_n & mov1_sreg=0; sfrp {
+    build SKIP_CHECK;
     inst_or1(sfrp, bit_op_n);
 }
 
 # OR1 CY, A.n
-:OR1 CY, A"."bit_op_n is opcode=0x71 & CY & A; op_l=0xE & bit_op_n & mov1_sreg=1 {
+:OR1 CY, A"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & A; op_l=0xE & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     inst_or1(A, bit_op_n);
 }
 
@@ -2401,22 +2682,26 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # OR1 CY, PSW.n
-:OR1 CY, PSW"."bit_op_n is opcode=0x71 & CY & PSW; op_l=0xE & bit_op_n & mov1_sreg=0; opcode=0xFA {
+:OR1 CY, PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & PSW; op_l=0xE & bit_op_n & mov1_sreg=0; opcode=0xFA {
+    build SKIP_CHECK;
     inst_or1(PSW, bit_op_n);
 }
 
 # OR1 CY, [HL].n
-:OR1 CY, AddrHL"."bit_op_n is opcode=0x71 & CY & AddrHL; op_l=0x6 & bit_op_n & mov1_sreg=1 {
+:OR1 CY, AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & AddrHL; op_l=0x6 & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     inst_or1(AddrHL, bit_op_n);
 }
 
 # XOR1 CY, saddr.n
-:XOR1 CY, saddr"."bit_op_n is opcode=0x71 & CY; op_l=0x7 & bit_op_n & mov1_sreg=0; saddr {
+:XOR1 CY, saddr"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0x7 & bit_op_n & mov1_sreg=0; saddr {
+    build SKIP_CHECK;
     inst_xor1(saddr, bit_op_n);
 }
 
 # XOR1 CY, sfr.n
-:XOR1 CY, sfrp"."bit_op_n is opcode=0x71 & CY; op_l=0xF & bit_op_n & mov1_sreg=0; sfrp {
+:XOR1 CY, sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0xF & bit_op_n & mov1_sreg=0; sfrp {
+    build SKIP_CHECK;
     inst_xor(sfrp, bit_op_n);
 }
 
@@ -2425,22 +2710,26 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # XOR1 CY, A.n
-:XOR1 CY, A"."bit_op_n is opcode=0x71 & CY & A; op_l=0xF & bit_op_n & mov1_sreg=1 {
+:XOR1 CY, A"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & A; op_l=0xF & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     inst_xor(A, bit_op_n);
 }
 
 # XOR1 CY, PSW.n
-:XOR1 CY, PSW"."bit_op_n is opcode=0x71 & CY & PSW; op_l=0xF & bit_op_n & mov1_sreg=0; opcode=0xFA {
+:XOR1 CY, PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & PSW; op_l=0xF & bit_op_n & mov1_sreg=0; opcode=0xFA {
+    build SKIP_CHECK;
     inst_xor(PSW, bit_op_n);
 }
 
 # XOR1 CY, [HL].n
-:XOR1 CY, AddrHL"."bit_op_n is opcode=0x71 & CY & AddrHL; op_l=0x7 & bit_op_n & mov1_sreg=1 {
+:XOR1 CY, AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & AddrHL; op_l=0x7 & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     inst_xor(PSW, bit_op_n);
 }
 
 # SET1 saddr.n
-:SET1 saddr"."bit_op_n is opcode=0x71; op_l=0x2 & bit_op_n & mov1_sreg=0; saddr {
+:SET1 saddr"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0x2 & bit_op_n & mov1_sreg=0; saddr {
+    build SKIP_CHECK;
     inst_set1(saddr, bit_op_n);
 }
 
@@ -2449,28 +2738,33 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # SET1 sfr.n
-:SET1 sfrp"."bit_op_n is opcode=0x71; op_l=0xA & bit_op_n & mov1_sreg=0; sfrp {
+:SET1 sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0xA & bit_op_n & mov1_sreg=0; sfrp {
+    build SKIP_CHECK;
     inst_set1(sfrp, bit_op_n);
 }
 
 # SET1 A.n
-:SET1 A"."bit_op_n is opcode=0x71 & A; op_l=0xA & bit_op_n & mov1_sreg=1 {
+:SET1 A"."bit_op_n is SKIP_CHECK & opcode=0x71 & A; op_l=0xA & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     inst_set1(A, bit_op_n);
 }
 
 # SET1 !addr16.n
-:SET1 addr16"."bit_op_n is opcode=0x71; op_l=0 & bit_op_n & mov1_sreg=0; addr16 {
+:SET1 addr16"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0 & bit_op_n & mov1_sreg=0; addr16 {
+    build SKIP_CHECK;
     inst_set1(addr16, bit_op_n);
 }
 
 # SET1 PSW.n
-:SET1 PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xA & bit_op_n & mov1_sreg=0; opcode=0xFA {
+:SET1 PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & PSW; op_l=0xA & bit_op_n & mov1_sreg=0; opcode=0xFA {
+    build SKIP_CHECK;
     inst_set1(PSW, bit_op_n);
     update_psw(PSW);
 }
 
 # SET1 [HL].n
-:SET1 AddrHL"."bit_op_n is opcode=0x71; op_l=0x2 & bit_op_n & mov1_sreg=1 & AddrHL {
+:SET1 AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0x2 & bit_op_n & mov1_sreg=1 & AddrHL {
+    build SKIP_CHECK;
     inst_set1(AddrHL, bit_op_n);
 }
 
@@ -2479,17 +2773,20 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # CLR1 saddr.n
-:CLR1 saddr"."bit_op_n is opcode=0x71; op_l=0x3 & bit_op_n & mov1_sreg=0; saddr {
+:CLR1 saddr"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0x3 & bit_op_n & mov1_sreg=0; saddr {
+    build SKIP_CHECK;
     inst_clr1(saddr, bit_op_n);
 }
 
 # CLR1 sfr.n
-:CLR1 sfrp"."bit_op_n is opcode=0x71; op_l=0xB & bit_op_n & mov1_sreg=0; sfrp {
+:CLR1 sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0xB & bit_op_n & mov1_sreg=0; sfrp {
+    build SKIP_CHECK;
     inst_clr1(sfrp, bit_op_n);
 }
 
 # CLR1 A.n
-:CLR1 A"."bit_op_n is opcode=0x71 & A; op_l=0xB & bit_op_n & mov1_sreg=1 {
+:CLR1 A"."bit_op_n is SKIP_CHECK & opcode=0x71 & A; op_l=0xB & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     inst_clr1(A, bit_op_n);
 }
 
@@ -2498,33 +2795,39 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # CLR1 !addr16.n
-:CLR1 addr16"."bit_op_n is opcode=0x71; op_l=0x8 & bit_op_n & mov1_sreg=0; addr16 {
+:CLR1 addr16"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0x8 & bit_op_n & mov1_sreg=0; addr16 {
+    build SKIP_CHECK;
     inst_clr1(addr16, bit_op_n);
 }
 
 # CLR1 PSW.n
-:CLR1 PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xB & bit_op_n & mov1_sreg=0; opcode=0xFA {
+:CLR1 PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & PSW; op_l=0xB & bit_op_n & mov1_sreg=0; opcode=0xFA {
+    build SKIP_CHECK;
     inst_clr1(PSW, bit_op_n);
     update_psw(PSW);
 }
 
 # CLR1 [HL].n
-:CLR1 AddrHL"."bit_op_n is opcode=0x71 & AddrHL; op_l=0x3 & bit_op_n & mov1_sreg=1 {
+:CLR1 AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & AddrHL; op_l=0x3 & bit_op_n & mov1_sreg=1 {
+    build SKIP_CHECK;
     inst_clr1(AddrHL, bit_op_n);
 }
 
 # SET1 CY
-:SET1 CY is opcode=0x71 & CY; opcode=0x80 {
+:SET1 CY is SKIP_CHECK & opcode=0x71 & CY; opcode=0x80 {
+    build SKIP_CHECK;
     inst_set1(CY, 0);
 }
 
 # CLR1 CY
-:CLR1 CY is opcode=0x71 & CY; opcode=0x88 {
+:CLR1 CY is SKIP_CHECK & opcode=0x71 & CY; opcode=0x88 {
+    build SKIP_CHECK;
     inst_clr1(CY, 0);
 }
 
 # NOT1 CY
-:NOT1 CY is opcode=0x71 & CY; opcode=0xC0 {
+:NOT1 CY is SKIP_CHECK & opcode=0x71 & CY; opcode=0xC0 {
+    build SKIP_CHECK;
     CY = ~CY & 0x1;
 }
 
@@ -2533,7 +2836,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # CALL rp
-:CALL CALL_RP is opcode=0x61; CALL_RP & op_l=0xA & mov1_sreg=1 {
+:CALL CALL_RP is SKIP_CHECK & opcode=0x61; CALL_RP & op_l=0xA & mov1_sreg=1 {
+    build SKIP_CHECK;
     local ret_pc:4 = inst_next;
     SP = SP - 4;
     local loc:3 = segment(SS, SP);
@@ -2544,7 +2848,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # CALL $!addr20
-:CALL jdisp16 is opcode=0xFE; jdisp16 {
+:CALL jdisp16 is SKIP_CHECK & opcode=0xFE; jdisp16 {
+    build SKIP_CHECK;
     local ret_pc:4 = inst_next;
     SP = SP - 4;
     local loc:3 = segment(SS, SP);
@@ -2554,7 +2859,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # CALL !addr16
-:CALL jaddr16 is opcode=0xFD; jaddr16 {
+:CALL jaddr16 is SKIP_CHECK & opcode=0xFD; jaddr16 {
+    build SKIP_CHECK;
     local ret_pc:4 = inst_next;
     SP = SP - 4;
     local loc:3 = segment(SS, SP);
@@ -2564,7 +2870,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # CALL !!addr20
-:CALL addr20 is opcode=0xFC; addr20 {
+:CALL addr20 is SKIP_CHECK & opcode=0xFC; addr20 {
+    build SKIP_CHECK;
     local ret_pc:4 = inst_next;
     SP = SP - 4;
     local loc:3 = segment(SS, SP);
@@ -2574,7 +2881,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # CALLT [CALLT]
-:CALLT CALLT_Entry is opcode=0x61; CALLT_Entry & op2_callt_hi & op2_callt_low & op2_b7=1 & op2_b23=0x1 {
+:CALLT CALLT_Entry is SKIP_CHECK & opcode=0x61; CALLT_Entry & op2_callt_hi & op2_callt_low & op2_b7=1 & op2_b23=0x1 {
+    build SKIP_CHECK;
     local ret_pc:4 = inst_next;
     SP = SP - 4;
     local loc:3 = segment(SS, SP);
@@ -2584,7 +2892,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # BRK
-:BRK is opcode=0x61; opcode=0xCC & brk_addr {
+:BRK is SKIP_CHECK & opcode=0x61; opcode=0xCC & brk_addr {
+    build SKIP_CHECK;
     SP = SP - 1;
     local ret_pc:4 = inst_next;
     local loc:3 = segment(SS, SP);
@@ -2603,12 +2912,14 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # RET
-:RET is opcode=0xD7 & ret_addr {
+:RET is SKIP_CHECK & opcode=0xD7 & ret_addr {
+    build SKIP_CHECK;
     return [ret_addr];
 }
 
 # RETI
-:RETI (PC) is opcode=0x61; opcode=0xFC & PC {
+:RETI (PC) is SKIP_CHECK & opcode=0x61; opcode=0xFC & PC {
+    build SKIP_CHECK;
     local loc:3 = segment(SS, SP);
     PC = *:3 loc;
     SP = SP + 3;
@@ -2620,7 +2931,8 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # RETB
-:RETB (PC) is opcode=0x61; opcode=0xEC & PC {
+:RETB (PC) is SKIP_CHECK & opcode=0x61; opcode=0xEC & PC {
+    build SKIP_CHECK;
     local loc:3 = segment(SS, SP);
     PC = *:3 loc;
     SP = SP + 3;
@@ -2636,21 +2948,24 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # PUSH PSW
-:PUSH PSW is opcode=0x61 & PSW; opcode=0xDD {
+:PUSH PSW is SKIP_CHECK & opcode=0x61 & PSW; opcode=0xDD {
+    build SKIP_CHECK;
     SP = SP - 2;
     local loc:3 = segment(SS, SP);
     *:2 loc = zext(PSW);
 }
 
 # PUSH rp
-:PUSH DREG_WORD is op_h=0xC & DREG_WORD & rp_source=1 {
+:PUSH DREG_WORD is SKIP_CHECK & op_h=0xC & DREG_WORD & rp_source=1 {
+    build SKIP_CHECK;
     SP = SP - 2;
     local loc:3 = segment(SS, SP);
     *:2 loc = DREG_WORD;
 }
 
 # POP PSW
-:POP PSW is opcode=0x61 & PSW; opcode=0xCD {
+:POP PSW is SKIP_CHECK & opcode=0x61 & PSW; opcode=0xCD {
+    build SKIP_CHECK;
     local loc:3 = segment(SS, SP);
     local status:2 = *:2 loc;
     SP = SP + 2;
@@ -2658,124 +2973,143 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 }
 
 # POP rp
-:POP DREG_WORD is op_h=0xC & DREG_WORD & rp_source=0 {
+:POP DREG_WORD is SKIP_CHECK & op_h=0xC & DREG_WORD & rp_source=0 {
+    build SKIP_CHECK;
     local loc:3 = segment(SS, SP);
     SP = SP + 2;
     DREG_WORD = *:2 loc;
 }
 
 # MOVW SP, #word
-:MOVW SP, u16 is opcode=0xCB & SP; opcode=0xF8; u16 {
+:MOVW SP, u16 is SKIP_CHECK & opcode=0xCB & SP; opcode=0xF8; u16 {
+    build SKIP_CHECK;
     SP = u16;
 }
 
 # MOVW SP, AX
-:MOVW SP, AX is opcode=0xBE & SP & AX; opcode=0xF8 {
+:MOVW SP, AX is SKIP_CHECK & opcode=0xBE & SP & AX; opcode=0xF8 {
+    build SKIP_CHECK;
     SP = AX;
 }
 
 # MOVW AX, SP
-:MOVW AX, SP is opcode=0xAE & SP & AX; opcode=0xF8 {
+:MOVW AX, SP is SKIP_CHECK & opcode=0xAE & SP & AX; opcode=0xF8 {
+    build SKIP_CHECK;
     AX = SP;
 }
 
 # The following show an additional addr16 on the opcode in
-# the ISA documentation. This looks like it may be a documentation
+# the ISA documentation. This SKIP_CHECK & looks like it may be a documentation
 # error as they're all register operands.
 # They're also commented out as they conflict with other MOVW instructions... See MOVW BC, !addr16 for example.
 
 # MOVW BC, SP
-#:MOVW BC, SP is opcode=0xDB & BC & SP {
+#:MOVW BC, SP is SKIP_CHECK & opcode=0xDB & BC & SP {
 #    BC = SP;
 #}
 
 # MOVW DE, SP
-#:MOVW DE, SP is opcode=0xEB & DE & SP {
+#:MOVW DE, SP is SKIP_CHECK & opcode=0xEB & DE & SP {
 #    DE = SP;
 #}
 
 # MOVW HL, SP
-#:MOVW HL, SP is opcode=0xFB & HL & SP {
+#:MOVW HL, SP is SKIP_CHECK & opcode=0xFB & HL & SP {
 #    HL = SP;
 #}
 
 # ADDW SP, #byte
-:ADDW SP, u8 is opcode=0x10 & SP; u8 {
+:ADDW SP, u8 is SKIP_CHECK & opcode=0x10 & SP; u8 {
+    build SKIP_CHECK;
     SP = SP + zext(u8);
 }
 
 # SUBW SP, #byte
-:SUBW SP, u8 is opcode=0x20 & SP; u8 {
+:SUBW SP, u8 is SKIP_CHECK & opcode=0x20 & SP; u8 {
+    build SKIP_CHECK;
     SP = SP - zext(u8);
 }
 
 # BR AX
-:BR AX is opcode=0x61 & AX; opcode=0xCB {
+:BR AX is SKIP_CHECK & opcode=0x61 & AX; opcode=0xCB {
+    build SKIP_CHECK;
     local addr:4 = segment(CS, AX);
     PC = addr:3;
     goto [PC];
 }
 
 # BR $addr20
-:BR jdisp8 is opcode=0xEF; jdisp8 {
+:BR jdisp8 is SKIP_CHECK & opcode=0xEF; jdisp8 {
+    build SKIP_CHECK;
     branch(jdisp8);
 }
 
 # BR $!addr20
-:BR jdisp16 is opcode=0xEE; jdisp16 {
+:BR jdisp16 is SKIP_CHECK & opcode=0xEE; jdisp16 {
+    build SKIP_CHECK;
     branch(jdisp16);
 }
 
 # BR !addr16
-:BR jaddr16 is opcode=0xED; jaddr16 {
+:BR jaddr16 is SKIP_CHECK & opcode=0xED; jaddr16 {
+    build SKIP_CHECK;
     branch(jaddr16);
 }
 
 # BR !!addr20
-:BR addr20 is opcode=0xEC; addr20 {
+:BR addr20 is SKIP_CHECK & opcode=0xEC; addr20 {
+    build SKIP_CHECK;
     branch(addr20);
 }
 
 # BC $addr20
 # P-code doesn't allow for conditional register updates
 # Only a conditional goto
-:BC jdisp8 is opcode=0xDC; jdisp8 {
+:BC jdisp8 is SKIP_CHECK & opcode=0xDC; jdisp8 {
+    build SKIP_CHECK;
     if (CY) goto jdisp8;
     goto inst_next;
 }
 
 # BNC $addr20
-:BNC jdisp8 is opcode=0xDE; jdisp8 {
+:BNC jdisp8 is SKIP_CHECK & opcode=0xDE; jdisp8 {
+    build SKIP_CHECK;
     if (!CY) goto jdisp8;
 }
 
 # BZ $addr20
-:BZ jdisp8 is opcode=0xDD; jdisp8 {
+:BZ jdisp8 is SKIP_CHECK & opcode=0xDD; jdisp8 {
+    build SKIP_CHECK;
     if (Z) goto jdisp8;
 }
 
 # BNZ $addr20
-:BNZ jdisp8 is opcode=0xDF; jdisp8 {
+:BNZ jdisp8 is SKIP_CHECK & opcode=0xDF; jdisp8 {
+    build SKIP_CHECK;
     if (!Z) goto jdisp8;
 }
 
 # BH $addr20
-:BH jdisp8 is opcode=0x61; opcode=0xC3; jdisp8 {
+:BH jdisp8 is SKIP_CHECK & opcode=0x61; opcode=0xC3; jdisp8 {
+    build SKIP_CHECK;
     if (!(Z | CY)) goto jdisp8;
 }
 
 # BNH $addr20
-:BNH jdisp8 is opcode=0x61; opcode=0xD3; jdisp8 {
+:BNH jdisp8 is SKIP_CHECK & opcode=0x61; opcode=0xD3; jdisp8 {
+    build SKIP_CHECK;
     if (Z | CY) goto jdisp8;
 }
 
 # BT saddr.n, $addr20
-:BT saddr"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x2 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
+:BT saddr"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31; op_l=0x2 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
+    build SKIP_CHECK;
     inst_bt(saddr, bit_op_n, jdisp8);
 }
 
 # BT sfr.n, $addr20
-:BT sfrp"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x2 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
+:BT sfrp"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31; op_l=0x2 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
+    build SKIP_CHECK;
     inst_bt(sfrp, bit_op_n, jdisp8);
 }
 
@@ -2784,22 +3118,26 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # BT A.n, $addr20
-:BT A"."bit_op_n, jdisp8 is opcode=0x31 & A; op_l=0x3 & bit_op_n & mov1_sreg=0; jdisp8 {
+:BT A"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31 & A; op_l=0x3 & bit_op_n & mov1_sreg=0; jdisp8 {
+    build SKIP_CHECK;
     inst_bt(A, bit_op_n, jdisp8);
 }
 
 # BT PSW.n, $addr20
-:BT PSW"."bit_op_n, jdisp8 is opcode=0x31 & PSW; op_l=0x2 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
+:BT PSW"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31 & PSW; op_l=0x2 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
+    build SKIP_CHECK;
     inst_bt(PSW, bit_op_n, jdisp8);
 }
 
 # BT [HL].n, $addr20
-:BT AddrHL"."bit_op_n, jdisp8 is opcode=0x31 & AddrHL; op_l=0x3 & bit_op_n & mov1_sreg=1; jdisp8 {
+:BT AddrHL"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31 & AddrHL; op_l=0x3 & bit_op_n & mov1_sreg=1; jdisp8 {
+    build SKIP_CHECK;
     inst_bt(AddrHL, bit_op_n, jdisp8);
 }
 
 # BF saddr.n, $addr20
-:BF saddr"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x4 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
+:BF saddr"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31; op_l=0x4 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
+    build SKIP_CHECK;
     inst_bf(saddr, bit_op_n, jdisp8);
 }
 
@@ -2808,22 +3146,26 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # BF sfr.n, $addr20
-:BF sfrp"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x4 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
+:BF sfrp"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31; op_l=0x4 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
+    build SKIP_CHECK;
     inst_bf(sfrp, bit_op_n, jdisp8);
 }
 
 # BF A.n, $addr20
-:BF A"."bit_op_n, jdisp8 is opcode=0x31 & A; op_l=0x5 & bit_op_n & mov1_sreg=0; jdisp8 {
+:BF A"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31 & A; op_l=0x5 & bit_op_n & mov1_sreg=0; jdisp8 {
+    build SKIP_CHECK;
     inst_bf(A, bit_op_n, jdisp8);
 }
 
 # BF PSW.n, $addr20
-:BF PSW"."bit_op_n, jdisp8 is opcode=0x31 & PSW; op_l=0x4 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
+:BF PSW"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31 & PSW; op_l=0x4 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
+    build SKIP_CHECK;
     inst_bf(PSW, bit_op_n, jdisp8);
 }
 
 # BF [HL].n, $addr20
-:BF AddrHL"."bit_op_n, jdisp8 is opcode=0x31 & AddrHL; op_l=0x5 & bit_op_n & mov1_sreg=1; jdisp8 {
+:BF AddrHL"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31 & AddrHL; op_l=0x5 & bit_op_n & mov1_sreg=1; jdisp8 {
+    build SKIP_CHECK;
     inst_bf(AddrHL, bit_op_n, jdisp8);
 }
 
@@ -2832,28 +3174,33 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # BTCLR saddr.n, $addr20
-:BTCLR saddr"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x0 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
+:BTCLR saddr"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31; op_l=0x0 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
+    build SKIP_CHECK;
     inst_btclr(saddr, bit_op_n, jdisp8);
 }
 
 # BTCLR sfr.n, $addr20
-:BTCLR sfrp"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x0 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
+:BTCLR sfrp"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31; op_l=0x0 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
+    build SKIP_CHECK;
     inst_btclr(sfrp, bit_op_n, jdisp8);
 }
 
 # BTCRL A.n, $addr20
-:BTCLR A"."bit_op_n, jdisp8 is opcode=0x31 & A; op_l=0x1 & bit_op_n & mov1_sreg=0; jdisp8 {
+:BTCLR A"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31 & A; op_l=0x1 & bit_op_n & mov1_sreg=0; jdisp8 {
+    build SKIP_CHECK;
     inst_btclr(A, bit_op_n, jdisp8);
 }
 
 # BTCLR PSW.n, $addr20
-:BTCLR PSW"."bit_op_n, jdisp8 is opcode=0x31 & PSW; op_l=0x0 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
+:BTCLR PSW"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31 & PSW; op_l=0x0 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
+    build SKIP_CHECK;
     inst_btclr(PSW, bit_op_n, jdisp8);
     update_psw(PSW);
 }
 
 # BTCRL [HL].n, $addr20
-:BTCLR AddrHL"."bit_op_n, jdisp8 is opcode=0x31 & AddrHL; op_l=0x1 & bit_op_n & mov1_sreg=1; jdisp8 {
+:BTCLR AddrHL"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31 & AddrHL; op_l=0x1 & bit_op_n & mov1_sreg=1; jdisp8 {
+    build SKIP_CHECK;
     inst_btclr(AddrHL, bit_op_n, jdisp8);
 }
 
@@ -2862,34 +3209,22 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 #
 
 # SKC
-:SKC is opcode=0x61; opcode=0xC8 {
-    inst_sk(CY);
-}
+:SKC is opcode=0x61; opcode=0xC8 [ skip_mode=1; globalset(inst_next, skip_mode); ] { }
 
 # SKNC
-:SKNC is opcode=0x61; opcode=0xD8 {
-    inst_sk(!CY);
-}
+:SKNC is opcode=0x61; opcode=0xD8 [ skip_mode=2; globalset(inst_next, skip_mode); ] { }
 
 # SKZ
-:SKZ is opcode=0x61; opcode=0xE8 {
-    inst_sk(Z);
-}
+:SKZ is opcode=0x61; opcode=0xE8 [ skip_mode=3; globalset(inst_next, skip_mode); ] { }
 
 # SKNZ
-:SKNZ is opcode=0x61; opcode=0xF8 {
-    inst_sk(!Z);
-}
-
-# SKH
-:SKH is opcode=0x61; opcode=0xE3 {
-    inst_sk(!(Z | CY));
-}
+:SKNZ is opcode=0x61; opcode=0xF8 [ skip_mode=4; globalset(inst_next, skip_mode); ] { }
 
 # SKNH
-:SKNH is opcode=0x61; opcode=0xF3 {
-    inst_sk(Z | CY);
-}
+:SKNH is opcode=0x61; opcode=0xF3 [ skip_mode=5; globalset(inst_next, skip_mode); ] { }
+
+# SKH
+:SKH is opcode=0x61; opcode=0xE3 [ skip_mode=6; globalset(inst_next, skip_mode); ] { }
 
 # SEL RBn
 :SEL rbs_op_n is opcode=0x61; op_l=0xF & rbs_op_n & mov1_sreg=1 [
@@ -2901,24 +3236,26 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 :NOP is opcode=0x00 {}
 
 # EI
-:EI is opcode=0x71; opcode=0x7A; opcode=0xFA {
+:EI is SKIP_CHECK & opcode=0x71; opcode=0x7A; opcode=0xFA {
+    build SKIP_CHECK;
     PSW = PSW | (1 << 7);
     update_psw(PSW);
     enable_interrupts();
 }
 
 # DI
-:DI is opcode=0x71; opcode=0x7B; opcode=0xFA {
+:DI is SKIP_CHECK & opcode=0x71; opcode=0x7B; opcode=0xFA {
+    build SKIP_CHECK;
     PSW = PSW & (0 << 7);
     update_psw(PSW);
     disable_interrupts();
 }
 
 # HALT
-:HALT is opcode=0x61; opcode=0xED { halt(); }
+:HALT is SKIP_CHECK & opcode=0x61; opcode=0xED { build SKIP_CHECK; halt(); }
 
 # STOP
-:STOP is opcode=0x61; opcode=0xFD { stop(); }
+:STOP is SKIP_CHECK & opcode=0x61; opcode=0xFD { build SKIP_CHECK; stop(); }
 
 # PREFIX
 : is opcode=0x11 [ es_prefix=1; globalset(inst_next, es_prefix); ] {}
