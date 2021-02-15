@@ -48,7 +48,7 @@ define register offset=0x80 size=4 contextreg;
 define register offset=0x84 size=1 SS;
 
 define context contextreg
-    es_prefix=(0, 0)
+    es_prefix=(0, 0) noflow
     rsb=(1,2)
     skip_mode=(3,5);
 
@@ -641,7 +641,7 @@ addr16: a16_sfr_reg is es_prefix=0 & a16_sfr_reg & a16_sfr_offset=0x1fff {
     export a16_sfr_reg;
 }
 
-addr16: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+addr16: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
     local loc:4;
     direct_addr_es(uaddr16:2, loc);
     export *:1 loc;
@@ -657,7 +657,7 @@ addr16w: a16w_sfr_reg is es_prefix=0 & a16w_sfr_reg & a16_sfr_offset=0x1fff {
     export a16w_sfr_reg;
 }
 
-addr16w: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+addr16w: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
     local loc:4;
     direct_addr_es(uaddr16:2, loc);
     export *:2 loc;
@@ -714,7 +714,7 @@ AddrDE: [DE] is es_prefix=0 & DE {
     export *:1 loc;
 }
 
-AddrDE: ES:[DE] is es_prefix=1 & DE & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrDE: ES:[DE] is es_prefix=1 & DE & ES {
     local loc:4;
     direct_addr_es(DE, loc);
     export *:1 loc;
@@ -726,7 +726,7 @@ AddrDEW: [DE] is es_prefix=0 & DE {
     export *:2 loc;
 }
 
-AddrDEW: ES:[DE] is es_prefix=1 & DE & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrDEW: ES:[DE] is es_prefix=1 & DE & ES {
     local loc:4;
     direct_addr_es(DE, loc);
     export *:2 loc;
@@ -739,7 +739,7 @@ AddrDEOffset: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
     export *:1 loc;
 }
 
-AddrDEOffset: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrDEOffset: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES {
     local loc:4;
     direct_addr_es(DE, loc);
     loc = loc + uaddr8;
@@ -753,7 +753,7 @@ AddrDEOffsetW: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
     export *:2 loc;
 }
 
-AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ]{
+AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES{
     local loc:4;
     direct_addr_es(DE, loc);
     loc = loc + uaddr8;
@@ -766,7 +766,7 @@ AddrHL: [HL] is HL & es_prefix=0 {
     export *:1 loc;
 }
 
-AddrHL: ES:[HL] is HL & es_prefix=1 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrHL: ES:[HL] is HL & es_prefix=1 & ES {
     local loc:4;
     direct_addr_es(HL, loc);
     export *:1 loc;
@@ -778,7 +778,7 @@ AddrHLW: [HL] is es_prefix=0 & HL {
     export *:2 loc;
 }
 
-AddrHLW: ES:[HL] is es_prefix=1 & HL & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrHLW: ES:[HL] is es_prefix=1 & HL & ES {
     local loc:4;
     direct_addr_es(HL, loc);
     export *:2 loc;
@@ -791,7 +791,7 @@ AddrHLOffset: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
     export *:1 loc;
 }
 
-AddrHLOffset: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ]{
+AddrHLOffset: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES{
     local loc:4;
     direct_addr_es(HL, loc);
     loc = loc + uaddr8;
@@ -805,7 +805,7 @@ AddrHLOffsetW: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
     export *:2 loc;
 }
 
-AddrHLOffsetW: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrHLOffsetW: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES {
     local loc:4;
     direct_addr_es(HL, loc);
     loc = loc + uaddr8;
@@ -819,7 +819,7 @@ AddrHLOffsetB: [HL+B] is es_prefix=0 & HL & B {
     export *:1 loc;
 }
 
-AddrHLOffsetB: ES:[HL+B] is es_prefix=1 & HL & B & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrHLOffsetB: ES:[HL+B] is es_prefix=1 & HL & B & ES {
     local loc:4;
     direct_addr_es(HL, loc);
     loc = loc + zext(B);
@@ -833,7 +833,7 @@ AddrHLOffsetC: [HL+C] is es_prefix=0 & HL & C {
     export *:1 loc;
 }
 
-AddrHLOffsetC: ES:[HL+C] is es_prefix=1 & HL & C & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrHLOffsetC: ES:[HL+C] is es_prefix=1 & HL & C & ES {
     local loc:4;
     direct_addr_es(HL, loc);
     loc = loc + zext(C);
@@ -847,7 +847,7 @@ AddrWordOffsetB: uaddr16[B] is es_prefix=0 & uaddr16 & B {
     export *:1 loc;
 }
 
-AddrWordOffsetB: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrWordOffsetB: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
     local loc:4;
     direct_addrb_es(B, loc);
     loc = loc + uaddr16;
@@ -861,7 +861,7 @@ AddrWordOffsetBW: uaddr16[B] is es_prefix=0 & uaddr16 & B {
     export *:2 loc;
 }
 
-AddrWordOffsetBW: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrWordOffsetBW: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
     local loc:4;
     direct_addrb_es(B, loc);
     loc = loc + uaddr16;
@@ -875,7 +875,7 @@ AddrWordOffsetC: uaddr16[C] is es_prefix=0 & uaddr16 & C {
     export *:1 loc;
 }
 
-AddrWordOffsetC: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrWordOffsetC: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
     local loc:4;
     direct_addrb_es(C, loc);
     loc = loc + uaddr16;
@@ -889,7 +889,7 @@ AddrWordOffsetCW: uaddr16[C] is es_prefix=0 & uaddr16 & C {
     export *:2 loc;
 }
 
-AddrWordOffsetCW: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrWordOffsetCW: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
     local loc:4;
     direct_addrb_es(C, loc);
     loc = loc + uaddr16;
@@ -903,7 +903,7 @@ AddrWordOffsetBC: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
     export *:1 loc;
 }
 
-AddrWordOffsetBC: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrWordOffsetBC: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
     local loc:4;
     direct_addr_es(BC, loc);
     loc = loc + uaddr16;
@@ -917,7 +917,7 @@ AddrWordOffsetBCW: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
     export *:2 loc;
 }
 
-AddrWordOffsetBCW: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES [ es_prefix=0; globalset(inst_start, es_prefix); ] {
+AddrWordOffsetBCW: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
     local loc:4;
     direct_addr_es(BC, loc);
     loc = loc + uaddr16;
@@ -3258,4 +3258,6 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 :STOP is SKIP_CHECK & opcode=0x61; opcode=0xFD { build SKIP_CHECK; stop(); }
 
 # PREFIX
-: is opcode=0x11 [ es_prefix=1; globalset(inst_next, es_prefix); ] {}
+:^instruction is es_prefix=0 & opcode=0x11; epsilon ... & instruction [ es_prefix=1; ] {
+    build instruction;
+}
