@@ -38,8 +38,14 @@ define register offset=0x40 size=3 [PC];
 define register offset=0x50 size=2 [SP      _     _     _      ];
 define register offset=0x50 size=1 [SPL SPH PSW _ CS ES PMC MEM];
 
-# Per AVR, they put status flags in their own registers for simplicity
-define register offset=0x70 size=1 [IE Z PSW_RBS1 AC PSW_RBS0 ISP1 ISP0 CY];
+@define IE 	        "PSW[7,1]"	# Interrupt Enable (IE)
+@define Z           "PSW[6,1]" 	# Zero Flag (Z)
+@define PSW_RBS1    "PSW[5,1]"	# Register Bank Select Hi-Bit (RBS1)
+@define AC 	        "PSW[4,1]"  # Auxiliary Carry Flag (AC)
+@define PSW_RBS0	"PSW[3,1]" 	# Register Bank Select Lo-Bit (RBS0)
+@define ISP1     	"PSW[2,1]" 	# In-service priority flag Hi-Bit (ISP1)
+@define ISP0 	    "PSW[1,1]"  # In-service priority flag Lo-Bit (ISP0)
+@define CY   	    "PSW[0,1]"  # Carry flag (CY)
 
 # For storing processor context
 define register offset=0x80 size=4 contextreg;
@@ -50,7 +56,7 @@ define register offset=0x84 size=1 SS;
 define context contextreg
     es_prefix=(0, 0) noflow
     rsb=(1,2)
-    skip_mode=(3,5);
+    skip_mode=(3,5) noflow;
 
 BANK0: is rsb=0 {}
 BANK1: is rsb=1 {}
@@ -395,6 +401,14 @@ macro reg_ind_es(reg1, reg2, res) {
     res = segment(ES, (zext(reg1) << 8) | zext(reg2));
 }
 
+macro aux_carry(dst, src) {
+    $(AC) = ((dst & 0xf) + (src & 0xf)) > 0xf;
+}
+
+macro aux_borrow(dst, src) {
+    $(AC) = (dst & 0xf) < (src & 0xf);
+}
+
 macro inst_xch(dst, src) {
     local tmp:1 = dst;
     dst = src;
@@ -402,58 +416,55 @@ macro inst_xch(dst, src) {
 }
 
 macro inst_inc(dst) {
+    aux_carry(dst, 1);
     dst = dst + 1;
-    Z = (dst == 0);
-    # Generate the carry if the increment generates a carry for bit 4 out of bit 3
-    # Clear in all other cases
-    AC = (dst == 0x8);
+    $(Z) = (dst == 0);
 }
 
 macro inst_dec(dst) {
+    aux_borrow(dst, 1);
     dst = dst - 1;
-    Z = (dst == 0);
-    # Generate the carry if the decrement generates a carry for bit 3 out of bit 4
-    # Clear in all other cases
-    AC = (dst == 0x7);
+    $(Z) = (dst == 0);
 }
 
 macro inst_add(dst, src) {
+    aux_carry(dst, src);
+    $(CY) = carry(dst, src);
     dst = dst + src;
-    Z = (dst == 0);
-    CY = carry(dst, src);
-    AC = (dst & 0x04) < (src & 0x04);
+    $(Z) = (dst == 0);
 }
 
 macro inst_addc(dst, src) {
-    dst = dst + CY;
+    dst = dst + $(CY);
     inst_add(dst, src);
 }
 
 macro inst_sub(dst, src) {
+    aux_borrow(dst, src);
+    $(CY) = carry(dst, src);
+    $(Z) = dst == src;
     dst = dst - src;
-    Z = (dst == 0);
-    CY = src < dst;
-    AC = (dst & 0x08) >= (src & 0x08);
+    $(Z) = (dst == 0);
 }
 
 macro inst_subc(dst, src) {
-    dst = dst - CY;
+    dst = dst - $(CY);
     inst_sub(dst, src);
 }
 
 macro inst_and(dst, src) {
     dst = dst & src;
-    Z = (dst == 0);
+    $(Z) = (dst == 0);
 }
 
 macro inst_or(dst, src) {
     dst = dst | src;
-    Z = (dst == 0);
+    $(Z) = (dst == 0);
 }
 
 macro inst_xor(dst, src) {
     dst = dst ^ src;
-    Z = (dst == 0);
+    $(Z) = (dst == 0);
 }
 
 macro inst_incw(dst) {
@@ -465,86 +476,68 @@ macro inst_decw(dst) {
 }
 
 macro inst_shr(dst, n) {
-    CY = (dst:1 & 0x01) != 0;
+    $(CY) = (dst:1 & 0x01) != 0;
     dst = dst >> n;
 }
 
 macro inst_shl(dst, n) {
-    CY = (dst:1 & 0x80) != 0;
+    $(CY) = (dst:1 & 0x80) != 0;
     dst = dst << n;
 }
 
 macro inst_shlw(dst, n) {
-    CY = (dst:2 & 0x8000) != 0;
+    $(CY) = (dst:2 & 0x8000) != 0;
     dst = dst << n;
 }
 
 macro inst_sar(dst, n) {
     local msb:1 = dst & 0x80;
-    CY = dst:1 & 0x01;
+    $(CY) = dst:1 & 0x01;
     dst = dst >> n;
     dst = dst & msb;
 }
 
 macro inst_sarw(dst, n) {
     local msb:2 = dst & 0x8000;
-    CY = dst:1 & 0x01;
+    $(CY) = dst:1 & 0x01;
     dst = dst >> n;
     dst = dst & msb;
 }
 
 macro inst_cmp(dst, src) {
-    Z = dst == src;
-    AC = (dst & 0x08) >= (src & 0x08);
-    CY = src < dst;
+    $(Z) = dst == src;
+    $(CY) = carry(dst, src);
+    aux_borrow(dst, src);
 }
 
 macro inst_cmp0(dst) {
-    Z = dst == 0;
-    AC = 0;
-    CY = 0;
+    $(Z) = dst == 0;
+    $(AC) = 0;
+    $(CY) = 0;
 }
 
 macro inst_addw(dst, src) {
-    CY = carry(dst, src);
+    $(CY) = carry(dst, src);
     dst = dst + src;
-    Z = dst == src;
-    AC = 0;
+    $(Z) = dst == src;
 }
 
 macro inst_subw(dst, src) {
-    CY = src < dst;
+    $(CY) = sborrow(dst, src);
+    $(Z) = dst == src;
     dst = dst - src;
-    Z = dst == src;
-    AC = 0;
 }
 
 macro inst_cmpw(dst, src) {
-    Z = dst == src;
-    AC = 0;
-    CY = src < dst;
-}
-
-macro update_psw(data) {
-    # Update PSW as expected
-    PSW    = data;
-    # Then split it apart into the shadow registers
-    # for use during decompilation
-    IE     = (data & 0x80) >> 7;
-    Z      = (data & 0x40) >> 6;
-    PSW_RBS1   = (data & 0x20) >> 5;
-    AC     = (data & 0x10) >> 4;
-    PSW_RBS0   = (data & 0x08) >> 3;
-    ISP1   = (data & 0x04) >> 2;
-    ISP0   = (data & 0x02) >> 1;
-    CY     = (data & 0x01);
+    $(Z) = dst == src;
+    $(CY) = sborrow(dst, src);
 }
 
 macro inst_rolwc(dst) {
     local msb:1 = (dst & 0x8000) != 0;
     dst = dst << 1;
-    dst = dst | zext(CY);
-    CY = msb;
+    dst = dst | zext($(CY));
+    $(CY) = msb;
 }
 
 macro mov1_read(dst, src, bit) {
@@ -555,22 +548,22 @@ macro mov1_write(dst, src, bit) {
     dst = dst | (src & (1 << bit));
 }
 
-# Destination for AND1 is always CY
+# Destination for AND1 is always $(CY)
 macro inst_and1(src, bit) {
     local src_bit:1 = (src & (1 << bit)) >> bit;
-    CY = CY & src_bit;
+    $(CY) = $(CY) & src_bit;
 }
 
-# Destination for OR1 is always CY
+# Destination for OR1 is always $(CY)
 macro inst_or1(src, bit) {
     local src_bit:1 = (src & (1 << bit) >> bit);
-    CY = CY | src_bit;
+    $(CY) = $(CY) | src_bit;
 }
 
-# Destination for XOR1 is always CY
+# Destination for XOR1 is always $(CY)
 macro inst_xor1(src, bit) {
     local src_bit:1 = (src & (1 << bit) >> bit);
-    CY = CY ^ src_bit;
+    $(CY) = $(CY) ^ src_bit;
 }
 
 macro inst_set1(dst, bit) {
@@ -941,12 +934,12 @@ CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
 
 # method derived from ARMinstructions.sinc
 
-skip_cond: is skip_mode=1 [ skip_mode=0; globalset(inst_next, skip_mode); ] { export CY; }
-skip_cond: is skip_mode=2 [ skip_mode=0; globalset(inst_next, skip_mode); ] { local tmp:1 = !CY; export tmp; }
-skip_cond: is skip_mode=3 [ skip_mode=0; globalset(inst_next, skip_mode); ] { export Z; }
-skip_cond: is skip_mode=4 [ skip_mode=0; globalset(inst_next, skip_mode); ] { local tmp:1 = !Z; export tmp; }
-skip_cond: is skip_mode=5 [ skip_mode=0; globalset(inst_next, skip_mode); ] { local tmp:1 = Z | CY; export tmp; }
-skip_cond: is skip_mode=6 [ skip_mode=0; globalset(inst_next, skip_mode); ] { local tmp:1 = !(Z | CY); export tmp; }
+skip_cond: is skip_mode=1 { local tmp:1 = $(CY); export tmp; }
+skip_cond: is skip_mode=2 { local tmp:1 = !$(CY); export tmp; }
+skip_cond: is skip_mode=3 { local tmp:1 = $(Z); export tmp; }
+skip_cond: is skip_mode=4 { local tmp:1 = !$(Z); export tmp; }
+skip_cond: is skip_mode=5 { local tmp:1 = $(Z) | $(CY); export tmp; }
+skip_cond: is skip_mode=6 { local tmp:1 = !($(Z) | $(CY)); export tmp; }
 
 SKIP_CHECK: is skip_mode=0 { } # always execute by default
 SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
@@ -1036,7 +1029,7 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 # MOV PSW, #byte
 :MOV PSW, "#"data is SKIP_CHECK & opcode=0x9F & PSW; opcode=0xFA; data {
     build SKIP_CHECK;
-    update_psw(data);
+    PSW = data;
 }
 
 # MOV A, PSW
@@ -1048,7 +1041,7 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 # MOV PSW, A
 :MOV PSW, A is SKIP_CHECK & opcode=0x9E & A & PSW; opcode=0xFA {
     build SKIP_CHECK;
-    update_psw(A);
+    PSW = A;
 }
 
 # MOV ES, #byte
@@ -1403,8 +1396,8 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 :MOVS X, AddrHLOffset ("Check "A" if zero")is SKIP_CHECK & opcode=0x61 & X & A; opcode=0xCE; AddrHLOffset {
     build SKIP_CHECK;
     AddrHLOffset = X;
-    Z = (X == 0);
-    CY = (X == 0) | (A == 0);
+    $(Z) = (X == 0);
+    $(CY) = (X == 0) | (A == 0);
 }
 
 # MOVW rp, #word
@@ -2176,9 +2169,9 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 # CMPS X, [HL+byte]
 :CMPS X, AddrHLOffset is SKIP_CHECK & opcode=0x61 & X; opcode=0xDE; AddrHLOffset {
     build SKIP_CHECK;
-    Z = X == AddrHLOffset;
-    CY = (Z != 0) | (AddrHLOffset == 0) | (X == 0);
-    AC = (X & 0x08) >= (AddrHLOffset & 0x08);
+    $(Z) = X == AddrHLOffset;
+    $(CY) = ($(Z) != 0) | (AddrHLOffset == 0) | (X == 0);
+    aux_borrow(X, AddrHLOffset);
 }
 
 # ADDW AX, #word
@@ -2509,18 +2502,18 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 :ROR A, 1 is SKIP_CHECK & opcode=0x61 & A; opcode=0xDB {
     build SKIP_CHECK;
     local lsb:1 = A & 0x1;
-    CY = (lsb != 0);
+    $(CY) = (lsb != 0);
     A = A >> 1;
-    A = A & (CY << 7);
+    A = A & ($(CY) << 7);
 }
 
 # ROL A, 1
 :ROL A, 1 is SKIP_CHECK & opcode=0x61 & A; opcode=0xEB {
     build SKIP_CHECK;
     local msb:1 = A & 0x80;
-    CY = (msb != 0);
+    $(CY) = (msb != 0);
     A = A << 1;
-    A = A | CY;
+    A = A | $(CY);
 }
 
 # RORC A, 1
@@ -2528,8 +2521,8 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
     build SKIP_CHECK;
     local lsb:1 = A & 1;
     A = A >> 1;
-    A = (CY << 7);
-    CY = lsb;
+    A = ($(CY) << 7);
+    $(CY) = lsb;
 }
 
 # ROLC A, 1
@@ -2537,8 +2530,8 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
     build SKIP_CHECK;
     local msb:1 = (A & 0x80) != 0;
     A = A << 1;
-    A = A | CY;
-    CY = msb;
+    A = A | $(CY);
+    $(CY) = msb;
 }
 
 # ROLWC AX, 1
@@ -2554,9 +2547,11 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 }
 
 # MOV1 CY, saddr.n
-:MOV1 CY, saddr"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0x4 & bit_op_n & mov1_sreg=0; saddr {
+:MOV1 "CY", saddr"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0x4 & bit_op_n & mov1_sreg=0; saddr {
     build SKIP_CHECK;
-    mov1_read(CY, saddr, bit_op_n);
+    local tmp:1 = $(CY);
+    mov1_read(tmp, saddr, bit_op_n);
+    $(CY) = tmp;
 }
 
 #
@@ -2564,33 +2559,41 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 #
 
 # MOV1 CY, sfr.n
-:MOV1 CY, sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0xC & bit_op_n & mov1_sreg=0; sfrp {
+:MOV1 "CY", sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0xC & bit_op_n & mov1_sreg=0; sfrp {
     build SKIP_CHECK;
-    mov1_read(CY, sfrp, bit_op_n);
+    local tmp:1 = $(CY);
+    mov1_read(tmp, sfrp, bit_op_n);
+    $(CY) = tmp;
 }
 
 # MOV1 CY, A.n
-:MOV1 CY, A"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & A; op_l=0xC & bit_op_n & mov1_sreg=1 {
+:MOV1 "CY", A"."bit_op_n is SKIP_CHECK & opcode=0x71 & A; op_l=0xC & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
-    mov1_read(CY, A, bit_op_n);
+    local tmp:1 = $(CY);
+    mov1_read(tmp, A, bit_op_n);
+    $(CY) = tmp;
 }
 
 # MOV1 CY, PSW.n
-:MOV1 CY, PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & PSW; op_l=0xC & bit_op_n; opcode=0xFA {
+:MOV1 "CY", PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & PSW; op_l=0xC & bit_op_n; opcode=0xFA {
     build SKIP_CHECK;
-    mov1_read(CY, PSW, bit_op_n);
+    local tmp:1 = $(CY);
+    mov1_read(tmp, PSW, bit_op_n);
+    $(CY) = tmp;
 }
 
 # MOV1 CY, [HL].0
-:MOV1 CY, AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & AddrHL; op_l=0x4 & bit_op_n & mov1_sreg=1 {
+:MOV1 "CY", AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & AddrHL; op_l=0x4 & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
-    mov1_read(CY, AddrHL, bit_op_n);
+    local tmp:1 = $(CY);
+    mov1_read(tmp, AddrHL, bit_op_n);
+    $(CY) = tmp;
 }
 
 # MOV1 saddr.n, CY
-:MOV1 saddr"."bit_op_n, CY is SKIP_CHECK & opcode=0x71 & CY; op_l=0x1 & bit_op_n & mov1_sreg=0; saddr {
+:MOV1 saddr"."bit_op_n, "CY" is SKIP_CHECK & opcode=0x71; op_l=0x1 & bit_op_n & mov1_sreg=0; saddr {
     build SKIP_CHECK;
-    mov1_write(saddr, CY, bit_op_n);
+    mov1_write(saddr, $(CY), bit_op_n);
 }
 
 #
@@ -2598,27 +2601,27 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 #
 
 # MOV1 sfr.n, CY
-:MOV1 sfrp"."bit_op_n, CY is SKIP_CHECK & opcode=0x71 & CY; op_l=0x9 & bit_op_n & mov1_sreg=0; sfrp {
+:MOV1 sfrp"."bit_op_n, "CY" is SKIP_CHECK & opcode=0x71; op_l=0x9 & bit_op_n & mov1_sreg=0; sfrp {
     build SKIP_CHECK;
-    mov1_write(sfrp, CY, bit_op_n);
+    mov1_write(sfrp, $(CY), bit_op_n);
 }
 
 # MOV1 A.n, CY
-:MOV1 A"."bit_op_n & 0x7, CY is SKIP_CHECK & opcode=0x71 & CY & A; op_l=0x9 & bit_op_n & mov1_sreg=1 {
+:MOV1 A"."bit_op_n & 0x7, "CY" is SKIP_CHECK & opcode=0x71 & A; op_l=0x9 & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
-    mov1_write(A, CY, bit_op_n);
+    mov1_write(A, $(CY), bit_op_n);
 }
 
 # MOV1 PSW.n, CY
-:MOV1 PSW"."bit_op_n, CY is SKIP_CHECK & opcode=0x71 & CY & PSW; op_l=0x9 & bit_op_n & mov1_sreg=0; opcode=0xFA {
+:MOV1 PSW"."bit_op_n, "CY" is SKIP_CHECK & opcode=0x71 & PSW; op_l=0x9 & bit_op_n & mov1_sreg=0; opcode=0xFA {
     build SKIP_CHECK;
-    mov1_write(PSW, CY, bit_op_n);
+    mov1_write(PSW, $(CY), bit_op_n);
 }
 
 # MOV1 [HL].n, CY
-:MOV1 AddrHL"."bit_op_n, CY is SKIP_CHECK & opcode=0x71 & CY & AddrHL; op_l=0x1 & bit_op_n & mov1_sreg=1 {
+:MOV1 AddrHL"."bit_op_n, "CY" is SKIP_CHECK & opcode=0x71 & AddrHL; op_l=0x1 & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
-    mov1_write(AddrHL, CY, bit_op_n);
+    mov1_write(AddrHL, $(CY), bit_op_n);
 }
 
 #
@@ -2626,25 +2629,25 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 #
 
 # AND1 CY, saddr.n
-:AND1 CY, saddr"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0x5 & bit_op_n & mov1_sreg=0; saddr {
+:AND1 "CY", saddr"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0x5 & bit_op_n & mov1_sreg=0; saddr {
     build SKIP_CHECK;
     inst_and1(saddr, bit_op_n);
 }
 
 # AND1 CY, sfr.n
-:AND1 CY, sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0xD & bit_op_n & mov1_sreg=0; sfrp {
+:AND1 "CY", sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0xD & bit_op_n & mov1_sreg=0; sfrp {
     build SKIP_CHECK;
     inst_and1(sfrp, bit_op_n);
 }
 
 # AND1 CY, A.n
-:AND1 CY, A"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & A; op_l=0xD & bit_op_n & mov1_sreg=1 {
+:AND1 "CY", A"."bit_op_n is SKIP_CHECK & opcode=0x71 & A; op_l=0xD & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
     inst_and1(A, bit_op_n);
 }
 
 # AND1 CY, PSW.n
-:AND1 CY, PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & PSW; op_l=0xD & bit_op_n & mov1_sreg=0; opcode=0xFA {
+:AND1 "CY", PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & PSW; op_l=0xD & bit_op_n & mov1_sreg=0; opcode=0xFA {
     build SKIP_CHECK;
     inst_and1(PSW, bit_op_n);
 }
@@ -2654,25 +2657,25 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 #
 
 # AND1 CY, [HL].n
-:AND1 CY, AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & AddrHL; op_l=0x5 & bit_op_n & mov1_sreg=1 {
+:AND1 "CY", AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & AddrHL; op_l=0x5 & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
     inst_and1(AddrHL, bit_op_n);
 }
 
 # OR1 CY, saddr.n
-:OR1 CY, saddr"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0x6 & bit_op_n & mov1_sreg=0; saddr {
+:OR1 "CY", saddr"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0x6 & bit_op_n & mov1_sreg=0; saddr {
     build SKIP_CHECK;
     inst_or1(saddr, bit_op_n);
 }
 
 # OR1 CY, sfr.n
-:OR1 CY, sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0xE & bit_op_n & mov1_sreg=0; sfrp {
+:OR1 "CY", sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0xE & bit_op_n & mov1_sreg=0; sfrp {
     build SKIP_CHECK;
     inst_or1(sfrp, bit_op_n);
 }
 
 # OR1 CY, A.n
-:OR1 CY, A"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & A; op_l=0xE & bit_op_n & mov1_sreg=1 {
+:OR1 "CY", A"."bit_op_n is SKIP_CHECK & opcode=0x71 & A; op_l=0xE & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
     inst_or1(A, bit_op_n);
 }
@@ -2682,25 +2685,25 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 #
 
 # OR1 CY, PSW.n
-:OR1 CY, PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & PSW; op_l=0xE & bit_op_n & mov1_sreg=0; opcode=0xFA {
+:OR1 "CY", PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & PSW; op_l=0xE & bit_op_n & mov1_sreg=0; opcode=0xFA {
     build SKIP_CHECK;
     inst_or1(PSW, bit_op_n);
 }
 
 # OR1 CY, [HL].n
-:OR1 CY, AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & AddrHL; op_l=0x6 & bit_op_n & mov1_sreg=1 {
+:OR1 "CY", AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & AddrHL; op_l=0x6 & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
     inst_or1(AddrHL, bit_op_n);
 }
 
 # XOR1 CY, saddr.n
-:XOR1 CY, saddr"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0x7 & bit_op_n & mov1_sreg=0; saddr {
+:XOR1 "CY", saddr"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0x7 & bit_op_n & mov1_sreg=0; saddr {
     build SKIP_CHECK;
     inst_xor1(saddr, bit_op_n);
 }
 
 # XOR1 CY, sfr.n
-:XOR1 CY, sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY; op_l=0xF & bit_op_n & mov1_sreg=0; sfrp {
+:XOR1 "CY", sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0xF & bit_op_n & mov1_sreg=0; sfrp {
     build SKIP_CHECK;
     inst_xor(sfrp, bit_op_n);
 }
@@ -2710,19 +2713,19 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 #
 
 # XOR1 CY, A.n
-:XOR1 CY, A"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & A; op_l=0xF & bit_op_n & mov1_sreg=1 {
+:XOR1 "CY", A"."bit_op_n is SKIP_CHECK & opcode=0x71 & A; op_l=0xF & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
     inst_xor(A, bit_op_n);
 }
 
 # XOR1 CY, PSW.n
-:XOR1 CY, PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & PSW; op_l=0xF & bit_op_n & mov1_sreg=0; opcode=0xFA {
+:XOR1 "CY", PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & PSW; op_l=0xF & bit_op_n & mov1_sreg=0; opcode=0xFA {
     build SKIP_CHECK;
     inst_xor(PSW, bit_op_n);
 }
 
 # XOR1 CY, [HL].n
-:XOR1 CY, AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & CY & AddrHL; op_l=0x7 & bit_op_n & mov1_sreg=1 {
+:XOR1 "CY", AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & AddrHL; op_l=0x7 & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
     inst_xor(PSW, bit_op_n);
 }
@@ -2759,7 +2762,6 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 :SET1 PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & PSW; op_l=0xA & bit_op_n & mov1_sreg=0; opcode=0xFA {
     build SKIP_CHECK;
     inst_set1(PSW, bit_op_n);
-    update_psw(PSW);
 }
 
 # SET1 [HL].n
@@ -2804,7 +2806,6 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 :CLR1 PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & PSW; op_l=0xB & bit_op_n & mov1_sreg=0; opcode=0xFA {
     build SKIP_CHECK;
     inst_clr1(PSW, bit_op_n);
-    update_psw(PSW);
 }
 
 # CLR1 [HL].n
@@ -2814,21 +2815,21 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 }
 
 # SET1 CY
-:SET1 CY is SKIP_CHECK & opcode=0x71 & CY; opcode=0x80 {
+:SET1 "CY" is SKIP_CHECK & opcode=0x71; opcode=0x80 {
     build SKIP_CHECK;
-    inst_set1(CY, 0);
+    inst_set1($(CY), 0);
 }
 
 # CLR1 CY
-:CLR1 CY is SKIP_CHECK & opcode=0x71 & CY; opcode=0x88 {
+:CLR1 "CY" is SKIP_CHECK & opcode=0x71; opcode=0x88 {
     build SKIP_CHECK;
-    inst_clr1(CY, 0);
+    inst_clr1($(CY), 0);
 }
 
 # NOT1 CY
-:NOT1 CY is SKIP_CHECK & opcode=0x71 & CY; opcode=0xC0 {
+:NOT1 "CY" is SKIP_CHECK & opcode=0x71; opcode=0xC0 {
     build SKIP_CHECK;
-    CY = ~CY & 0x1;
+    $(CY) = ~$(CY) & 0x1;
 }
 
 #
@@ -2904,9 +2905,8 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
     loc = segment(SS, SP);
     *:3 loc = inst_next;
 
-    IE = 0;
+    $(IE) = 0;
     PSW = PSW & 0x7f;
-    update_psw(PSW);
 
     call brk_addr;
 }
@@ -2924,7 +2924,7 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
     PC = *:3 loc;
     SP = SP + 3;
     loc = segment(SS, SP);
-    update_psw(*:1 loc);
+    PSW = *:1 loc;
     SP = SP + 1;
 
     return [PC];
@@ -2937,7 +2937,7 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
     PC = *:3 loc;
     SP = SP + 3;
     loc = segment(SS, SP);
-    update_psw(*:1 loc);
+    PSW = *:1 loc;
     SP = SP + 1;
 
     return [PC];
@@ -2969,7 +2969,7 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
     local loc:3 = segment(SS, SP);
     local status:2 = *:2 loc;
     SP = SP + 2;
-    update_psw(status:1);
+    PSW = status:1;
 }
 
 # POP rp
@@ -3067,38 +3067,38 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 # Only a conditional goto
 :BC jdisp8 is SKIP_CHECK & opcode=0xDC; jdisp8 {
     build SKIP_CHECK;
-    if (CY) goto jdisp8;
+    if ($(CY)) goto jdisp8;
     goto inst_next;
 }
 
 # BNC $addr20
 :BNC jdisp8 is SKIP_CHECK & opcode=0xDE; jdisp8 {
     build SKIP_CHECK;
-    if (!CY) goto jdisp8;
+    if (!$(CY)) goto jdisp8;
 }
 
 # BZ $addr20
 :BZ jdisp8 is SKIP_CHECK & opcode=0xDD; jdisp8 {
     build SKIP_CHECK;
-    if (Z) goto jdisp8;
+    if ($(Z)) goto jdisp8;
 }
 
 # BNZ $addr20
 :BNZ jdisp8 is SKIP_CHECK & opcode=0xDF; jdisp8 {
     build SKIP_CHECK;
-    if (!Z) goto jdisp8;
+    if (!$(Z)) goto jdisp8;
 }
 
 # BH $addr20
 :BH jdisp8 is SKIP_CHECK & opcode=0x61; opcode=0xC3; jdisp8 {
     build SKIP_CHECK;
-    if (!(Z | CY)) goto jdisp8;
+    if (!($(Z) | $(CY))) goto jdisp8;
 }
 
 # BNH $addr20
 :BNH jdisp8 is SKIP_CHECK & opcode=0x61; opcode=0xD3; jdisp8 {
     build SKIP_CHECK;
-    if (Z | CY) goto jdisp8;
+    if ($(Z) | $(CY)) goto jdisp8;
 }
 
 # BT saddr.n, $addr20
@@ -3195,7 +3195,6 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 :BTCLR PSW"."bit_op_n, jdisp8 is SKIP_CHECK & opcode=0x31 & PSW; op_l=0x0 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
     build SKIP_CHECK;
     inst_btclr(PSW, bit_op_n, jdisp8);
-    update_psw(PSW);
 }
 
 # BTCRL [HL].n, $addr20
@@ -3238,16 +3237,14 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 # EI
 :EI is SKIP_CHECK & opcode=0x71; opcode=0x7A; opcode=0xFA {
     build SKIP_CHECK;
-    PSW = PSW | (1 << 7);
-    update_psw(PSW);
+    $(IE) = 1;
     enable_interrupts();
 }
 
 # DI
 :DI is SKIP_CHECK & opcode=0x71; opcode=0x7B; opcode=0xFA {
     build SKIP_CHECK;
-    PSW = PSW & (0 << 7);
-    update_psw(PSW);
+    $(IE) = 0;
     disable_interrupts();
 }
 
