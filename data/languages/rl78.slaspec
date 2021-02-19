@@ -138,6 +138,8 @@ define ram offset=0x80 size=2 [
     CALLTB8 CALLTBA CALLTBC CALLTBE
 ];
 
+define ram offset=0xF0090 size=1 DFLCTL; # Data flash control register
+
 # Implementation-specific special function registers, starting from 0xFFF00
 define ram offset=0xFFF00 size=1 [
     SFR00 SFR01 SFR02 SFR03 SFR04 SFR05 SFR06 SFR07
@@ -429,7 +431,7 @@ macro inst_dec(dst) {
 
 macro inst_add(dst, src) {
     aux_carry(dst, src);
-    $(CY) = carry(dst, src);
+    $(CY) = (zext(dst) + zext(src)) > 0xff:2;
     dst = dst + src;
     $(Z) = (dst == 0);
 }
@@ -441,7 +443,7 @@ macro inst_addc(dst, src) {
 
 macro inst_sub(dst, src) {
     aux_borrow(dst, src);
-    $(CY) = carry(dst, src);
+    $(CY) = dst < src;
     $(Z) = dst == src;
     dst = dst - src;
     $(Z) = (dst == 0);
@@ -506,7 +508,7 @@ macro inst_sarw(dst, n) {
 
 macro inst_cmp(dst, src) {
     $(Z) = dst == src;
-    $(CY) = carry(dst, src);
+    $(CY) = dst < src;
     aux_borrow(dst, src);
 }
 
@@ -517,20 +519,20 @@ macro inst_cmp0(dst) {
 }
 
 macro inst_addw(dst, src) {
-    $(CY) = carry(dst, src);
+    $(CY) = (zext(dst) + zext(src)) > 0xffff:4;
     dst = dst + src;
     $(Z) = dst == src;
 }
 
 macro inst_subw(dst, src) {
-    $(CY) = sborrow(dst, src);
+    $(CY) = dst < src;
     $(Z) = dst == src;
     dst = dst - src;
 }
 
 macro inst_cmpw(dst, src) {
     $(Z) = dst == src;
-    $(CY) = sborrow(dst, src);
+    $(CY) = dst < src;
 }
 
 macro inst_rolwc(dst) {
