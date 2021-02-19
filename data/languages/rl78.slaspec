@@ -50,9 +50,6 @@ define register offset=0x50 size=1 [SPL SPH PSW _ CS ES PMC MEM];
 # For storing processor context
 define register offset=0x80 size=4 contextreg;
 
-# Fake segment register for the stack
-define register offset=0x84 size=1 SS;
-
 define context contextreg
     es_prefix=(0, 0) noflow
     rsb=(1,2)
@@ -257,10 +254,10 @@ DREG_WORD:^BC is BC & dreg_word=1 { export BC; }
 DREG_WORD:^DE is DE & dreg_word=2 { export DE; }
 DREG_WORD:^HL is HL & dreg_word=3 { export HL; }
 
-CALL_RP:^AX is AX & call_rp=4 { export AX; }
-CALL_RP:^BC is BC & call_rp=5 { export BC; }
-CALL_RP:^DE is DE & call_rp=6 { export DE; }
-CALL_RP:^HL is HL & call_rp=7 { export HL; }
+CALL_RP:^AX is AX & call_rp=4 { local target:3 = segment(CS, AX); export target; }
+CALL_RP:^BC is BC & call_rp=5 { local target:3 = segment(CS, BC); export target; }
+CALL_RP:^DE is DE & call_rp=6 { local target:3 = segment(CS, DE); export target; }
+CALL_RP:^HL is HL & call_rp=7 { local target:3 = segment(CS, HL); export target; }
 
 attach names [ rbs_op_n ] [ RBS0 RBS1 RBS2 RBS3 ];
 
@@ -395,11 +392,13 @@ macro short_direct_addr(addr, res) {
 
 # Section 3.4.6 Page 160
 macro reg_ind(reg1, reg2, res) {
+    # TODO missing instructions
     res = segment(0xF:1, (zext(reg1) << 8) | zext(reg2));
 }
 
 # Section 3.4.6 Page 160
 macro reg_ind_es(reg1, reg2, res) {
+    # TODO missing instructions
     res = segment(ES, (zext(reg1) << 8) | zext(reg2));
 }
 
@@ -604,6 +603,8 @@ macro inst_btclr(src, bit, target) {
 
 # Instruction data tokens
 
+sp: SP is SP { local loc:3 = segment(0:1, SP); export loc; }
+
 u8: "#"data is data {
     local tmp:1 = data;
     export tmp;
@@ -615,19 +616,19 @@ u16: "#"dataw is dataw {
 }
 
 saddr: uaddr8 is uaddr8 {
-    local loc:4;
+    local loc:3;
     short_direct_addr(uaddr8:1, loc);
     export *:1 loc;
 }
 
 saddrp: uaddr8 is uaddr8 {
-    local loc:4;
+    local loc:3;
     short_direct_addr(uaddr8:1, loc);
     export *:2 loc;
 }
 
 addr16: "!"uaddr16 is es_prefix=0 & uaddr16 {
-    local loc:4;
+    local loc:3;
     direct_addr(uaddr16:2, loc);
     export *:1 loc;
 }
@@ -637,23 +638,23 @@ addr16: a16_sfr_reg is es_prefix=0 & a16_sfr_reg & a16_sfr_offset=0x1fff {
 }
 
 addr16: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
-    local loc:4;
+    local loc:3;
     direct_addr_es(uaddr16:2, loc);
     export *:1 loc;
 }
 
 addr16w: "!"uaddr16 is es_prefix=0 & uaddr16 {
-    local loc:4;
+    local loc:3;
     direct_addr(uaddr16:2, loc);
     export *:2 loc;
 }
 
 addr16w: a16w_sfr_reg is es_prefix=0 & a16w_sfr_reg & a16_sfr_offset=0x1fff {
-    export a16w_sfr_reg;
+    export *:2 a16w_sfr_reg;
 }
 
 addr16w: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
-    local loc:4;
+    local loc:3;
     direct_addr_es(uaddr16:2, loc);
     export *:2 loc;
 }
@@ -675,7 +676,7 @@ sfrpw: sfr_byte is sfr_byte {
 }
 
 sfrpw: fixed_sfr_w is fixed_sfr_w & fixed_sfr_offset=0x1f {
-    export fixed_sfr_w;
+    export *:2 fixed_sfr_w;
 }
 
 jdisp8: "$"loc is saddr8 [ loc = inst_next + saddr8; ] {
@@ -695,243 +696,244 @@ brk_addr: loc is opcode [ loc = 0x007F7E; ] {
     export *:3 loc;
 }
 
-ret_addr: opcode is opcode {
-    local loc:3 = segment(SS, SP);
-    SP = SP + 4;
+ret_addr: opcode is opcode & sp {
+    local loc:3 = sp;
+    sp = sp + 4;
     export *:3 loc;
 }
 
 # Register Ponter tokens - [r]
 
 AddrDE: [DE] is es_prefix=0 & DE {
-    local loc:4;
+    local loc:3;
     direct_addr(DE, loc);
     export *:1 loc;
 }
 
 AddrDE: ES:[DE] is es_prefix=1 & DE & ES {
-    local loc:4;
+    local loc:3;
     direct_addr_es(DE, loc);
     export *:1 loc;
 }
 
 AddrDEW: [DE] is es_prefix=0 & DE {
-    local loc:4;
+    local loc:3;
     direct_addr(DE, loc);
     export *:2 loc;
 }
 
 AddrDEW: ES:[DE] is es_prefix=1 & DE & ES {
-    local loc:4;
+    local loc:3;
     direct_addr_es(DE, loc);
     export *:2 loc;
 }
 
 AddrDEOffset: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
-    local loc:4;
+    local loc:3;
     direct_addr(DE, loc);
     loc = loc + uaddr8;
     export *:1 loc;
 }
 
 AddrDEOffset: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES {
-    local loc:4;
+    local loc:3;
     direct_addr_es(DE, loc);
     loc = loc + uaddr8;
     export *:1 loc;
 }
 
 AddrDEOffsetW: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
-    local loc:4;
+    local loc:3;
     direct_addr(DE, loc);
     loc = loc + uaddr8;
     export *:2 loc;
 }
 
 AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES{
-    local loc:4;
+    local loc:3;
     direct_addr_es(DE, loc);
     loc = loc + uaddr8;
     export *:2 loc;
 }
 
 AddrHL: [HL] is HL & es_prefix=0 {
-    local loc:4;
+    local loc:3;
     direct_addr(HL, loc);
     export *:1 loc;
 }
 
 AddrHL: ES:[HL] is HL & es_prefix=1 & ES {
-    local loc:4;
+    local loc:3;
     direct_addr_es(HL, loc);
     export *:1 loc;
 }
 
 AddrHLW: [HL] is es_prefix=0 & HL {
-    local loc:4;
+    local loc:3;
     direct_addr(HL, loc);
     export *:2 loc;
 }
 
 AddrHLW: ES:[HL] is es_prefix=1 & HL & ES {
-    local loc:4;
+    local loc:3;
     direct_addr_es(HL, loc);
     export *:2 loc;
 }
 
 AddrHLOffset: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
-    local loc:4;
+    local loc:3;
     direct_addr(HL, loc);
     loc = loc + uaddr8;
     export *:1 loc;
 }
 
 AddrHLOffset: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES{
-    local loc:4;
+    local loc:3;
     direct_addr_es(HL, loc);
     loc = loc + uaddr8;
     export *:1 loc;
 }
 
 AddrHLOffsetW: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
-    local loc:4;
+    local loc:3;
     direct_addr(HL, loc);
     loc = loc + uaddr8;
     export *:2 loc;
 }
 
 AddrHLOffsetW: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES {
-    local loc:4;
+    local loc:3;
     direct_addr_es(HL, loc);
     loc = loc + uaddr8;
     export *:2 loc;
 }
 
 AddrHLOffsetB: [HL+B] is es_prefix=0 & HL & B {
-    local loc:4;
+    local loc:3;
     direct_addr(HL, loc);
     loc = loc + zext(B);
     export *:1 loc;
 }
 
 AddrHLOffsetB: ES:[HL+B] is es_prefix=1 & HL & B & ES {
-    local loc:4;
+    local loc:3;
     direct_addr_es(HL, loc);
     loc = loc + zext(B);
     export *:1 loc;
 }
 
 AddrHLOffsetC: [HL+C] is es_prefix=0 & HL & C {
-    local loc:4;
+    local loc:3;
     direct_addr(HL, loc);
     loc = loc + zext(C);
     export *:1 loc;
 }
 
 AddrHLOffsetC: ES:[HL+C] is es_prefix=1 & HL & C & ES {
-    local loc:4;
+    local loc:3;
     direct_addr_es(HL, loc);
     loc = loc + zext(C);
     export *:1 loc;
 }
 
 AddrWordOffsetB: uaddr16[B] is es_prefix=0 & uaddr16 & B {
-    local loc:4;
-    direct_addrb(B, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addrb(uaddr16:2, loc);
+    loc = loc + zext(B);
     export *:1 loc;
 }
 
 AddrWordOffsetB: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
-    local loc:4;
-    direct_addrb_es(B, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addrb_es(uaddr16:2, loc);
+    loc = loc + zext(B);
     export *:1 loc;
 }
 
 AddrWordOffsetBW: uaddr16[B] is es_prefix=0 & uaddr16 & B {
-    local loc:4;
-    direct_addrb(B, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addrb(uaddr16:2, loc);
+    loc = loc + zext(B);
     export *:2 loc;
 }
 
 AddrWordOffsetBW: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
-    local loc:4;
-    direct_addrb_es(B, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addrb_es(uaddr16:2, loc);
+    loc = loc + zext(B);
     export *:2 loc;
 }
 
 AddrWordOffsetC: uaddr16[C] is es_prefix=0 & uaddr16 & C {
-    local loc:4;
-    direct_addrb(C, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addrb(uaddr16:2, loc);
+    loc = loc + zext(C);
     export *:1 loc;
 }
 
 AddrWordOffsetC: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
-    local loc:4;
-    direct_addrb_es(C, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addrb_es(uaddr16:2, loc);
+    loc = loc + zext(C);
     export *:1 loc;
 }
 
 AddrWordOffsetCW: uaddr16[C] is es_prefix=0 & uaddr16 & C {
-    local loc:4;
-    direct_addrb(C, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addrb(uaddr16:2, loc);
+    loc = loc + zext(C);
     export *:2 loc;
 }
 
 AddrWordOffsetCW: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
-    local loc:4;
-    direct_addrb_es(C, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addrb_es(uaddr16:2, loc);
+    loc = loc + zext(C);
     export *:2 loc;
 }
 
 AddrWordOffsetBC: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
-    local loc:4;
-    direct_addr(BC, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addr(uaddr16:2, loc);
+    loc = loc + zext(BC);
     export *:1 loc;
 }
 
 AddrWordOffsetBC: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
-    local loc:4;
-    direct_addr_es(BC, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addr_es(uaddr16:2, loc);
+    loc = loc + zext(BC);
     export *:1 loc;
 }
 
 AddrWordOffsetBCW: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
-    local loc:4;
-    direct_addr(BC, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addr(uaddr16:2, loc);
+    loc = loc + zext(BC);
     export *:2 loc;
 }
 
 AddrWordOffsetBCW: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
-    local loc:4;
-    direct_addr_es(BC, loc);
-    loc = loc + uaddr16;
+    local loc:3;
+    direct_addr_es(uaddr16:2, loc);
+    loc = loc + zext(BC);
     export *:2 loc;
 }
 
-AddrSPOffset: [SP+uaddr8] is SP & uaddr8 {
-    local loc:3 = zext(SP) + uaddr8;
+AddrSPOffset: [sp+uaddr8] is sp & uaddr8 {
+    local loc:3 = sp + uaddr8;
     export *:1 loc;
 }
 
-AddrSPOffsetW: [SP+uaddr8] is SP & uaddr8 {
-    local loc:3 = zext(SP) + uaddr8;
+AddrSPOffsetW: [sp+uaddr8] is sp & uaddr8 {
+    local loc:3 = sp + uaddr8;
     export *:2 loc;
 }
 
 CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
     [ ct_entry = 0x80 | ((op2_callt_hi << 4) | op2_callt_low << 1); ] {
-    export *:2 ct_entry;
+    local loc:3 = segment(0:1, *:2 ct_entry:3);
+    export loc;
 }
 
 # method derived from ARMinstructions.sinc
@@ -2839,77 +2841,43 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 #
 
 # CALL rp
-:CALL CALL_RP is SKIP_CHECK & opcode=0x61; CALL_RP & op_l=0xA & mov1_sreg=1 {
+:CALL CALL_RP is SKIP_CHECK & opcode=0x61; CALL_RP & op_l=0xA & mov1_sreg=1 & sp {
     build SKIP_CHECK;
-    local ret_pc:4 = inst_next;
-    SP = SP - 4;
-    local loc:3 = segment(SS, SP);
-    *loc = ret_pc;
-    loc = segment(CS, CALL_RP);
-    PC = loc;
-    call [loc];
+    call [CALL_RP];
 }
 
 # CALL $!addr20
-:CALL jdisp16 is SKIP_CHECK & opcode=0xFE; jdisp16 {
+:CALL jdisp16 is SKIP_CHECK & opcode=0xFE & sp; jdisp16 {
     build SKIP_CHECK;
-    local ret_pc:4 = inst_next;
-    SP = SP - 4;
-    local loc:3 = segment(SS, SP);
-    *loc = ret_pc;
-    PC = loc;
     call jdisp16;
 }
 
 # CALL !addr16
-:CALL jaddr16 is SKIP_CHECK & opcode=0xFD; jaddr16 {
+:CALL jaddr16 is SKIP_CHECK & opcode=0xFD & sp; jaddr16 {
     build SKIP_CHECK;
-    local ret_pc:4 = inst_next;
-    SP = SP - 4;
-    local loc:3 = segment(SS, SP);
-    *loc = ret_pc;
-
     call jaddr16;
 }
 
 # CALL !!addr20
-:CALL addr20 is SKIP_CHECK & opcode=0xFC; addr20 {
+:CALL addr20 is SKIP_CHECK & opcode=0xFC & sp; addr20 {
     build SKIP_CHECK;
-    local ret_pc:4 = inst_next;
-    SP = SP - 4;
-    local loc:3 = segment(SS, SP);
-    *loc = ret_pc;
-
     call addr20;
 }
 
 # CALLT [CALLT]
-:CALLT CALLT_Entry is SKIP_CHECK & opcode=0x61; CALLT_Entry & op2_callt_hi & op2_callt_low & op2_b7=1 & op2_b23=0x1 {
+:CALLT CALLT_Entry is SKIP_CHECK & opcode=0x61 & sp; CALLT_Entry & op2_callt_hi & op2_callt_low & op2_b7=1 & op2_b23=0x1 {
     build SKIP_CHECK;
-    local ret_pc:4 = inst_next;
-    SP = SP - 4;
-    local loc:3 = segment(SS, SP);
-    *loc = ret_pc;
-
     call CALLT_Entry;
 }
 
 # BRK
-:BRK is SKIP_CHECK & opcode=0x61; opcode=0xCC & brk_addr {
+:BRK is SKIP_CHECK & opcode=0x61 & sp; opcode=0xCC & brk_addr {
     build SKIP_CHECK;
-    SP = SP - 1;
-    local ret_pc:4 = inst_next;
-    local loc:3 = segment(SS, SP);
-    *loc = ret_pc;
-    SP = SP - 1;
-    *:1 loc = PSW;
-    SP = SP - 3;
-    loc = segment(SS, SP);
-    *:3 loc = inst_next;
 
     $(IE) = 0;
     PSW = PSW & 0x7f;
 
+    PC = brk_addr;
     call brk_addr;
 }
 
@@ -2920,28 +2888,14 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 }
 
 # RETI
-:RETI (PC) is SKIP_CHECK & opcode=0x61; opcode=0xFC & PC {
+:RETI (PC) is SKIP_CHECK & opcode=0x61 & sp; opcode=0xFC & PC {
     build SKIP_CHECK;
-    local loc:3 = segment(SS, SP);
-    PC = *:3 loc;
-    SP = SP + 3;
-    loc = segment(SS, SP);
-    PSW = *:1 loc;
-    SP = SP + 1;
-
     return [PC];
 }
 
 # RETB
-:RETB (PC) is SKIP_CHECK & opcode=0x61; opcode=0xEC & PC {
+:RETB (PC) is SKIP_CHECK & opcode=0x61 & sp; opcode=0xEC & PC {
     build SKIP_CHECK;
-    local loc:3 = segment(SS, SP);
-    PC = *:3 loc;
-    SP = SP + 3;
-    loc = segment(SS, SP);
-    PSW = *:1 loc;
-    SP = SP + 1;
-
     return [PC];
 }
 
@@ -2950,36 +2904,32 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
 #
 
 # PUSH PSW
-:PUSH PSW is SKIP_CHECK & opcode=0x61 & PSW; opcode=0xDD {
+:PUSH PSW is SKIP_CHECK & opcode=0x61 & PSW & sp; opcode=0xDD {
     build SKIP_CHECK;
-    SP = SP - 2;
-    local loc:3 = segment(SS, SP);
-    *:2 loc = zext(PSW);
+    *:2 sp = zext(PSW);
+    sp = sp - 2;
 }
 
 # PUSH rp
-:PUSH DREG_WORD is SKIP_CHECK & op_h=0xC & DREG_WORD & rp_source=1 {
+:PUSH DREG_WORD is SKIP_CHECK & op_h=0xC & DREG_WORD & rp_source=1 & sp {
     build SKIP_CHECK;
-    SP = SP - 2;
-    local loc:3 = segment(SS, SP);
-    *:2 loc = DREG_WORD;
+    *sp = DREG_WORD;
+    sp = sp - 2;
 }
 
 # POP PSW
-:POP PSW is SKIP_CHECK & opcode=0x61 & PSW; opcode=0xCD {
+:POP PSW is SKIP_CHECK & opcode=0x61 & PSW & sp; opcode=0xCD {
     build SKIP_CHECK;
-    local loc:3 = segment(SS, SP);
-    local status:2 = *:2 loc;
-    SP = SP + 2;
+    local status:2 = *sp;
+    sp = sp + 2;
     PSW = status:1;
 }
 
 # POP rp
-:POP DREG_WORD is SKIP_CHECK & op_h=0xC & DREG_WORD & rp_source=0 {
+:POP DREG_WORD is SKIP_CHECK & op_h=0xC & DREG_WORD & rp_source=0 & sp {
     build SKIP_CHECK;
-    local loc:3 = segment(SS, SP);
-    SP = SP + 2;
-    DREG_WORD = *:2 loc;
+    DREG_WORD = *sp;
+    sp = sp + 2;
 }
 
 # MOVW SP, #word
@@ -3000,44 +2950,24 @@ SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }
     AX = SP;
 }
 
-# The following show an additional addr16 on the opcode in
-# the ISA documentation. This SKIP_CHECK & looks like it may be a documentation
-# error as they're all register operands.
-# They're also commented out as they conflict with other MOVW instructions... See MOVW BC, !addr16 for example.
-
-# MOVW BC, SP
-#:MOVW BC, SP is SKIP_CHECK & opcode=0xDB & BC & SP {
-#    BC = SP;
-#}
-
-# MOVW DE, SP
-#:MOVW DE, SP is SKIP_CHECK & opcode=0xEB & DE & SP {
-#    DE = SP;
-#}
-
-# MOVW HL, SP
-#:MOVW HL, SP is SKIP_CHECK & opcode=0xFB & HL & SP {
-#    HL = SP;
-#}
-
 # ADDW SP, #byte
-:ADDW SP, u8 is SKIP_CHECK & opcode=0x10 & SP; u8 {
+:ADDW sp, u8 is SKIP_CHECK & opcode=0x10 & sp; u8 {
     build SKIP_CHECK;
-    SP = SP + zext(u8);
+    sp = sp + zext(u8);
 }
 
 # SUBW SP, #byte
-:SUBW SP, u8 is SKIP_CHECK & opcode=0x20 & SP; u8 {
+:SUBW sp, u8 is SKIP_CHECK & opcode=0x20 & sp; u8 {
     build SKIP_CHECK;
-    SP = SP - zext(u8);
+    sp = sp - zext(u8);
 }
 
 # BR AX
 :BR AX is SKIP_CHECK & opcode=0x61 & AX; opcode=0xCB {
     build SKIP_CHECK;
-    local addr:4 = segment(CS, AX);
-    PC = addr:3;
-    goto [PC];
+    local addr:3 = segment(CS, AX);
+    PC = addr;
+    goto [addr];
 }
 
 # BR $addr20

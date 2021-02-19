@@ -9,7 +9,7 @@
     <machine_alignment value="2" />
     <default_alignment value="2" />
     <default_pointer_alignment value="2" />
-    <pointer_size value="2" />
+    <pointer_size value="3" />
     <wchar_size value="2" />
     <short_size value="2" />
     <integer_size value="2" />
@@ -18,11 +18,9 @@
     <float_size value="4" />
     <double_size value="4" />
     <long_double_size value="8" />
- </data_organization>
+  </data_organization>
   <global>
     <range space="ram"/>
-    <!-- this prevents the decompiler from creating the in_SS local-->
-    <register name="SS"/>
   </global>
   <stackpointer register="SP" space="ram" growth="negative"/>
   <returnaddress>

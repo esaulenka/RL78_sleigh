@@ -19,7 +19,6 @@
     </constresolve>
   </segmentop>
   <register_data>
-    <register name="SS" hidden="true"/>
     <register name="es_prefix" hidden="true"/>
     <register name="rsb" hidden="true"/>
     <register name="skip_mode" hidden="true"/>
