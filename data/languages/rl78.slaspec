@@ -135,7 +135,82 @@ define ram offset=0x80 size=2 [
     CALLTB8 CALLTBA CALLTBC CALLTBE
 ];
 
-define ram offset=0xF0090 size=1 DFLCTL; # Data flash control register
+define ram offset=0xF0010 size=1 [ADM2 ADUL ADLL ADTES];
+define ram offset=0xF0030 size=1 [
+    PU0    PU1    _     PU3
+    PU4    PU5    PU6   PU7
+    PU8    PU9    PU10  PU11
+    PU12   _      PU14  _
+    PIM0   PIM1   _     _
+    PIM4   PIM5   _     _
+    PIM8   _      _     _
+    _      _      PIM14 _
+    POM0   POM1   _     _
+    POM4   POM5   _     POM7
+    POM8   POM9   _     _
+    _      _      POM14 _
+    PMC0   _      _     PMC3
+    _      _      _     _
+    _      _      PMC10  PMC11
+    PMC12  _      PMC14  _
+    NFEN0  NFEN1  NFEN2  ISC
+    TIS0   _      ADPC   PIOR
+    IAWCTL _      _      _
+    _      GDIDIS
+];
+define ram offset=0xF0090 size=1 DFCTL;
+define ram offset=0xF00A0 size=1 HIOTRM;
+define ram offset=0xF00A8 size=1 HOCODIV;
+define ram offset=0xF00E0 size=2 [MDCL MDCH];
+define ram offset=0xF00E8 size=1 MDUC;
+define ram offset=0xF00F0 size=1 [PER0 _ _ OSMC _ RPECTL];
+define ram offset=0xF00FE size=1 BCDADJ;
+define ram offset=0xF0100 size=2 [
+    SSR00 SSR01 SSR02 SSR03
+    SIR00 SIR01 SIR02 SIR03
+    SMR00 SMR01 SMR02 SMR03
+    SCR00 SCR01 SCR02 SCR03
+    SE0   SS0   ST0   SPS0
+    SO0   SOE0  _     _
+    _     _     SOL0  _
+    SSC0  _     _     _
+    SSR10 SSR11 SSR12 SSR13
+    SIR10 SIR11 SIR12 SIR13
+    SMR10 SMR11 SMR12 SMR13
+    SCR10 SCR11 SCR12 SCR13
+    SE1   SS1   ST1   SPS1
+    SO1   SOE1  _     _
+    _     _     SOL1  _
+    SSC1  _     _     _
+    TCR00 TCR01 TCR02 TCR03
+    TCR04 TCR05 TCR06 TCR07
+    TMR00 TMR01 TMR02 TMR03
+    TMR04 TMR05 TMR06 TMR07
+    TSR00 TSR01 TSR02 TSR03
+    TSR04 TSR05 TSR06 TSR07
+    TE0   TS0   TT0   TPS0
+    TO0   TOE0  TOL0  TOM0
+    TCR10 TCR11 TCR12 TCR13
+    TCR14 TCR15 TCR16 TCR17
+    TMR10 TMR11 TMR12 TMR13
+    TMR14 TMR15 TMR16 TMR17
+    TSR10 TSR11 TSR12 TSR13
+    TSR14 TSR15 TSR16 TSR17
+    TE1   TS1   TT1   TPS1
+    TO1   TOE1  TOL1  TOM1
+];
+define ram offset=0xF0200 size=1 [DSA2 DSA3];
+define ram offset=0xF0202 size=2 [DRA2 DRA3 DBC2 DBC3];
+define ram offset=0xF020A size=1 [DMC2 DMC3 DRC2 DRC3];
+define ram offset=0xF0230 size=1 [
+    IICCTL00 IICCTL01 IICWL0 IICWH0
+    SVA0 _ _ _ IICTL100 IICTL11
+    IICWL1 IICWH1 SVA1
+];
+
+define ram offset=0xF02F0 size=1 CRC0CTL;
+define ram offset=0xF02F2 size=2 PGCRCL;
+define ram offset=0xF02FA size=2 CRCD;
 
 # Implementation-specific special function registers, starting from 0xFFF00
 define ram offset=0xFFF00 size=1 [
