@@ -1,0 +1,478 @@
+# Section # Page # of RL78/G13 User Manual
+
+# Section 3.4.3 Page 157
+macro direct_addr(addr, res) {
+    res = segment(0xF:1, addr);
+}
+
+macro direct_addr_es(addr, res) {
+    res = segment(ES, addr);
+}
+
+macro direct_addrb(addr, res) {
+    direct_addr(addr, res);
+}
+
+macro direct_addrb_es(addr, res) {
+    direct_addr_es(addr, res);
+}
+
+# Section 3.4.4 Page 158
+macro short_direct_addr(addr, res) {
+    res = segment(0xF:1, zext(addr) + 0xFE00:2);
+}
+
+# Section 3.4.6 Page 160
+macro reg_ind(reg1, reg2, res) {
+    # TODO missing instructions
+    res = segment(0xF:1, (zext(reg1) << 8) | zext(reg2));
+}
+
+# Section 3.4.6 Page 160
+macro reg_ind_es(reg1, reg2, res) {
+    # TODO missing instructions
+    res = segment(ES, (zext(reg1) << 8) | zext(reg2));
+}
+
+BANK0: is rsb=0 {}
+BANK1: is rsb=1 {}
+BANK2: is rsb=2 {}
+BANK3: is rsb=3 {}
+
+X:"X" is BANK0 { export X0; }
+X:"X" is BANK1 { export X1; }
+X:"X" is BANK2 { export X2; }
+X:"X" is BANK3 { export X3; }
+
+A:"A" is BANK0 { export A0; }
+A:"A" is BANK1 { export A1; }
+A:"A" is BANK2 { export A2; }
+A:"A" is BANK3 { export A3; }
+
+C:"C" is BANK0 { export C0; }
+C:"C" is BANK1 { export C1; }
+C:"C" is BANK2 { export C2; }
+C:"C" is BANK3 { export C3; }
+
+B:"B" is BANK0 { export B0; }
+B:"B" is BANK1 { export B1; }
+B:"B" is BANK2 { export B2; }
+B:"B" is BANK3 { export B3; }
+
+E:"E" is BANK0 { export E0; }
+E:"E" is BANK1 { export E1; }
+E:"E" is BANK2 { export E2; }
+E:"E" is BANK3 { export E3; }
+
+D:"D" is BANK0 { export D0; }
+D:"D" is BANK1 { export D1; }
+D:"D" is BANK2 { export D2; }
+D:"D" is BANK3 { export D3; }
+
+L:"L" is BANK0 { export L0; }
+L:"L" is BANK1 { export L1; }
+L:"L" is BANK2 { export L2; }
+L:"L" is BANK3 { export L3; }
+
+H:"H" is BANK0 { export H0; }
+H:"H" is BANK1 { export H1; }
+H:"H" is BANK2 { export H2; }
+H:"H" is BANK3 { export H3; }
+
+AX:"AX" is BANK0 { export AX0; }
+AX:"AX" is BANK1 { export AX1; }
+AX:"AX" is BANK2 { export AX2; }
+AX:"AX" is BANK3 { export AX3; }
+
+BC:"BC" is BANK0 { export BC0; }
+BC:"BC" is BANK1 { export BC1; }
+BC:"BC" is BANK2 { export BC2; }
+BC:"BC" is BANK3 { export BC3; }
+
+DE:"DE" is BANK0 { export DE0; }
+DE:"DE" is BANK1 { export DE1; }
+DE:"DE" is BANK2 { export DE2; }
+DE:"DE" is BANK3 { export DE3; }
+
+HL:"HL" is BANK0 { export HL0; }
+HL:"HL" is BANK1 { export HL1; }
+HL:"HL" is BANK2 { export HL2; }
+HL:"HL" is BANK3 { export HL3; }
+
+DREG_BYTE:^X is X & dreg_byte=0 { export X; }
+DREG_BYTE:^A is A & dreg_byte=1 { export A; }
+DREG_BYTE:^C is C & dreg_byte=2 { export C; }
+DREG_BYTE:^B is B & dreg_byte=3 { export B; }
+DREG_BYTE:^E is E & dreg_byte=4 { export E; }
+DREG_BYTE:^D is D & dreg_byte=5 { export D; }
+DREG_BYTE:^L is L & dreg_byte=6 { export L; }
+DREG_BYTE:^H is H & dreg_byte=7 { export H; }
+
+DREG_AXBC:^X is X & dreg_axbc=0 { export X; }
+DREG_AXBC:^A is A & dreg_axbc=1 { export A; }
+DREG_AXBC:^C is C & dreg_axbc=2 { export C; }
+DREG_AXBC:^B is B & dreg_axbc=3 { export B; }
+
+DREG_WORD:^AX is AX & dreg_word=0 { export AX; }
+DREG_WORD:^BC is BC & dreg_word=1 { export BC; }
+DREG_WORD:^DE is DE & dreg_word=2 { export DE; }
+DREG_WORD:^HL is HL & dreg_word=3 { export HL; }
+
+CALL_RP:^AX is AX & call_rp=4 { local target:3 = segment(CS, AX); export target; }
+CALL_RP:^BC is BC & call_rp=5 { local target:3 = segment(CS, BC); export target; }
+CALL_RP:^DE is DE & call_rp=6 { local target:3 = segment(CS, DE); export target; }
+CALL_RP:^HL is HL & call_rp=7 { local target:3 = segment(CS, HL); export target; }
+
+SREG2_BYTE:^X is X & sreg2_byte=0 { export X; }
+SREG2_BYTE:^A is A & sreg2_byte=1 { export A; }
+SREG2_BYTE:^C is C & sreg2_byte=2 { export C; }
+SREG2_BYTE:^B is B & sreg2_byte=3 { export B; }
+SREG2_BYTE:^E is E & sreg2_byte=4 { export E; }
+SREG2_BYTE:^D is D & sreg2_byte=5 { export D; }
+SREG2_BYTE:^L is L & sreg2_byte=6 { export L; }
+SREG2_BYTE:^H is H & sreg2_byte=7 { export H; }
+
+sp: SP is SP { local loc:3 = segment(0:1, SP); export loc; }
+
+u8: "#"data is data {
+    local tmp:1 = data;
+    export tmp;
+}
+
+u16: "#"dataw is dataw {
+    local tmp:2 = dataw;
+    export tmp;
+}
+
+saddr: uaddr8 is uaddr8 {
+    local loc:3;
+    short_direct_addr(uaddr8:1, loc);
+    export *:1 loc;
+}
+
+saddrp: uaddr8 is uaddr8 {
+    local loc:3;
+    short_direct_addr(uaddr8:1, loc);
+    export *:2 loc;
+}
+
+addr16: "!"uaddr16 is es_prefix=0 & uaddr16 {
+    local loc:3;
+    direct_addr(uaddr16:2, loc);
+    export *:1 loc;
+}
+
+addr16: a16_sfr_reg is es_prefix=0 & a16_sfr_reg & a16_sfr_offset=0x1fff {
+    export a16_sfr_reg;
+}
+
+addr16: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
+    local loc:3;
+    direct_addr_es(uaddr16:2, loc);
+    export *:1 loc;
+}
+
+addr16w: "!"uaddr16 is es_prefix=0 & uaddr16 {
+    local loc:3;
+    direct_addr(uaddr16:2, loc);
+    export *:2 loc;
+}
+
+addr16w: a16w_sfr_reg is es_prefix=0 & a16w_sfr_reg & a16_sfr_offset=0x1fff {
+    export *:2 a16w_sfr_reg;
+}
+
+addr16w: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
+    local loc:3;
+    direct_addr_es(uaddr16:2, loc);
+    export *:2 loc;
+}
+
+addr20: "!!"uaddr20 is uaddr20 {
+    export *:3 uaddr20;
+}
+
+sfrp: sfr_byte is sfr_byte {
+    export *:1 sfr_byte;
+}
+
+sfrp: fixed_sfr is fixed_sfr & fixed_sfr_offset=0x1f {
+    export fixed_sfr;
+}
+
+sfrpw: sfr_word is sfr_word {
+    export *:2 sfr_word;
+}
+
+sfrpw: fixed_sfr_w is fixed_sfr_w & fixed_sfr_offset=0x1f {
+    export *:2 fixed_sfr_w;
+}
+
+jdisp8: "$"loc is saddr8 [ loc = inst_next + saddr8; ] {
+    export *:3 loc;
+}
+
+jaddr16: "!"uaddr16 is uaddr16 {
+    local loc:3 = segment(0:1, uaddr16:2);
+    export *:3 loc;
+}
+
+jdisp16: "$!"loc is saddr16 [ loc = inst_next + saddr16; ] {
+    export *:3 loc;
+}
+
+brk_addr: loc is opcode [ loc = 0x007F7E; ] {
+    export *:3 loc;
+}
+
+ret_addr: opcode is opcode & sp {
+    local loc:3 = sp;
+    sp = sp + 4;
+    export *:3 loc;
+}
+
+# Register Ponter tokens - [r]
+
+AddrDE: [DE] is es_prefix=0 & DE {
+    local loc:3;
+    direct_addr(DE, loc);
+    export *:1 loc;
+}
+
+AddrDE: ES:[DE] is es_prefix=1 & DE & ES {
+    local loc:3;
+    direct_addr_es(DE, loc);
+    export *:1 loc;
+}
+
+AddrDEW: [DE] is es_prefix=0 & DE {
+    local loc:3;
+    direct_addr(DE, loc);
+    export *:2 loc;
+}
+
+AddrDEW: ES:[DE] is es_prefix=1 & DE & ES {
+    local loc:3;
+    direct_addr_es(DE, loc);
+    export *:2 loc;
+}
+
+AddrDEOffset: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
+    local loc:3;
+    direct_addr(DE, loc);
+    loc = loc + uaddr8;
+    export *:1 loc;
+}
+
+AddrDEOffset: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES {
+    local loc:3;
+    direct_addr_es(DE, loc);
+    loc = loc + uaddr8;
+    export *:1 loc;
+}
+
+AddrDEOffsetW: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
+    local loc:3;
+    direct_addr(DE, loc);
+    loc = loc + uaddr8;
+    export *:2 loc;
+}
+
+AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES{
+    local loc:3;
+    direct_addr_es(DE, loc);
+    loc = loc + uaddr8;
+    export *:2 loc;
+}
+
+AddrHL: [HL] is HL & es_prefix=0 {
+    local loc:3;
+    direct_addr(HL, loc);
+    export *:1 loc;
+}
+
+AddrHL: ES:[HL] is HL & es_prefix=1 & ES {
+    local loc:3;
+    direct_addr_es(HL, loc);
+    export *:1 loc;
+}
+
+AddrHLW: [HL] is es_prefix=0 & HL {
+    local loc:3;
+    direct_addr(HL, loc);
+    export *:2 loc;
+}
+
+AddrHLW: ES:[HL] is es_prefix=1 & HL & ES {
+    local loc:3;
+    direct_addr_es(HL, loc);
+    export *:2 loc;
+}
+
+AddrHLOffset: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
+    local loc:3;
+    direct_addr(HL, loc);
+    loc = loc + uaddr8;
+    export *:1 loc;
+}
+
+AddrHLOffset: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES{
+    local loc:3;
+    direct_addr_es(HL, loc);
+    loc = loc + uaddr8;
+    export *:1 loc;
+}
+
+AddrHLOffsetW: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
+    local loc:3;
+    direct_addr(HL, loc);
+    loc = loc + uaddr8;
+    export *:2 loc;
+}
+
+AddrHLOffsetW: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES {
+    local loc:3;
+    direct_addr_es(HL, loc);
+    loc = loc + uaddr8;
+    export *:2 loc;
+}
+
+AddrHLOffsetB: [HL+B] is es_prefix=0 & HL & B {
+    local loc:3;
+    direct_addr(HL, loc);
+    loc = loc + zext(B);
+    export *:1 loc;
+}
+
+AddrHLOffsetB: ES:[HL+B] is es_prefix=1 & HL & B & ES {
+    local loc:3;
+    direct_addr_es(HL, loc);
+    loc = loc + zext(B);
+    export *:1 loc;
+}
+
+AddrHLOffsetC: [HL+C] is es_prefix=0 & HL & C {
+    local loc:3;
+    direct_addr(HL, loc);
+    loc = loc + zext(C);
+    export *:1 loc;
+}
+
+AddrHLOffsetC: ES:[HL+C] is es_prefix=1 & HL & C & ES {
+    local loc:3;
+    direct_addr_es(HL, loc);
+    loc = loc + zext(C);
+    export *:1 loc;
+}
+
+AddrWordOffsetB: uaddr16[B] is es_prefix=0 & uaddr16 & B {
+    local loc:3;
+    direct_addrb(uaddr16:2, loc);
+    loc = loc + zext(B);
+    export *:1 loc;
+}
+
+AddrWordOffsetB: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
+    local loc:3;
+    direct_addrb_es(uaddr16:2, loc);
+    loc = loc + zext(B);
+    export *:1 loc;
+}
+
+AddrWordOffsetBW: uaddr16[B] is es_prefix=0 & uaddr16 & B {
+    local loc:3;
+    direct_addrb(uaddr16:2, loc);
+    loc = loc + zext(B);
+    export *:2 loc;
+}
+
+AddrWordOffsetBW: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
+    local loc:3;
+    direct_addrb_es(uaddr16:2, loc);
+    loc = loc + zext(B);
+    export *:2 loc;
+}
+
+AddrWordOffsetC: uaddr16[C] is es_prefix=0 & uaddr16 & C {
+    local loc:3;
+    direct_addrb(uaddr16:2, loc);
+    loc = loc + zext(C);
+    export *:1 loc;
+}
+
+AddrWordOffsetC: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
+    local loc:3;
+    direct_addrb_es(uaddr16:2, loc);
+    loc = loc + zext(C);
+    export *:1 loc;
+}
+
+AddrWordOffsetCW: uaddr16[C] is es_prefix=0 & uaddr16 & C {
+    local loc:3;
+    direct_addrb(uaddr16:2, loc);
+    loc = loc + zext(C);
+    export *:2 loc;
+}
+
+AddrWordOffsetCW: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
+    local loc:3;
+    direct_addrb_es(uaddr16:2, loc);
+    loc = loc + zext(C);
+    export *:2 loc;
+}
+
+AddrWordOffsetBC: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
+    local loc:3;
+    direct_addr(uaddr16:2, loc);
+    loc = loc + zext(BC);
+    export *:1 loc;
+}
+
+AddrWordOffsetBC: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
+    local loc:3;
+    direct_addr_es(uaddr16:2, loc);
+    loc = loc + zext(BC);
+    export *:1 loc;
+}
+
+AddrWordOffsetBCW: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
+    local loc:3;
+    direct_addr(uaddr16:2, loc);
+    loc = loc + zext(BC);
+    export *:2 loc;
+}
+
+AddrWordOffsetBCW: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
+    local loc:3;
+    direct_addr_es(uaddr16:2, loc);
+    loc = loc + zext(BC);
+    export *:2 loc;
+}
+
+AddrSPOffset: [sp+uaddr8] is sp & uaddr8 {
+    local loc:3 = sp + uaddr8;
+    export *:1 loc;
+}
+
+AddrSPOffsetW: [sp+uaddr8] is sp & uaddr8 {
+    local loc:3 = sp + uaddr8;
+    export *:2 loc;
+}
+
+CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
+    [ ct_entry = 0x80 | ((op2_callt_hi << 4) | op2_callt_low << 1); ] {
+    local loc:3 = segment(0:1, *:2 ct_entry:3);
+    export loc;
+}
+
+# method derived from ARMinstructions.sinc
+
+skip_cond: is skip_mode=1 { local tmp:1 = $(CY); export tmp; }
+skip_cond: is skip_mode=2 { local tmp:1 = !$(CY); export tmp; }
+skip_cond: is skip_mode=3 { local tmp:1 = $(Z); export tmp; }
+skip_cond: is skip_mode=4 { local tmp:1 = !$(Z); export tmp; }
+skip_cond: is skip_mode=5 { local tmp:1 = $(Z) | $(CY); export tmp; }
+skip_cond: is skip_mode=6 { local tmp:1 = !($(Z) | $(CY)); export tmp; }
+
+SKIP_CHECK: is skip_mode=0 { } # always execute by default
+SKIP_CHECK: is skip_cond { if (skip_cond) goto inst_next; }

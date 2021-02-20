@@ -1,0 +1,377 @@
+# Bank 0 - General Purpose
+define register offset=0x18 size=1 [X0 A0 _ C0 B0 _ E0 D0 _ L0 H0];  # 8-bit
+define register offset=0x18 size=2 [AX0 BC0 DE0 HL0];  #16-bit
+
+# Bank 1 - General Purpose
+define register offset=0x10 size=1 [X1 A1 C1 B1 E1 D1 L1 H1];  # 8-bit
+define register offset=0x10 size=2 [AX1 BC1 DE1 HL1];  #16-bit
+
+# Bank 2 - Callee Preserved
+define register offset=0x8 size=1 [X2 A2 C2 B2 E2 D2 L2 H2];  # 8-bit
+define register offset=0x8 size=2 [AX2 BC2 DE2 HL2];  #16-bit
+
+# Bank 3 - Reserved for Interrupt Handlers
+define register offset=0 size=1 [X3 A3 C3 B3 E3 D3 L3 H3];  # 8-bit
+define register offset=0 size=2 [AX3 BC3 DE3 HL3];  #16-bit
+
+# Special purpose registers
+define register offset=0x40 size=3 [PC];
+define register offset=0x50 size=2 [SP      _     _     _      ];
+define register offset=0x50 size=1 [SPL SPH PSW _ CS ES PMC MEM];
+
+@define IE 	        "PSW[7,1]"	# Interrupt Enable (IE)
+@define Z           "PSW[6,1]" 	# Zero Flag (Z)
+@define PSW_RBS1    "PSW[5,1]"	# Register Bank Select Hi-Bit (RBS1)
+@define AC 	        "PSW[4,1]"  # Auxiliary Carry Flag (AC)
+@define PSW_RBS0	"PSW[3,1]" 	# Register Bank Select Lo-Bit (RBS0)
+@define ISP1     	"PSW[2,1]" 	# In-service priority flag Hi-Bit (ISP1)
+@define ISP0 	    "PSW[1,1]"  # In-service priority flag Lo-Bit (ISP0)
+@define CY   	    "PSW[0,1]"  # Carry flag (CY)
+
+# For storing processor context
+define register offset=0x80 size=4 contextreg;
+
+define context contextreg
+    es_prefix=(0, 0) noflow
+    rsb=(1,2)
+    skip_mode=(3,5) noflow;
+
+# CALL Table entries
+define ram offset=0x80 size=2 [
+    CALLT80 CALLT82 CALLT84 CALLT86
+    CALLT88 CALLT8A CALLT8C CALLT8E
+
+    CALLT90 CALLT92 CALLT94 CALLT96
+    CALLT98 CALLT9A CALLT9C CALLT9E
+
+    CALLTA0 CALLTA2 CALLTA4 CALLTA6
+    CALLTA8 CALLTAA CALLTAC CALLTAE
+
+    CALLTB0 CALLTB2 CALLTB4 CALLTB6
+    CALLTB8 CALLTBA CALLTBC CALLTBE
+];
+
+define ram offset=0xF0010 size=1 [ADM2 ADUL ADLL ADTES];
+define ram offset=0xF0030 size=1 [
+    PU0    PU1    _     PU3
+    PU4    PU5    PU6   PU7
+    PU8    PU9    PU10  PU11
+    PU12   _      PU14  _
+    PIM0   PIM1   _     _
+    PIM4   PIM5   _     _
+    PIM8   _      _     _
+    _      _      PIM14 _
+    POM0   POM1   _     _
+    POM4   POM5   _     POM7
+    POM8   POM9   _     _
+    _      _      POM14 _
+    PMC0   _      _     PMC3
+    _      _      _     _
+    _      _      PMC10  PMC11
+    PMC12  _      PMC14  _
+    NFEN0  NFEN1  NFEN2  ISC
+    TIS0   _      ADPC   PIOR
+    IAWCTL _      _      _
+    _      GDIDIS
+];
+define ram offset=0xF0090 size=1 DFCTL;
+define ram offset=0xF00A0 size=1 HIOTRM;
+define ram offset=0xF00A8 size=1 HOCODIV;
+define ram offset=0xF00E0 size=2 [MDCL MDCH];
+define ram offset=0xF00E8 size=1 MDUC;
+define ram offset=0xF00F0 size=1 [PER0 _ _ OSMC _ RPECTL];
+define ram offset=0xF00FE size=1 BCDADJ;
+define ram offset=0xF0100 size=2 [
+    SSR00 SSR01 SSR02 SSR03
+    SIR00 SIR01 SIR02 SIR03
+    SMR00 SMR01 SMR02 SMR03
+    SCR00 SCR01 SCR02 SCR03
+    SE0   SS0   ST0   SPS0
+    SO0   SOE0  _     _
+    _     _     SOL0  _
+    SSC0  _     _     _
+    SSR10 SSR11 SSR12 SSR13
+    SIR10 SIR11 SIR12 SIR13
+    SMR10 SMR11 SMR12 SMR13
+    SCR10 SCR11 SCR12 SCR13
+    SE1   SS1   ST1   SPS1
+    SO1   SOE1  _     _
+    _     _     SOL1  _
+    SSC1  _     _     _
+    TCR00 TCR01 TCR02 TCR03
+    TCR04 TCR05 TCR06 TCR07
+    TMR00 TMR01 TMR02 TMR03
+    TMR04 TMR05 TMR06 TMR07
+    TSR00 TSR01 TSR02 TSR03
+    TSR04 TSR05 TSR06 TSR07
+    TE0   TS0   TT0   TPS0
+    TO0   TOE0  TOL0  TOM0
+    TCR10 TCR11 TCR12 TCR13
+    TCR14 TCR15 TCR16 TCR17
+    TMR10 TMR11 TMR12 TMR13
+    TMR14 TMR15 TMR16 TMR17
+    TSR10 TSR11 TSR12 TSR13
+    TSR14 TSR15 TSR16 TSR17
+    TE1   TS1   TT1   TPS1
+    TO1   TOE1  TOL1  TOM1
+];
+define ram offset=0xF0200 size=1 [DSA2 DSA3];
+define ram offset=0xF0202 size=2 [DRA2 DRA3 DBC2 DBC3];
+define ram offset=0xF020A size=1 [DMC2 DMC3 DRC2 DRC3];
+define ram offset=0xF0230 size=1 [
+    IICCTL00 IICCTL01 IICWL0 IICWH0
+    SVA0 _ _ _ IICTL100 IICTL11
+    IICWL1 IICWH1 SVA1
+];
+
+define ram offset=0xF02F0 size=1 CRC0CTL;
+define ram offset=0xF02F2 size=2 PGCRCL;
+define ram offset=0xF02FA size=2 CRCD;
+
+# Implementation-specific special function registers, starting from 0xFFF00
+define ram offset=0xFFF00 size=1 [
+    P0 P1 P2  P3  P4  P5  P6  P7
+    P8 P9 P10 P11 P12 P13 P14 P15
+
+    TXD0 _ RXD0 _ TXD3 _ RXD3 _
+    _ _ TDR01L TDR01H _ _ _ ADCRH
+
+    PM0 PM1 PM2  PM3  PM4  PM5 PM6  PM7
+    PM8 PM9 PM10 PM11 PM12 _ PM14 PM15
+
+    ADM0 ADS ADM1 _ _ _ _ KRM
+    EGP0 EGN0 EGP1 EGN1 _ _ _ _
+
+    _ _ _ _ TXD1 _ RXD1 _
+    TXD2 _ RXD2 _ _ _ _ _
+
+    IICA0 IICS0 IICF0 _ IICA1 IICS1 IICF1 _    
+    _ _ _ _ _ _ _ _
+
+    _ _ _ _ _ _ TDR03L TDR03H
+    _ _ _ _ _ _ _ _
+
+    _ _ TDR11L TDR11H _ _ TDR13L TDR13H
+    _ _ _ _ _ _ _ _
+    
+    _ _ _ _ _ _ _ _
+    _ _ _ _ _ _ _ _ 
+    
+    _ _ SEC MIN HOUR WEEK DAY MONTH
+    YEAR SUBCUD ALARMWM ALARMWH ALARMWW RTCC0 RTCC1 _
+
+    CMC CSC OSTC OSTS CKC CKS0 CKS1 _
+    RESF LVIM LVIS WDTE CRCIN _ _ _
+
+    DSA0 DSA1 DRA0L DRA0H DRA1L DRA1H DBC0L DBC0H
+    DMC0 DMC1 DRC0 DRC1 _ _ _ _
+    
+    _ _ _ _ _ _ _ _
+    _ _ _ _ _ _ _ _
+
+    IF2L IF2H IF3L _ MK2L MK2H MK3L _
+    PR02L PR02H PR03L _ PR12L PR12H PR13L _
+
+    IF0L IF0H IF1L IF1H MK0L MK0H MK1L MK1H
+    PR00L PR00H PR01L PR01H PR10L PR10H PR11L PR11H
+
+    _ _ _ _ _ _ _ _
+    _ _ _ _ _ _ _ _
+];
+
+define ram offset=0xFFF00 size=2 [
+    _ _ _ _ _ _ _ _
+
+    SDR00 SDR01 SDR12 SDR13 TDR00 TDR01 _ ADCR
+    
+    _ _ _ _ _ _ _ _
+    
+    _ _ _ _ _ _ _ _
+    
+    _ _ SDR02 SDR03 SDR10 SDR11 _ _
+    
+    _ _ _ _ _ _ _ _
+    
+    _ _ TDR02 TDR03 TDR04 TDR05 TDR06 TDR07
+    
+    TDR10 TDR11 TDR12 TDR1 TDR14 TDR15 TDR16 TDR17
+    
+    _ _ _ _ _ _ _ _
+    
+    ITMC _ _ _ _ _ _ _
+    
+    _ _ _ _ _ _ _ _
+    
+    _ DRA0 DRA1 DBC0 DBC1 _ _ _
+    
+    _ _ _ _ _ _ _ _
+    
+    IF2 IF3 MK2 MK3 PR02 PR03 PR12 PR13
+    
+    IF0 IF1 MK0 MK1 PR00 PR01 PR10 PR11
+    
+    MDAL MDAH MDBH MDBL _ _ _ _
+];
+
+define token base (8)
+    opcode = (0, 7)
+    op_h = (4, 7)
+    op_l = (0, 3)
+    # Whether an rp (16-bit) register is the data source
+    rp_source = (0, 0)
+    mov1_sreg   = (7, 7)
+    # The n'th bit to use for *1 instructions
+    bit_op_n = (4, 6)
+    # Register bank selection also uses the same bits
+    # as the bitwise operators
+    rbs_op_n = (4, 5)
+    # Unused instructions
+    clrb_unused = (2, 3)
+    movw_op = (3, 3)
+    call_rp = (4, 6)
+    dreg_word = (1, 2)
+    dreg_byte = (0, 2)
+    dreg_axbc = (0, 1)
+    sreg_byte = (0, 2);
+
+define token base2 (8)
+    # Bits 2, 7 is set and Bit 3 is unset for CALLT instructions
+    op2_b7       = (7, 7)
+    op2_b23      = (2, 3)
+    op2_callt_low = (4, 6)
+    op2_callt_hi  = (0, 1)
+    # NOTE: Many arithmetic instructions that act upon registers
+    # alone are decoded by the upper 5 bits of the second byte
+    # of the opcode. Ex. XOR 0x78 >> 3 -> 0xf
+    op2_h       = (3, 7)
+    # Bit arithmetic uses the nibble of the second byte
+    # to determine the operation (See SHR)
+    op2_l       = (0, 3)
+    shift_n     = (4, 7)
+    sreg2_byte  = (0, 2);
+
+define token data8 (8)
+    data        = (0, 7)
+    uaddr8      = (0, 7)
+    saddr8      = (0, 7) signed
+    sfr_byte    = (0, 7)
+    sfr_word    = (0, 7)
+    fixed_sfr_offset = (3, 7)
+    fixed_sfr   = (0, 2)
+    fixed_sfr_w   = (0, 2);
+
+define token data16 (16)
+    dataw = (0, 15)
+    uaddr16 = (0, 15)
+    saddr16 = (0, 15) signed
+    a16_sfr_offset = (3, 15)
+    a16_sfr_reg = (0, 2)
+    a16w_sfr_reg = (0, 2);
+
+define token data24 (24)
+    uaddr20 = (0, 19);
+
+attach names [ rbs_op_n ] [ RBS0 RBS1 RBS2 RBS3 ];
+
+attach variables [ fixed_sfr ] [ SPL SPH PSW _ CS ES PMC MEM ];
+attach variables [ fixed_sfr_w ] [ SP _ _ _ _ _ _ _ ];
+
+attach variables [ a16_sfr_reg ] [ SPL SPH PSW _ CS ES PMC MEM ];
+attach variables [ a16w_sfr_reg ] [ SP _ _ _ _ _ _ _ ];
+
+attach variables [ sfr_byte ] [
+    P0 P1 P2  P3  P4  P5  P6  P7
+    P8 P9 P10 P11 P12 P13 P14 P15
+
+    TXD0 _ RXD0 _ TXD3 _ RXD3 _
+    _ _ TDR01L TDR01H _ _ _ ADCRH
+
+    PM0 PM1 PM2  PM3  PM4  PM5 PM6  PM7
+    PM8 PM9 PM10 PM11 PM12 _ PM14 PM15
+
+    ADM0 ADS ADM1 _ _ _ _ KRM
+    EGP0 EGN0 EGP1 EGN1 _ _ _ _
+
+    _ _ _ _ TXD1 _ RXD1 _
+    TXD2 _ RXD2 _ _ _ _ _
+
+    IICA0 IICS0 IICF0 _ IICA1 IICS1 IICF1 _    
+    _ _ _ _ _ _ _ _
+
+    _ _ _ _ _ _ TDR03L TDR03H
+    _ _ _ _ _ _ _ _
+
+    _ _ TDR11L TDR11H _ _ TDR13L TDR13H
+    _ _ _ _ _ _ _ _
+    
+    _ _ _ _ _ _ _ _
+    _ _ _ _ _ _ _ _ 
+    
+    _ _ SEC MIN HOUR WEEK DAY MONTH
+    YEAR SUBCUD ALARMWM ALARMWH ALARMWW RTCC0 RTCC1 _
+
+    CMC CSC OSTC OSTS CKC CKS0 CKS1 _
+    RESF LVIM LVIS WDTE CRCIN _ _ _
+
+    DSA0 DSA1 DRA0L DRA0H DRA1L DRA1H DBC0L DBC0H
+    DMC0 DMC1 DRC0 DRC1 _ _ _ _
+    
+    _ _ _ _ _ _ _ _
+    _ _ _ _ _ _ _ _
+
+    IF2L IF2H IF3L _ MK2L MK2H MK3L _
+    PR02L PR02H PR03L _ PR12L PR12H PR13L _
+
+    IF0L IF0H IF1L IF1H MK0L MK0H MK1L MK1H
+    PR00L PR00H PR01L PR01H PR10L PR10H PR11L PR11H
+
+    _ _ _ _ _ _ _ _
+    _ _ _ _ _ _ PMC _
+];
+
+attach variables [ sfr_word ] [
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    SDR00 _ SDR01 _ SDR12 _ SDR13 _ TDR00 _ TDR01 _ _ _ ADCR _
+    
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    
+    _ _ _ _ SDR02 _ SDR03 _ SDR10 _ SDR11 _ _ _ _ _
+    
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    
+    _ _ _ _ TDR02 _ TDR03 _ TDR04 _ TDR05 _ TDR06 _ TDR07 _
+    
+    TDR10 _ TDR11 _ TDR12 _ TDR1 _ TDR14 _ TDR15 _ TDR16 _ TDR17 _
+    
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    
+    ITMC _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    
+    _ _ DRA0 _ DRA1 _ DBC0 _ DBC1 _ _ _ _ _ _ _
+    
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    
+    IF2 _ IF3 _ MK2 _ MK3 _ PR02 _ PR03 _ PR12 _ PR13 _
+
+    IF0 _ IF1 _ MK0 _ MK1 _ PR00 _ PR01 _ PR10 _ PR11 _
+
+    MDAL _ MDAH _ MDBH _ MDBL _ _ _ _ _ _ _ _ _
+];
+
+define pcodeop todo;
+define pcodeop halt;
+define pcodeop stop;
+define pcodeop invalid;
+
+define pcodeop divwu;
+define pcodeop machu;
+define pcodeop mach;
+
+define pcodeop disable_interrupts;
+define pcodeop enable_interrupts;
+define pcodeop segment; # res:3 = segment(seg:1, addr:2);
