@@ -1,9 +1,8 @@
 #########################################################################
 # RL78 Core in SLEIGH
 #
-# Based off of the work from Hedgeberg and aerosoul94
+# Based off of the work from Hedgeberg, aerosoul94 and MikeM64
 #
-# MikeM64, 2020
 #########################################################################
 
 define endian=little;
