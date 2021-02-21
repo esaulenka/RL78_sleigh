@@ -162,10 +162,6 @@ addr16: "!"uaddr16 is es_prefix=0 & uaddr16 {
     export *:1 loc;
 }
 
-addr16: a16_sfr_reg is es_prefix=0 & a16_sfr_reg & a16_sfr_offset=0x1fff {
-    export a16_sfr_reg;
-}
-
 addr16: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
     local loc:3;
     direct_addr_es(uaddr16:2, loc);
@@ -176,10 +172,6 @@ addr16w: "!"uaddr16 is es_prefix=0 & uaddr16 {
     local loc:3;
     direct_addr(uaddr16:2, loc);
     export *:2 loc;
-}
-
-addr16w: a16w_sfr_reg is es_prefix=0 & a16w_sfr_reg & a16_sfr_offset=0x1fff {
-    export *:2 a16w_sfr_reg;
 }
 
 addr16w: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
@@ -196,16 +188,8 @@ sfrp: sfr_byte is sfr_byte {
     export *:1 sfr_byte;
 }
 
-sfrp: fixed_sfr is fixed_sfr & fixed_sfr_offset=0x1f {
-    export fixed_sfr;
-}
-
-sfrpw: sfr_word is sfr_word {
+sfrpw: sfr_word is sfr_word & bit0=0 {
     export *:2 sfr_word;
-}
-
-sfrpw: fixed_sfr_w is fixed_sfr_w & fixed_sfr_offset=0x1f {
-    export *:2 fixed_sfr_w;
 }
 
 jdisp8: "$"loc is saddr8 [ loc = inst_next + saddr8; ] {
@@ -213,8 +197,7 @@ jdisp8: "$"loc is saddr8 [ loc = inst_next + saddr8; ] {
 }
 
 jaddr16: "!"uaddr16 is uaddr16 {
-    local loc:3 = segment(0:1, uaddr16:2);
-    export *:3 loc;
+    export *:3 uaddr16;
 }
 
 jdisp16: "$!"loc is saddr16 [ loc = inst_next + saddr16; ] {

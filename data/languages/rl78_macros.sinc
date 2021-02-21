@@ -15,21 +15,21 @@ macro inst_xch(dst, src) {
 
 macro inst_inc(dst) {
     aux_carry(dst, 1);
+    $(Z) = (dst == -1);
     dst = dst + 1;
-    $(Z) = (dst == 0);
 }
 
 macro inst_dec(dst) {
     aux_borrow(dst, 1);
+    $(Z) = (dst == 1);
     dst = dst - 1;
-    $(Z) = (dst == 0);
 }
 
 macro inst_add(dst, src) {
     aux_carry(dst, src);
-    $(CY) = (zext(dst) + zext(src)) > 0xff:2;
+    $(CY) = (0xff - dst) < src;
     dst = dst + src;
-    $(Z) = (dst == 0);
+    $(Z) = dst == 0;
 }
 
 macro inst_addc(dst, src) {
@@ -42,7 +42,6 @@ macro inst_sub(dst, src) {
     $(CY) = dst < src;
     $(Z) = dst == src;
     dst = dst - src;
-    $(Z) = (dst == 0);
 }
 
 macro inst_subc(dst, src) {
@@ -74,32 +73,28 @@ macro inst_decw(dst) {
 }
 
 macro inst_shr(dst, n) {
-    $(CY) = (dst:1 & 0x01) != 0;
-    dst = dst >> n;
+    local tmp = dst >> (n-1);
+    $(CY) = (tmp & 1) == 1;
+    dst = tmp >> 1;
 }
 
 macro inst_shl(dst, n) {
-    $(CY) = (dst:1 & 0x80) != 0;
+    $(CY) = (dst & (1 << (n-1))) != 0;
     dst = dst << n;
 }
 
 macro inst_shlw(dst, n) {
-    $(CY) = (dst:2 & 0x8000) != 0;
-    dst = dst << n;
+    inst_shl(dst, n);
 }
 
 macro inst_sar(dst, n) {
-    local msb:1 = dst & 0x80;
-    $(CY) = dst:1 & 0x01;
-    dst = dst >> n;
-    dst = dst & msb;
+    local tmp = dst s>> (n-1);
+    $(CY) = (tmp & 1) == 1;
+    dst = tmp s>> 1;
 }
 
 macro inst_sarw(dst, n) {
-    local msb:2 = dst & 0x8000;
-    $(CY) = dst:1 & 0x01;
-    dst = dst >> n;
-    dst = dst & msb;
+    inst_sar(dst, n);
 }
 
 macro inst_cmp(dst, src) {
@@ -115,9 +110,9 @@ macro inst_cmp0(dst) {
 }
 
 macro inst_addw(dst, src) {
-    $(CY) = (zext(dst) + zext(src)) > 0xffff:4;
+    $(CY) = (0xffff - dst) < src;
     dst = dst + src;
-    $(Z) = dst == src;
+    $(Z) = dst == 0;
 }
 
 macro inst_subw(dst, src) {
@@ -129,13 +124,6 @@ macro inst_subw(dst, src) {
 macro inst_cmpw(dst, src) {
     $(Z) = dst == src;
     $(CY) = dst < src;
-}
-
-macro inst_rolwc(dst) {
-    local msb:1 = (dst & 0x8000) != 0;
-    dst = dst << 1;
-    dst = dst | zext($(CY));
-    $(CY) = msb;
 }
 
 macro mov1_read(dst, src, bit) {

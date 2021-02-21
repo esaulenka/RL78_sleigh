@@ -1230,7 +1230,7 @@
 }
 
 # ADDW AX, AX
-:ADDW "AX", "AX" is SKIP_CHECK & AX & opcode=0x1 {
+:ADDW AX, "AX" is SKIP_CHECK & AX & opcode=0x1 {
     build SKIP_CHECK;
     inst_addw(AX, AX);
 }
@@ -1577,22 +1577,25 @@
 # ROLC A, 1
 :ROLC A, 1 is SKIP_CHECK & opcode=0x61 & A; opcode=0xDC {
     build SKIP_CHECK;
-    local msb:1 = (A & 0x80) != 0;
+    $(CY) = A s< 0;
     A = A << 1;
     A = A | $(CY);
-    $(CY) = msb;
 }
 
 # ROLWC AX, 1
 :ROLWC AX, 1 is SKIP_CHECK & opcode=0x61 & AX; opcode=0xEE {
     build SKIP_CHECK;
-    inst_rolwc(AX);
+    $(CY) = AX s< 0;
+    AX = AX << 1;
+    AX = AX | zext($(CY));
 }
 
 # ROLWC BC, 1
 :ROLWC BC, 1 is SKIP_CHECK & opcode=0x61 & BC; opcode=0xBC {
     build SKIP_CHECK;
-    inst_rolwc(BC);
+    $(CY) = BC s< 0;
+    BC = BC << 1;
+    BC = BC | zext($(CY));
 }
 
 # MOV1 CY, saddr.n
