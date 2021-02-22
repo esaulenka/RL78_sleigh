@@ -194,6 +194,10 @@ addr20: "!!"uaddr20 is uaddr20 {
     export *:3 uaddr20;
 }
 
+sfrp: PSW is PSW & data=0xFA {
+    export PSW;
+}
+
 sfrp: sfr_byte is sfr_byte {
     export *:1 sfr_byte;
 }

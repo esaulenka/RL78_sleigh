@@ -8,21 +8,21 @@ macro aux_borrow(dst, src) {
 }
 
 macro inst_xch(dst, src) {
-    local tmp:1 = dst;
+    local tmp = dst;
     dst = src;
     src = tmp;
 }
 
 macro inst_inc(dst) {
     aux_carry(dst, 1);
-    $(Z) = (dst == -1);
     dst = dst + 1;
+    $(Z) = dst == 0;
 }
 
 macro inst_dec(dst) {
     aux_borrow(dst, 1);
-    $(Z) = (dst == 1);
     dst = dst - 1;
+    $(Z) = dst == 0;
 }
 
 macro inst_add(dst, src) {
@@ -40,8 +40,8 @@ macro inst_addc(dst, src) {
 macro inst_sub(dst, src) {
     aux_borrow(dst, src);
     $(CY) = dst < src;
-    $(Z) = dst == src;
     dst = dst - src;
+    $(Z) = dst == 0;
 }
 
 macro inst_subc(dst, src) {
@@ -51,17 +51,17 @@ macro inst_subc(dst, src) {
 
 macro inst_and(dst, src) {
     dst = dst & src;
-    $(Z) = (dst == 0);
+    $(Z) = dst == 0;
 }
 
 macro inst_or(dst, src) {
     dst = dst | src;
-    $(Z) = (dst == 0);
+    $(Z) = dst == 0;
 }
 
 macro inst_xor(dst, src) {
     dst = dst ^ src;
-    $(Z) = (dst == 0);
+    $(Z) = dst == 0;
 }
 
 macro inst_incw(dst) {
@@ -117,8 +117,8 @@ macro inst_addw(dst, src) {
 
 macro inst_subw(dst, src) {
     $(CY) = dst < src;
-    $(Z) = dst == src;
     dst = dst - src;
+    $(Z) = dst == 0;
 }
 
 macro inst_cmpw(dst, src) {
@@ -126,38 +126,45 @@ macro inst_cmpw(dst, src) {
     $(CY) = dst < src;
 }
 
+macro inst_clr1(dst, bit) {
+    dst = dst & ~(1 << bit);
+}
+
 macro mov1_read(dst, src, bit) {
     dst = (src & (1 << bit)) != 0;
 }
 
+macro mov1_read_cy(src, bit) {
+    $(CY) = (src & (1 << bit)) != 0;
+}
+
 macro mov1_write(dst, src, bit) {
+    inst_clr1(dst, bit);
     dst = dst | (src & (1 << bit));
+}
+
+macro mov1_cy_write(dst, bit) {
+    inst_clr1(dst, bit);
+    dst = dst | ($(CY) << bit);
 }
 
 # Destination for AND1 is always $(CY)
 macro inst_and1(src, bit) {
-    local src_bit:1 = (src & (1 << bit)) >> bit;
-    $(CY) = $(CY) & src_bit;
+    $(CY) = $(CY) && ((src & (1 << bit)) != 0);
 }
 
 # Destination for OR1 is always $(CY)
 macro inst_or1(src, bit) {
-    local src_bit:1 = (src & (1 << bit) >> bit);
-    $(CY) = $(CY) | src_bit;
+    $(CY) = $(CY) || ((src & (1 << bit)) != 0);
 }
 
 # Destination for XOR1 is always $(CY)
 macro inst_xor1(src, bit) {
-    local src_bit:1 = (src & (1 << bit) >> bit);
-    $(CY) = $(CY) ^ src_bit;
+    $(CY) = $(CY) ^ ((src & (1 << bit)) != 0);
 }
 
 macro inst_set1(dst, bit) {
     dst = dst | (1 << bit);
-}
-
-macro inst_clr1(dst, bit) {
-    dst = dst & (~dst & (0 << bit));
 }
 
 macro branch(target) {
@@ -174,8 +181,7 @@ macro inst_bf(src, bit, target) {
 }
 
 macro inst_btclr(src, bit, target) {
-    if (!(src & (1 << bit))) goto target;
-    # Clear the bit post-branch, would be a NOP
-    # if the bit was not set in the first place
-    src = (~src & (0 << bit));
+    if (!(src & (1 << bit))) goto inst_next;
+    inst_clr1(src, bit);
+    goto target;
 }

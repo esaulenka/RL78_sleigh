@@ -20,12 +20,6 @@
     <register name="rsb" hidden="true"/>
     <register name="skip_mode" hidden="true"/>
   </register_data>
-  <context_data>
-    <tracked_set space="register">
-      <set name="CS" val="0x0"/>
-      <set name="ES" val="0xf"/>
-    </tracked_set>
-  </context_data>
   <volatile outputop="reg_write" inputop="reg_read">
     <range space="ram" first="0xe0000" last="0xe00ff"/> <!-- xcbase xdbase -->
   </volatile>

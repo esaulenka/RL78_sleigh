@@ -899,6 +899,11 @@
     inst_subc(SREG2_BYTE, A);
 }
 
+:SUBC A, "A" is SKIP_CHECK & opcode=0x61 & A; opcode=0x31 {
+    build SKIP_CHECK;
+    inst_subc(A, A);
+}
+
 # SUBC A, saddr
 :SUBC A, saddr is SKIP_CHECK & opcode=0x3B & A; saddr {
     build SKIP_CHECK;
@@ -1591,7 +1596,7 @@
 }
 
 # ROLWC BC, 1
-:ROLWC BC, 1 is SKIP_CHECK & opcode=0x61 & BC; opcode=0xBC {
+:ROLWC BC, 1 is SKIP_CHECK & opcode=0x61 & BC; opcode=0xFE {
     build SKIP_CHECK;
     cy:2 = zext($(CY));
     $(CY) = BC s< 0;
@@ -1602,9 +1607,7 @@
 # MOV1 CY, saddr.n
 :MOV1 "CY", saddr"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0x4 & bit_op_n & mov1_sreg=0; saddr {
     build SKIP_CHECK;
-    local tmp:1 = $(CY);
-    mov1_read(tmp, saddr, bit_op_n);
-    $(CY) = tmp;
+    mov1_read_cy(saddr, bit_op_n);
 }
 
 #
@@ -1614,39 +1617,31 @@
 # MOV1 CY, sfr.n
 :MOV1 "CY", sfrp"."bit_op_n is SKIP_CHECK & opcode=0x71; op_l=0xC & bit_op_n & mov1_sreg=0; sfrp {
     build SKIP_CHECK;
-    local tmp:1 = $(CY);
-    mov1_read(tmp, sfrp, bit_op_n);
-    $(CY) = tmp;
+    mov1_read_cy(sfrp, bit_op_n);
 }
 
 # MOV1 CY, A.n
 :MOV1 "CY", A"."bit_op_n is SKIP_CHECK & opcode=0x71 & A; op_l=0xC & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
-    local tmp:1 = $(CY);
-    mov1_read(tmp, A, bit_op_n);
-    $(CY) = tmp;
+    mov1_read_cy(A, bit_op_n);
 }
 
 # MOV1 CY, PSW.n
 :MOV1 "CY", PSW"."bit_op_n is SKIP_CHECK & opcode=0x71 & PSW; op_l=0xC & bit_op_n; opcode=0xFA {
     build SKIP_CHECK;
-    local tmp:1 = $(CY);
-    mov1_read(tmp, PSW, bit_op_n);
-    $(CY) = tmp;
+    mov1_read_cy(PSW, bit_op_n);
 }
 
 # MOV1 CY, [HL].0
 :MOV1 "CY", AddrHL"."bit_op_n is SKIP_CHECK & opcode=0x71 & AddrHL; op_l=0x4 & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
-    local tmp:1 = $(CY);
-    mov1_read(tmp, AddrHL, bit_op_n);
-    $(CY) = tmp;
+    mov1_read_cy(AddrHL, bit_op_n);
 }
 
 # MOV1 saddr.n, CY
 :MOV1 saddr"."bit_op_n, "CY" is SKIP_CHECK & opcode=0x71; op_l=0x1 & bit_op_n & mov1_sreg=0; saddr {
     build SKIP_CHECK;
-    mov1_write(saddr, $(CY), bit_op_n);
+    mov1_cy_write(saddr, bit_op_n);
 }
 
 #
@@ -1656,25 +1651,25 @@
 # MOV1 sfr.n, CY
 :MOV1 sfrp"."bit_op_n, "CY" is SKIP_CHECK & opcode=0x71; op_l=0x9 & bit_op_n & mov1_sreg=0; sfrp {
     build SKIP_CHECK;
-    mov1_write(sfrp, $(CY), bit_op_n);
+    mov1_cy_write(sfrp, bit_op_n);
 }
 
 # MOV1 A.n, CY
 :MOV1 A"."bit_op_n & 0x7, "CY" is SKIP_CHECK & opcode=0x71 & A; op_l=0x9 & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
-    mov1_write(A, $(CY), bit_op_n);
+    mov1_cy_write(A, bit_op_n);
 }
 
 # MOV1 PSW.n, CY
 :MOV1 PSW"."bit_op_n, "CY" is SKIP_CHECK & opcode=0x71 & PSW; op_l=0x9 & bit_op_n & mov1_sreg=0; opcode=0xFA {
     build SKIP_CHECK;
-    mov1_write(PSW, $(CY), bit_op_n);
+    mov1_cy_write(PSW, bit_op_n);
 }
 
 # MOV1 [HL].n, CY
 :MOV1 AddrHL"."bit_op_n, "CY" is SKIP_CHECK & opcode=0x71 & AddrHL; op_l=0x1 & bit_op_n & mov1_sreg=1 {
     build SKIP_CHECK;
-    mov1_write(AddrHL, $(CY), bit_op_n);
+    mov1_cy_write(AddrHL, bit_op_n);
 }
 
 #

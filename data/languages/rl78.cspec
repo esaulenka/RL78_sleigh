@@ -79,8 +79,8 @@
     </pentry>
   </output>
   <killedbycall>
-    <register name="ES"/>
-    <register name="CS"/>
+    <register name="ES0"/>
+    <register name="CS0"/>
   </killedbycall>
   <unaffected>
     <register name="BC0"/>
@@ -185,8 +185,8 @@
         </pentry>
       </output>
       <killedbycall>
-        <register name="ES"/>
-        <register name="CS"/>
+        <register name="ES0"/>
+        <register name="CS0"/>
       </killedbycall>
       <unaffected>
         <register name="SP"/>
