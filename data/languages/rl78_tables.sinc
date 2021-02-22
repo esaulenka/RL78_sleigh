@@ -5,7 +5,7 @@ macro direct_addr(addr, res) {
     res = segment(0xF:1, addr);
 }
 
-macro direct_addr_es(addr, res) {
+macro direct_addr_es(ES, addr, res) {
     res = segment(ES, addr);
 }
 
@@ -13,8 +13,8 @@ macro direct_addrb(addr, res) {
     direct_addr(addr, res);
 }
 
-macro direct_addrb_es(addr, res) {
-    direct_addr_es(addr, res);
+macro direct_addrb_es(ES, addr, res) {
+    direct_addr_es(ES, addr, res);
 }
 
 # Section 3.4.4 Page 158
@@ -29,7 +29,7 @@ macro reg_ind(reg1, reg2, res) {
 }
 
 # Section 3.4.6 Page 160
-macro reg_ind_es(reg1, reg2, res) {
+macro reg_ind_es(ES, reg1, reg2, res) {
     # TODO missing instructions
     res = segment(ES, (zext(reg1) << 8) | zext(reg2));
 }
@@ -99,6 +99,16 @@ HL:"HL" is BANK1 { export HL1; }
 HL:"HL" is BANK2 { export HL2; }
 HL:"HL" is BANK3 { export HL3; }
 
+CS:"CS" is BANK0 { export CS0; }
+CS:"CS" is BANK1 { export CS1; }
+CS:"CS" is BANK2 { export CS2; }
+CS:"CS" is BANK3 { export CS3; }
+
+ES:"ES" is BANK0 { export ES0; }
+ES:"ES" is BANK1 { export ES1; }
+ES:"ES" is BANK2 { export ES2; }
+ES:"ES" is BANK3 { export ES3; }
+
 DREG_BYTE:^X is X & dreg_byte=0 { export X; }
 DREG_BYTE:^A is A & dreg_byte=1 { export A; }
 DREG_BYTE:^C is C & dreg_byte=2 { export C; }
@@ -118,10 +128,10 @@ DREG_WORD:^BC is BC & dreg_word=1 { export BC; }
 DREG_WORD:^DE is DE & dreg_word=2 { export DE; }
 DREG_WORD:^HL is HL & dreg_word=3 { export HL; }
 
-CALL_RP:^AX is AX & call_rp=4 { local target:3 = segment(CS, AX); export target; }
-CALL_RP:^BC is BC & call_rp=5 { local target:3 = segment(CS, BC); export target; }
-CALL_RP:^DE is DE & call_rp=6 { local target:3 = segment(CS, DE); export target; }
-CALL_RP:^HL is HL & call_rp=7 { local target:3 = segment(CS, HL); export target; }
+CALL_RP:^AX is AX & CS & call_rp=4 { local target:3 = segment(CS, AX); export target; }
+CALL_RP:^BC is BC & CS & call_rp=5 { local target:3 = segment(CS, BC); export target; }
+CALL_RP:^DE is DE & CS & call_rp=6 { local target:3 = segment(CS, DE); export target; }
+CALL_RP:^HL is HL & CS & call_rp=7 { local target:3 = segment(CS, HL); export target; }
 
 SREG2_BYTE:^X is X & sreg2_byte=0 { export X; }
 SREG2_BYTE:^A is A & sreg2_byte=1 { export A; }
@@ -164,7 +174,7 @@ addr16: "!"uaddr16 is es_prefix=0 & uaddr16 {
 
 addr16: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
     local loc:3;
-    direct_addr_es(uaddr16:2, loc);
+    direct_addr_es(ES, uaddr16:2, loc);
     export *:1 loc;
 }
 
@@ -176,7 +186,7 @@ addr16w: "!"uaddr16 is es_prefix=0 & uaddr16 {
 
 addr16w: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
     local loc:3;
-    direct_addr_es(uaddr16:2, loc);
+    direct_addr_es(ES, uaddr16:2, loc);
     export *:2 loc;
 }
 
@@ -224,7 +234,7 @@ AddrDE: [DE] is es_prefix=0 & DE {
 
 AddrDE: ES:[DE] is es_prefix=1 & DE & ES {
     local loc:3;
-    direct_addr_es(DE, loc);
+    direct_addr_es(ES, DE, loc);
     export *:1 loc;
 }
 
@@ -236,7 +246,7 @@ AddrDEW: [DE] is es_prefix=0 & DE {
 
 AddrDEW: ES:[DE] is es_prefix=1 & DE & ES {
     local loc:3;
-    direct_addr_es(DE, loc);
+    direct_addr_es(ES, DE, loc);
     export *:2 loc;
 }
 
@@ -249,7 +259,7 @@ AddrDEOffset: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
 
 AddrDEOffset: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES {
     local loc:3;
-    direct_addr_es(DE, loc);
+    direct_addr_es(ES, DE, loc);
     loc = loc + uaddr8;
     export *:1 loc;
 }
@@ -261,9 +271,9 @@ AddrDEOffsetW: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
     export *:2 loc;
 }
 
-AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES{
+AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES {
     local loc:3;
-    direct_addr_es(DE, loc);
+    direct_addr_es(ES, DE, loc);
     loc = loc + uaddr8;
     export *:2 loc;
 }
@@ -276,7 +286,7 @@ AddrHL: [HL] is HL & es_prefix=0 {
 
 AddrHL: ES:[HL] is HL & es_prefix=1 & ES {
     local loc:3;
-    direct_addr_es(HL, loc);
+    direct_addr_es(ES, HL, loc);
     export *:1 loc;
 }
 
@@ -288,7 +298,7 @@ AddrHLW: [HL] is es_prefix=0 & HL {
 
 AddrHLW: ES:[HL] is es_prefix=1 & HL & ES {
     local loc:3;
-    direct_addr_es(HL, loc);
+    direct_addr_es(ES, HL, loc);
     export *:2 loc;
 }
 
@@ -299,9 +309,9 @@ AddrHLOffset: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
     export *:1 loc;
 }
 
-AddrHLOffset: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES{
+AddrHLOffset: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES {
     local loc:3;
-    direct_addr_es(HL, loc);
+    direct_addr_es(ES, HL, loc);
     loc = loc + uaddr8;
     export *:1 loc;
 }
@@ -315,7 +325,7 @@ AddrHLOffsetW: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
 
 AddrHLOffsetW: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES {
     local loc:3;
-    direct_addr_es(HL, loc);
+    direct_addr_es(ES, HL, loc);
     loc = loc + uaddr8;
     export *:2 loc;
 }
@@ -329,7 +339,7 @@ AddrHLOffsetB: [HL+B] is es_prefix=0 & HL & B {
 
 AddrHLOffsetB: ES:[HL+B] is es_prefix=1 & HL & B & ES {
     local loc:3;
-    direct_addr_es(HL, loc);
+    direct_addr_es(ES, HL, loc);
     loc = loc + zext(B);
     export *:1 loc;
 }
@@ -343,7 +353,7 @@ AddrHLOffsetC: [HL+C] is es_prefix=0 & HL & C {
 
 AddrHLOffsetC: ES:[HL+C] is es_prefix=1 & HL & C & ES {
     local loc:3;
-    direct_addr_es(HL, loc);
+    direct_addr_es(ES, HL, loc);
     loc = loc + zext(C);
     export *:1 loc;
 }
@@ -357,7 +367,7 @@ AddrWordOffsetB: uaddr16[B] is es_prefix=0 & uaddr16 & B {
 
 AddrWordOffsetB: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
     local loc:3;
-    direct_addrb_es(uaddr16:2, loc);
+    direct_addrb_es(ES, uaddr16:2, loc);
     loc = loc + zext(B);
     export *:1 loc;
 }
@@ -371,7 +381,7 @@ AddrWordOffsetBW: uaddr16[B] is es_prefix=0 & uaddr16 & B {
 
 AddrWordOffsetBW: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
     local loc:3;
-    direct_addrb_es(uaddr16:2, loc);
+    direct_addrb_es(ES, uaddr16:2, loc);
     loc = loc + zext(B);
     export *:2 loc;
 }
@@ -385,7 +395,7 @@ AddrWordOffsetC: uaddr16[C] is es_prefix=0 & uaddr16 & C {
 
 AddrWordOffsetC: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
     local loc:3;
-    direct_addrb_es(uaddr16:2, loc);
+    direct_addrb_es(ES, uaddr16:2, loc);
     loc = loc + zext(C);
     export *:1 loc;
 }
@@ -399,7 +409,7 @@ AddrWordOffsetCW: uaddr16[C] is es_prefix=0 & uaddr16 & C {
 
 AddrWordOffsetCW: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
     local loc:3;
-    direct_addrb_es(uaddr16:2, loc);
+    direct_addrb_es(ES, uaddr16:2, loc);
     loc = loc + zext(C);
     export *:2 loc;
 }
@@ -413,7 +423,7 @@ AddrWordOffsetBC: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
 
 AddrWordOffsetBC: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
     local loc:3;
-    direct_addr_es(uaddr16:2, loc);
+    direct_addr_es(ES, uaddr16:2, loc);
     loc = loc + zext(BC);
     export *:1 loc;
 }
@@ -427,7 +437,7 @@ AddrWordOffsetBCW: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
 
 AddrWordOffsetBCW: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
     local loc:3;
-    direct_addr_es(uaddr16:2, loc);
+    direct_addr_es(ES, uaddr16:2, loc);
     loc = loc + zext(BC);
     export *:2 loc;
 }

@@ -14,9 +14,6 @@
         res = (zext(addr) << 16) + zext(seg);
       ]]></body>
     </pcode>
-    <constresolve>
-      <register name="ES"/>
-    </constresolve>
   </segmentop>
   <register_data>
     <register name="es_prefix" hidden="true"/>

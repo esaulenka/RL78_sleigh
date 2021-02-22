@@ -2011,7 +2011,7 @@
 }
 
 # BR AX
-:BR AX is SKIP_CHECK & opcode=0x61 & AX; opcode=0xCB {
+:BR AX is SKIP_CHECK & opcode=0x61 & AX & CS; opcode=0xCB {
     build SKIP_CHECK;
     local addr:3 = segment(CS, AX);
     PC = addr;
