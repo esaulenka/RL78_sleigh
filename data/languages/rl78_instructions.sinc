@@ -1550,8 +1550,7 @@
 # ROR A, 1
 :ROR A, 1 is SKIP_CHECK & opcode=0x61 & A; opcode=0xDB {
     build SKIP_CHECK;
-    local lsb:1 = A & 0x1;
-    $(CY) = (lsb != 0);
+    $(CY) = (A & 0x1) == 1;
     A = A >> 1;
     A = A & ($(CY) << 7);
 }
@@ -1559,8 +1558,7 @@
 # ROL A, 1
 :ROL A, 1 is SKIP_CHECK & opcode=0x61 & A; opcode=0xEB {
     build SKIP_CHECK;
-    local msb:1 = A & 0x80;
-    $(CY) = (msb != 0);
+    $(CY) = A s< 0;
     A = A << 1;
     A = A | $(CY);
 }
@@ -1570,32 +1568,35 @@
     build SKIP_CHECK;
     local lsb:1 = A & 1;
     A = A >> 1;
-    A = ($(CY) << 7);
+    A = $(CY) << 7;
     $(CY) = lsb;
 }
 
 # ROLC A, 1
 :ROLC A, 1 is SKIP_CHECK & opcode=0x61 & A; opcode=0xDC {
     build SKIP_CHECK;
+    cy:1 = $(CY);
     $(CY) = A s< 0;
     A = A << 1;
-    A = A | $(CY);
+    A = A | cy;
 }
 
 # ROLWC AX, 1
 :ROLWC AX, 1 is SKIP_CHECK & opcode=0x61 & AX; opcode=0xEE {
     build SKIP_CHECK;
+    cy:2 = zext($(CY));
     $(CY) = AX s< 0;
     AX = AX << 1;
-    AX = AX | zext($(CY));
+    AX = AX | cy;
 }
 
 # ROLWC BC, 1
 :ROLWC BC, 1 is SKIP_CHECK & opcode=0x61 & BC; opcode=0xBC {
     build SKIP_CHECK;
+    cy:2 = zext($(CY));
     $(CY) = BC s< 0;
     BC = BC << 1;
-    BC = BC | zext($(CY));
+    BC = BC | cy;
 }
 
 # MOV1 CY, saddr.n
