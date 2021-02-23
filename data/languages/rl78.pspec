@@ -4,7 +4,6 @@
 
 <processor_spec>
   <programcounter register="PC"/>
-  <segmented_address space="ram" type="protected"/>
   <segmentop space="ram" userop="segment" farpointer="yes">
     <pcode>
       <input name="seg" size="1"/>
