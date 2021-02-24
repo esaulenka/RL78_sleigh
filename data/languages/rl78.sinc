@@ -258,17 +258,28 @@ define token data8 (8)
     saddr8      = (0, 7) signed
     sfr_byte    = (0, 7)
     sfr_word    = (0, 7)
-    bit0        = (0, 0);
+    fixed_sfr_offset = (3, 7)
+    fixed_sfr   = (0, 2)
+    fixed_sfr_w   = (0, 2);
 
 define token data16 (16)
     dataw = (0, 15)
     uaddr16 = (0, 15)
-    saddr16 = (0, 15) signed;
+    saddr16 = (0, 15) signed
+    a16_sfr_offset = (3, 15)
+    a16_sfr_reg = (0, 2)
+    a16w_sfr_reg = (0, 2);
 
 define token data24 (24)
     uaddr20 = (0, 19);
 
 attach names [ rbs_op_n ] [ RBS0 RBS1 RBS2 RBS3 ];
+
+attach variables [ fixed_sfr ] [ SPL SPH PSW _ CS0 ES0 PMC MEM ];
+attach variables [ fixed_sfr_w ] [ SP _ _ _ _ _ _ _ ];
+
+attach variables [ a16_sfr_reg ] [ SPL SPH PSW _ CS0 ES0 PMC MEM ];
+attach variables [ a16w_sfr_reg ] [ SP _ _ _ _ _ _ _ ];
 
 attach variables [ sfr_byte ] [
     P0 P1 P2  P3  P4  P5  P6  P7

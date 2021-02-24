@@ -172,6 +172,10 @@ addr16: "!"uaddr16 is es_prefix=0 & uaddr16 {
     export *:1 loc;
 }
 
+addr16: a16_sfr_reg is es_prefix=0 & a16_sfr_reg & a16_sfr_offset=0x1fff {
+    export a16_sfr_reg;
+}
+
 addr16: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
     local loc:3;
     direct_addr_es(ES, uaddr16:2, loc);
@@ -182,6 +186,10 @@ addr16w: "!"uaddr16 is es_prefix=0 & uaddr16 {
     local loc:3;
     direct_addr(uaddr16:2, loc);
     export *:2 loc;
+}
+
+addr16w: a16w_sfr_reg is es_prefix=0 & a16w_sfr_reg & a16_sfr_offset=0x1fff {
+    export *:2 a16w_sfr_reg;
 }
 
 addr16w: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
@@ -198,11 +206,19 @@ sfrp: PSW is PSW & data=0xFA {
     export PSW;
 }
 
+sfrp: fixed_sfr is fixed_sfr & fixed_sfr_offset=0x1f {
+    export fixed_sfr;
+}
+
 sfrp: sfr_byte is sfr_byte {
     export *:1 sfr_byte;
 }
 
-sfrpw: sfr_word is sfr_word & bit0=0 {
+sfrpw: fixed_sfr_w is fixed_sfr_w & fixed_sfr_offset=0x1f {
+    export *:2 fixed_sfr_w;
+}
+
+sfrpw: sfr_word is sfr_word {
     export *:2 sfr_word;
 }
 
