@@ -9,17 +9,8 @@ macro direct_addr_es(ES, addr, res) {
     res = segment(ES, addr);
 }
 
-macro direct_addrb(addr, res) {
-    direct_addr(addr, res);
-}
-
 macro direct_addrb_es(ES, addr, res) {
     direct_addr_es(ES, addr, res);
-}
-
-# Section 3.4.4 Page 158
-macro short_direct_addr(addr, res) {
-    res = segment(0xF:1, zext(addr) + 0xFE00:2);
 }
 
 # Section 3.4.6 Page 160
@@ -145,31 +136,27 @@ SREG2_BYTE:^H is H & sreg2_byte=7 { export H; }
 sp: SP is SP { local loc:3 = segment(0:1, SP); export loc; }
 
 u8: "#"data is data {
-    local tmp:1 = data;
-    export tmp;
+    export *[const]:1 data;
 }
 
 u16: "#"dataw is dataw {
-    local tmp:2 = dataw;
-    export tmp;
+    export *[const]:2 dataw;
 }
 
-saddr: uaddr8 is uaddr8 {
-    local loc:3;
-    short_direct_addr(uaddr8:1, loc);
-    export *:1 loc;
+saddr_val: val is uaddr8 [val = 0xFFE00 + uaddr8;] { export *[const]:3 val; }
+
+saddr: uaddr8 is uaddr8 & saddr_val {
+    export *:1 saddr_val;
 }
 
-saddrp: uaddr8 is uaddr8 {
-    local loc:3;
-    short_direct_addr(uaddr8:1, loc);
-    export *:2 loc;
+saddrp: uaddr8 is uaddr8 & saddr_val {
+    export *:2 saddr_val;
 }
 
-addr16: "!"uaddr16 is es_prefix=0 & uaddr16 {
-    local loc:3;
-    direct_addr(uaddr16:2, loc);
-    export *:1 loc;
+direct_addr_val: val is uaddr16 [val = 0xF0000 + uaddr16; ] { export *[const]:3 val; }
+
+addr16: "!"uaddr16 is es_prefix=0 & uaddr16 & direct_addr_val {
+    export *:1 direct_addr_val;
 }
 
 addr16: a16_sfr_reg is es_prefix=0 & a16_sfr_reg & a16_sfr_offset=0x1fff {
@@ -182,10 +169,8 @@ addr16: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
     export *:1 loc;
 }
 
-addr16w: "!"uaddr16 is es_prefix=0 & uaddr16 {
-    local loc:3;
-    direct_addr(uaddr16:2, loc);
-    export *:2 loc;
+addr16w: "!"uaddr16 is es_prefix=0 & uaddr16 & direct_addr_val {
+    export *:2 direct_addr_val;
 }
 
 addr16w: a16w_sfr_reg is es_prefix=0 & a16w_sfr_reg & a16_sfr_offset=0x1fff {
@@ -378,10 +363,8 @@ AddrHLOffsetC: ES:[HL+C] is es_prefix=1 & HL & C & ES {
     export *:1 loc;
 }
 
-AddrWordOffsetB: uaddr16[B] is es_prefix=0 & uaddr16 & B {
-    local loc:3;
-    direct_addrb(uaddr16:2, loc);
-    loc = loc + zext(B);
+AddrWordOffsetB: uaddr16[B] is es_prefix=0 & uaddr16 & B & direct_addr_val {
+    loc = direct_addr_val + zext(B);
     export *:1 loc;
 }
 
@@ -392,10 +375,8 @@ AddrWordOffsetB: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
     export *:1 loc;
 }
 
-AddrWordOffsetBW: uaddr16[B] is es_prefix=0 & uaddr16 & B {
-    local loc:3;
-    direct_addrb(uaddr16:2, loc);
-    loc = loc + zext(B);
+AddrWordOffsetBW: uaddr16[B] is es_prefix=0 & uaddr16 & B & direct_addr_val {
+    loc = direct_addr_val + zext(B);
     export *:2 loc;
 }
 
@@ -406,10 +387,8 @@ AddrWordOffsetBW: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
     export *:2 loc;
 }
 
-AddrWordOffsetC: uaddr16[C] is es_prefix=0 & uaddr16 & C {
-    local loc:3;
-    direct_addrb(uaddr16:2, loc);
-    loc = loc + zext(C);
+AddrWordOffsetC: uaddr16[C] is es_prefix=0 & uaddr16 & C & direct_addr_val {
+    loc = direct_addr_val + zext(C);
     export *:1 loc;
 }
 
@@ -420,10 +399,8 @@ AddrWordOffsetC: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
     export *:1 loc;
 }
 
-AddrWordOffsetCW: uaddr16[C] is es_prefix=0 & uaddr16 & C {
-    local loc:3;
-    direct_addrb(uaddr16:2, loc);
-    loc = loc + zext(C);
+AddrWordOffsetCW: uaddr16[C] is es_prefix=0 & uaddr16 & C & direct_addr_val {
+    loc = direct_addr_val + zext(C);
     export *:2 loc;
 }
 
@@ -434,10 +411,8 @@ AddrWordOffsetCW: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
     export *:2 loc;
 }
 
-AddrWordOffsetBC: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
-    local loc:3;
-    direct_addr(uaddr16:2, loc);
-    loc = loc + zext(BC);
+AddrWordOffsetBC: uaddr16[BC] is es_prefix=0 & uaddr16 & BC & direct_addr_val {
+    loc = direct_addr_val + zext(BC);
     export *:1 loc;
 }
 
@@ -448,10 +423,8 @@ AddrWordOffsetBC: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
     export *:1 loc;
 }
 
-AddrWordOffsetBCW: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
-    local loc:3;
-    direct_addr(uaddr16:2, loc);
-    loc = loc + zext(BC);
+AddrWordOffsetBCW: uaddr16[BC] is es_prefix=0 & uaddr16 & BC & direct_addr_val {
+    loc = direct_addr_val + zext(BC);
     export *:2 loc;
 }
 
@@ -472,9 +445,13 @@ AddrSPOffsetW: [sp+uaddr8] is sp & uaddr8 {
     export *:2 loc;
 }
 
-CALLT_Entry: [ct_entry] is op2_callt_low & op2_callt_hi
-    [ ct_entry = 0x80 | ((op2_callt_hi << 4) | op2_callt_low << 1); ] {
-    local loc:3 = segment(0:1, *:2 ct_entry:3);
+ct_entry: val is op2_callt_low & op2_callt_hi
+        [ val = 0x80 | ((op2_callt_hi << 4) | op2_callt_low << 1); ] {
+    export *[const]:3 val;
+}
+
+CALLT_Entry: [ct_entry] is ct_entry {
+    local loc:3 = segment(0:1, *:2 ct_entry);
     export loc;
 }
 

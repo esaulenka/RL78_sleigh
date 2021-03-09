@@ -19,7 +19,7 @@ define register offset=0x30 size=1 [CS0 CS1 CS2 CS3 ES0 ES1 ES2 ES3];
 # Special purpose registers
 define register offset=0x40 size=3 [PC];
 define register offset=0x50 size=2 [SP      _     _     _      ];
-define register offset=0x50 size=1 [_ _ PSW];
+define register offset=0x50 size=1 [SPL SPH PSW];
 
 @define IE 	        "PSW[7,1]"	# Interrupt Enable (IE)
 @define Z           "PSW[6,1]" 	# Zero Flag (Z)
@@ -178,7 +178,7 @@ define ram offset=0xFFF00 size=1 [
 	PR00L PR00H PR01L PR01H PR10L PR10H PR11L PR11H
 
 	SFR240 SFR241 SFR242 SFR243 SFR244 SFR245 SFR246 SFR247
-	SPL SPH _PSW RESERVE _CS _ES PMC MEM
+	_ _ _ RESERVE _CS _ES PMC MEM
 ];
 
 define ram offset=0xFFF00 size=2 [
@@ -328,7 +328,7 @@ attach variables [ sfr_byte ] [
 	PR00L PR00H PR01L PR01H PR10L PR10H PR11L PR11H
 
 	SFR240 SFR241 SFR242 SFR243 SFR244 SFR245 SFR246 SFR247
-	SPL SPH _PSW RESERVE _CS _ES PMC MEM
+	SPL SPH PSW RESERVE _CS _ES PMC MEM
 ];
 
 attach variables [ sfr_word ] [
