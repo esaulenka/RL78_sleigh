@@ -33,6 +33,9 @@
     <register name="es_prefix" hidden="true"/>
     <register name="rsb" hidden="true"/>
   </register_data>
+  <inferptrbounds>
+    <range space="ram" first="0x10000" last="0xffee0"/>   <!-- Don't try to infer pointers from constants in the body of a function -->
+  </inferptrbounds>
   <volatile outputop="reg_write" inputop="reg_read">
     <range space="ram" first="0xe0000" last="0xe00ff"/> <!-- xcbase xdbase -->
   </volatile>

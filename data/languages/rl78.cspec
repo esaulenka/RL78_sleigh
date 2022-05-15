@@ -28,7 +28,7 @@
   </returnaddress>
   <default_proto>
     <prototype name="__v2_call" strategy="register" extrapop="0" stackshift="4">
-    <input killedbycall="true" pointermax="4">
+    <input killedbycall="false" pointermax="4">
       <pentry minsize="1" maxsize="2">
         <register name="AX0"/>
       </pentry>
@@ -64,6 +64,7 @@
       <unaffected>
         <register name="SP"/>
         <register name="PSW"/>
+        <register name="HL0"/>
       </unaffected>
       <localrange>
         <range space="stack"/>
