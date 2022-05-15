@@ -3,6 +3,9 @@
 <!-- See Relax specification: Ghidra/Framework/SoftwareModeling/data/languages/processor_spec.rxg -->
 
 <processor_spec>
+  <properties>
+    <property key="pcodeInjectLibraryClass" value="ghidra.rl78.RL78InjectLibrary"/>
+  </properties>
   <programcounter register="PC"/>
   <segmentop space="ram" userop="segment" farpointer="yes">
     <pcode>
@@ -10,7 +13,7 @@
       <input name="addr" size="2"/>
       <output name="res" size="3"/>
       <body><![CDATA[
-        res = (zext(addr) << 16) + zext(seg);
+        res = (zext(seg) << 16) + zext(addr);
       ]]></body>
     </pcode>
   </segmentop>
@@ -29,7 +32,6 @@
   <register_data>
     <register name="es_prefix" hidden="true"/>
     <register name="rsb" hidden="true"/>
-    <register name="skip_mode" hidden="true"/>
   </register_data>
   <volatile outputop="reg_write" inputop="reg_read">
     <range space="ram" first="0xe0000" last="0xe00ff"/> <!-- xcbase xdbase -->

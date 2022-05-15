@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import ghidra.app.util.bin.ByteProvider;
 import ghidra.app.util.bin.format.elf.ElfException;
@@ -18,14 +19,14 @@ import ghidra.app.util.Option;
 import ghidra.framework.model.DomainObject;
 import ghidra.program.model.lang.Endian;
 
-import generic.continues.RethrowContinuesFactory;
-
 public class RL78ElfLoader extends ElfLoader {
+
+	private static final Consumer<String> SILENT_CONSUMER = (a) -> {};
 
 	@Override
 	public Collection<LoadSpec> findSupportedLoadSpecs(ByteProvider provider) throws IOException {
 		try {
-			ElfHeader elf = ElfHeader.createElfHeader(RethrowContinuesFactory.INSTANCE, provider);
+			ElfHeader elf = new ElfHeader(provider, SILENT_CONSUMER);
 			if (elf.e_machine() == RL78Constants.MACHINE_TYPE) {
 				return getLoadSpecs(provider);
 			}
@@ -39,7 +40,7 @@ public class RL78ElfLoader extends ElfLoader {
 		List<LoadSpec> loadSpecs = new ArrayList<>();
 
 		try {
-			ElfHeader elf = ElfHeader.createElfHeader(RethrowContinuesFactory.INSTANCE, provider);
+			ElfHeader elf = new ElfHeader(provider, SILENT_CONSUMER);
 			List<QueryResult> results =
 				QueryOpinionService.query(super.getName(), elf.getMachineName(), elf.getFlags());
 			for (QueryResult result : results) {
