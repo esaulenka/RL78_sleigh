@@ -133,7 +133,7 @@ SREG2_BYTE:^D is D & sreg2_byte=5 { export D; }
 SREG2_BYTE:^L is L & sreg2_byte=6 { export L; }
 SREG2_BYTE:^H is H & sreg2_byte=7 { export H; }
 
-sp: SP is SP { local loc:3 = segment(0:1, SP); export loc; }
+sp: SP is SP { export SP; }
 
 u8: "#"data is data {
     export *[const]:1 data;
@@ -224,9 +224,9 @@ brk_addr: loc is opcode [ loc = 0x007F7E; ] {
 }
 
 ret_addr: opcode is opcode & sp {
-    local loc:3 = sp;
+    local loc:2 = sp;
     sp = sp + 4;
-    export *[ram]:3 loc;
+    export *[stackspace]:3 loc;
 }
 
 # Register Ponter tokens - [r]
@@ -436,13 +436,13 @@ AddrWordOffsetBCW: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
 }
 
 AddrSPOffset: [sp+uaddr8] is sp & uaddr8 {
-    local loc:3 = sp + uaddr8;
-    export *[ram]:1 loc;
+    local loc:2 = sp + uaddr8;
+    export *[stackspace]:1 loc;
 }
 
 AddrSPOffsetW: [sp+uaddr8] is sp & uaddr8 {
-    local loc:3 = sp + uaddr8;
-    export *[ram]:2 loc;
+    local loc:2 = sp + uaddr8;
+    export *[stackspace]:2 loc;
 }
 
 ct_entry: val is op2_callt_low & op2_callt_hi

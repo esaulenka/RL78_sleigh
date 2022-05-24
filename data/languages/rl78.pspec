@@ -7,6 +7,9 @@
     <property key="pcodeInjectLibraryClass" value="ghidra.rl78.RL78InjectLibrary"/>
   </properties>
   <programcounter register="PC"/>
+  <incidentalcopy>
+    <register name="HL0"/>
+  </incidentalcopy>
   <segmentop space="ram" userop="segment" farpointer="yes">
     <pcode>
       <input name="seg" size="1"/>
