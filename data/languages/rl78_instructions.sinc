@@ -1,5 +1,3 @@
-define pcodeop getNextInstructionLength;
-
 #
 # Table 1/30
 #
@@ -1926,20 +1924,20 @@ define pcodeop getNextInstructionLength;
 }
 
 # RETI
-:RETI (PC) is opcode=0x61; opcode=0xFC & PC & sp {
-    PC = *[stackspace] sp;
-    sp = sp + 3;
-    PSW = *[stackspace] sp;
-    sp = sp + 1;
+:RETI (PC) is opcode=0x61; opcode=0xFC & PC {
+    PC = *SP;
+    SP = SP + 3;
+    PSW = *SP;
+    SP = SP + 1;
     return [PC];
 }
 
 # RETB
-:RETB (PC) is opcode=0x61; opcode=0xEC & PC & sp {
-    PC = *[stackspace] sp;
-    sp = sp + 3;
-    PSW = *[stackspace] sp;
-    sp = sp + 1;
+:RETB (PC) is opcode=0x61; opcode=0xEC & PC {
+    PC = *SP;
+    SP = SP + 3;
+    PSW = *SP;
+    SP = SP + 1;
     return [PC];
 }
 
@@ -1948,67 +1946,56 @@ define pcodeop getNextInstructionLength;
 #
 
 # PUSH PSW
-:PUSH PSW is opcode=0x61 & PSW & sp; opcode=0xDD {
-
-    *[stackspace]:2 sp = zext(PSW);
-    sp = sp - 2;
+:PUSH PSW is opcode=0x61 & PSW; opcode=0xDD {
+    *SP = PSW;
+    SP = SP - 2;
 }
 
 # PUSH rp
-:PUSH DREG_WORD is op_h=0xC & DREG_WORD & rp_source=1 & sp {
-
-    *[stackspace]:2 sp = DREG_WORD;
-    sp = sp - 2;
+:PUSH DREG_WORD is op_h=0xC & DREG_WORD & rp_source=1 {
+    *:2 SP = DREG_WORD;
+    SP = SP - 2;
 }
 
 # POP PSW
-:POP PSW is opcode=0x61 & PSW & sp; opcode=0xCD {
-
-    local status:2 = *[stackspace] sp;
-    sp = sp + 2;
-    PSW = status:1;
+:POP PSW is opcode=0x61 & PSW; opcode=0xCD {
+    PSW = *SP;
+    SP = SP + 2;
 }
 
 # POP rp
-:POP DREG_WORD is op_h=0xC & DREG_WORD & rp_source=0 & sp {
-
-    DREG_WORD = *[stackspace] sp;
-    sp = sp + 2;
+:POP DREG_WORD is op_h=0xC & DREG_WORD & rp_source=0 {
+    DREG_WORD = *SP;
+    SP = SP + 2;
 }
 
 # MOVW SP, #word
 :MOVW SP, u16 is opcode=0xCB & SP; opcode=0xF8; u16 {
-
-    SP = u16;
+    SP = segment(SPC, u16);
 }
 
 # MOVW SP, AX
-:MOVW sp, AX is opcode=0xBE & sp & AX; opcode=0xF8 {
-
-    sp = segment(0:1, AX);
+:MOVW SP, AX is opcode=0xBE & AX & SP; opcode=0xF8 {
+    SP = segment(SPC, AX);
 }
 
 # MOVW AX, SP
-:MOVW AX, SP is opcode=0xAE & SP & AX; opcode=0xF8 {
-
-    AX = SP;
+:MOVW AX, SP is opcode=0xAE & AX & SP; opcode=0xF8 {
+    AX = SPS;
 }
 
 # ADDW SP, #byte
-:ADDW sp, u8 is opcode=0x10 & sp; u8 {
-
-    sp = sp + zext(u8);
+:ADDW SP, u8 is opcode=0x10 & SP; u8 {
+    SP = SP + zext(u8);
 }
 
 # SUBW SP, #byte
-:SUBW sp, u8 is opcode=0x20 & sp; u8 {
-
-    sp = sp - zext(u8);
+:SUBW SP, u8 is opcode=0x20 & SP; u8 {
+    SP = SP - zext(u8);
 }
 
 # BR AX
 :BR AX is opcode=0x61 & AX & CS; opcode=0xCB {
-
     local addr:3 = segment(CS, AX);
     PC = addr;
     goto [addr];
@@ -2198,23 +2185,23 @@ define pcodeop getNextInstructionLength;
     inst_btclr(AddrHL, bit_op_n, jdisp8);
 }
 
-SKIP1: loc is epsilon [ loc = inst_next + 1; ] {
+SKIP_TARGET: loc is skip_mode=1 [ loc = inst_next + 1; ] {
     export *[ram]:3 loc;
 }
 
-SKIP2: loc is epsilon [ loc = inst_next + 2; ] {
+SKIP_TARGET: loc is skip_mode=2 [ loc = inst_next + 2; ] {
     export *[ram]:3 loc;
 }
 
-SKIP3: loc is epsilon [ loc = inst_next + 3; ] {
+SKIP_TARGET: loc is skip_mode=3 [ loc = inst_next + 3; ] {
     export *[ram]:3 loc;
 }
 
-SKIP4: loc is epsilon [ loc = inst_next + 4; ] {
+SKIP_TARGET: loc is skip_mode=4 [ loc = inst_next + 4; ] {
     export *[ram]:3 loc;
 }
 
-SKIP5: loc is epsilon [ loc = inst_next + 5; ] {
+SKIP_TARGET: loc is skip_mode=5 [ loc = inst_next + 5; ] {
     export *[ram]:3 loc;
 }
 
@@ -2223,141 +2210,51 @@ SKIP5: loc is epsilon [ loc = inst_next + 5; ] {
 #
 
 # SKC
-:SKC is SKIP1 & SKIP2 & SKIP3 & SKIP4 & SKIP5 & opcode=0x61; opcode=0xC8 {
-    len:2 = getNextInstructionLength();
+:SKC is SKIP_TARGET & opcode=0x61; opcode=0xC8 {
     if ($(CY)) goto <skip>;
     goto inst_next;
     <skip>
-    if (len == 1) goto <skip1>;
-    if (len == 2) goto <skip2>;
-    if (len == 3) goto <skip3>;
-    if (len == 4) goto <skip4>;
-    if (len == 5) goto <skip5>;
-    <skip1>
-    branch(SKIP1);
-    <skip2>
-    branch(SKIP2);
-    <skip3>
-    branch(SKIP3);
-    <skip4>
-    branch(SKIP4);
-    <skip5>
-    branch(SKIP5);
+    branch(SKIP_TARGET);
 }
 
 # SKNC
-:SKNC is SKIP1 & SKIP2 & SKIP3 & SKIP4 & SKIP5 & opcode=0x61; opcode=0xD8 {
-    len:2 = getNextInstructionLength();
+:SKNC is SKIP_TARGET & opcode=0x61; opcode=0xD8 {
     if (!$(CY)) goto <skip>;
     goto inst_next;
     <skip>
-    if (len == 1) goto <skip1>;
-    if (len == 2) goto <skip2>;
-    if (len == 3) goto <skip3>;
-    if (len == 4) goto <skip4>;
-    if (len == 5) goto <skip5>;
-    <skip1>
-    branch(SKIP1);
-    <skip2>
-    branch(SKIP2);
-    <skip3>
-    branch(SKIP3);
-    <skip4>
-    branch(SKIP4);
-    <skip5>
-    branch(SKIP5);
+    branch(SKIP_TARGET);
 }
 
 # SKZ
-:SKZ is SKIP1 & SKIP2 & SKIP3 & SKIP4 & SKIP5 & opcode=0x61; opcode=0xE8 {
-    len:2 = getNextInstructionLength();
+:SKZ is SKIP_TARGET & opcode=0x61; opcode=0xE8 {
     if ($(Z)) goto <skip>;
     goto inst_next;
     <skip>
-    if (len == 1) goto <skip1>;
-    if (len == 2) goto <skip2>;
-    if (len == 3) goto <skip3>;
-    if (len == 4) goto <skip4>;
-    if (len == 5) goto <skip5>;
-    <skip1>
-    branch(SKIP1);
-    <skip2>
-    branch(SKIP2);
-    <skip3>
-    branch(SKIP3);
-    <skip4>
-    branch(SKIP4);
-    <skip5>
-    branch(SKIP5);
+    branch(SKIP_TARGET);
 }
 
 # SKNZ
-:SKNZ is SKIP1 & SKIP2 & SKIP3 & SKIP4 & SKIP5 & opcode=0x61; opcode=0xF8 {
-    len:2 = getNextInstructionLength();
+:SKNZ is SKIP_TARGET & opcode=0x61; opcode=0xF8 {
     if (!$(Z)) goto <skip>;
     goto inst_next;
     <skip>
-    if (len == 1) goto <skip1>;
-    if (len == 2) goto <skip2>;
-    if (len == 3) goto <skip3>;
-    if (len == 4) goto <skip4>;
-    if (len == 5) goto <skip5>;
-    <skip1>
-    branch(SKIP1);
-    <skip2>
-    branch(SKIP2);
-    <skip3>
-    branch(SKIP3);
-    <skip4>
-    branch(SKIP4);
-    <skip5>
-    branch(SKIP5);
+    branch(SKIP_TARGET);
 }
 
 # SKH
-:SKH is SKIP1 & SKIP2 & SKIP3 & SKIP4 & SKIP5 & opcode=0x61; opcode=0xE3 {
-    len:2 = getNextInstructionLength();
+:SKH is SKIP_TARGET & opcode=0x61; opcode=0xE3 {
     if ($(Z) | $(CY)) goto <skip>;
     goto inst_next;
     <skip>
-    if (len == 1) goto <skip1>;
-    if (len == 2) goto <skip2>;
-    if (len == 3) goto <skip3>;
-    if (len == 4) goto <skip4>;
-    if (len == 5) goto <skip5>;
-    <skip1>
-    branch(SKIP1);
-    <skip2>
-    branch(SKIP2);
-    <skip3>
-    branch(SKIP3);
-    <skip4>
-    branch(SKIP4);
-    <skip5>
-    branch(SKIP5);
+    branch(SKIP_TARGET);
 }
 
 # SKNH
-:SKNH is SKIP1 & SKIP2 & SKIP3 & SKIP4 & SKIP5 & opcode=0x61; opcode=0xF3 {
-    len:2 = getNextInstructionLength();
+:SKNH is SKIP_TARGET & opcode=0x61; opcode=0xF3 {
     if (!($(Z) | $(CY))) goto <skip>;
     goto inst_next;
     <skip>
-    if (len == 1) goto <skip1>;
-    if (len == 2) goto <skip2>;
-    if (len == 3) goto <skip3>;
-    if (len == 4) goto <skip4>;
-    if (len == 5) goto <skip5>;
-    <skip1>
-    branch(SKIP1);
-    <skip2>
-    branch(SKIP2);
-    <skip3>
-    branch(SKIP3);
-    <skip4>
-    branch(SKIP4);
-    <skip5>
-    branch(SKIP5);
+    branch(SKIP_TARGET);
 }
 
 # SEL RBn

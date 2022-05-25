@@ -3,9 +3,6 @@
 <!-- See Relax specification: Ghidra/Framework/SoftwareModeling/data/languages/processor_spec.rxg -->
 
 <processor_spec>
-  <properties>
-    <property key="pcodeInjectLibraryClass" value="ghidra.rl78.RL78InjectLibrary"/>
-  </properties>
   <programcounter register="PC"/>
   <incidentalcopy>
     <register name="HL0"/>

@@ -18,8 +18,9 @@ define register offset=0x30 size=1 [CS0 CS1 CS2 CS3 ES0 ES1 ES2 ES3];
 
 # Special purpose registers
 define register offset=0x40 size=3 [PC];
-define register offset=0x50 size=2 [SP      _     _     _      ];
-define register offset=0x50 size=1 [SPL SPH PSW];
+define register offset=0x49 size=3 SP;
+define register offset=0x50 size=2 [SPS      _     _     _      ];
+define register offset=0x49 size=1 [SPL SPH SPC PSW];
 
 @define IE 	        "PSW[7,1]"	# Interrupt Enable (IE)
 @define Z           "PSW[6,1]" 	# Zero Flag (Z)
@@ -33,8 +34,6 @@ define register offset=0x50 size=1 [SPL SPH PSW];
 # For storing processor context
 define register offset=0x80 size=4 contextreg;
 define register offset=0x84 size=1 skipflag;
-#define register offset=0x90 size=2 SP;
-#define register offset=0x90 size=3 SP0;
 
 define context contextreg
     es_prefix=(0, 0) noflow
