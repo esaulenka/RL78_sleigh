@@ -640,7 +640,6 @@
 
 # MOVW HL, !addr16
 :MOVW HL, addr16w is opcode=0xFB & HL; addr16w {
-
     HL = addr16w;
 }
 
@@ -1925,18 +1924,18 @@
 
 # RETI
 :RETI (PC) is opcode=0x61; opcode=0xFC & PC {
-    PC = *SP;
+    PC = *[stackspace] SP;
     SP = SP + 3;
-    PSW = *SP;
+    PSW = *[stackspace] SP;
     SP = SP + 1;
     return [PC];
 }
 
 # RETB
 :RETB (PC) is opcode=0x61; opcode=0xEC & PC {
-    PC = *SP;
+    PC = *[stackspace] SP;
     SP = SP + 3;
-    PSW = *SP;
+    PSW = *[stackspace] SP;
     SP = SP + 1;
     return [PC];
 }
@@ -1947,41 +1946,41 @@
 
 # PUSH PSW
 :PUSH PSW is opcode=0x61 & PSW; opcode=0xDD {
-    *SP = PSW;
+    *[stackspace] SP = PSW;
     SP = SP - 2;
 }
 
 # PUSH rp
 :PUSH DREG_WORD is op_h=0xC & DREG_WORD & rp_source=1 {
-    *:2 SP = DREG_WORD;
+    *[stackspace]:2 SP = DREG_WORD;
     SP = SP - 2;
 }
 
 # POP PSW
 :POP PSW is opcode=0x61 & PSW; opcode=0xCD {
-    PSW = *SP;
+    PSW = *[stackspace] SP;
     SP = SP + 2;
 }
 
 # POP rp
 :POP DREG_WORD is op_h=0xC & DREG_WORD & rp_source=0 {
-    DREG_WORD = *SP;
+    DREG_WORD = *[stackspace] SP;
     SP = SP + 2;
 }
 
 # MOVW SP, #word
 :MOVW SP, u16 is opcode=0xCB & SP; opcode=0xF8; u16 {
-    SP = segment(SPC, u16);
+    SP = u16;
 }
 
 # MOVW SP, AX
 :MOVW SP, AX is opcode=0xBE & AX & SP; opcode=0xF8 {
-    SP = segment(SPC, AX);
+    SP = AX;
 }
 
 # MOVW AX, SP
 :MOVW AX, SP is opcode=0xAE & AX & SP; opcode=0xF8 {
-    AX = SPS;
+    AX = SP;
 }
 
 # ADDW SP, #byte

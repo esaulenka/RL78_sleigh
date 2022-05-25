@@ -171,13 +171,8 @@ addr16w: "!"uaddr16 is es_prefix=0 & uaddr16 & direct_addr_val {
     export *[ram]:2 direct_addr_val;
 }
 
-addr16w: a16w_sfr_reg is es_prefix=0 & a16w_sfr_reg & a16_sfr_reg=0 & a16_sfr_offset=0x1fff {
-    sp = SP:2;
-    export sp;
-}
-
-addr16w: a16w_sfr_reg is es_prefix=0 & a16w_sfr_reg & a16_sfr_reg!=0 & a16_sfr_offset=0x1fff {
-    export *[ram]:2 a16w_sfr_reg;
+addr16w: a16w_sfr_reg is es_prefix=0 & a16w_sfr_reg & a16_sfr_offset=0x1fff {
+    export a16w_sfr_reg;
 }
 
 addr16w: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
@@ -190,10 +185,6 @@ addr20: "!!"uaddr20 is uaddr20 {
     export *[ram]:3 uaddr20;
 }
 
-sfrp: PSW is PSW & data=0xFA {
-    export PSW;
-}
-
 sfrp: fixed_sfr is fixed_sfr & fixed_sfr_offset=0x1f {
     export fixed_sfr;
 }
@@ -202,12 +193,8 @@ sfrp: sfr_byte is sfr_byte {
     export *[ram]:1 sfr_byte;
 }
 
-sfrpw: fixed_sfr_w is fixed_sfr_w & fixed_sfr=0 & fixed_sfr_offset=0x1f {
-    export SPS;
-}
-
-sfrpw: fixed_sfr_w is fixed_sfr_w & fixed_sfr!=0 & fixed_sfr_offset=0x1f {
-    export *[ram]:2 fixed_sfr_w;
+sfrpw: fixed_sfr_w is fixed_sfr_w & fixed_sfr_offset=0x1f {
+    export fixed_sfr_w;
 }
 
 sfrpw: sfr_word is sfr_word {
@@ -231,7 +218,7 @@ brk_addr: loc is opcode [ loc = 0x007F7E; ] {
 }
 
 ret_addr: opcode is opcode {
-    local loc:3 = SP;
+    local loc:2 = SP;
     SP = SP + 4;
     export *:3 loc;
 }
@@ -443,12 +430,12 @@ AddrWordOffsetBCW: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
 }
 
 AddrSPOffset: [SP+uaddr8] is uaddr8 & SP {
-    local loc:3 = SP + uaddr8;
+    local loc:2 = SP + uaddr8;
     export *:1 loc;
 }
 
 AddrSPOffsetW: [SP+uaddr8] is uaddr8 & SP {
-    local loc:3 = SP + uaddr8;
+    local loc:2 = SP + uaddr8;
     export *:2 loc;
 }
 

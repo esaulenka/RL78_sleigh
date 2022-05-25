@@ -8,8 +8,8 @@
 define endian=little;
 define alignment=1;
 
-#define space ffs type=ram_space size=4 default;
 define space ram        type=ram_space      size=3 default;
+define space stackspace type=ram_space      size=2;
 define space register   type=register_space size=1;
 
 @include "rl78.sinc"
