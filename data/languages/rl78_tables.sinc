@@ -90,15 +90,9 @@ HL:"HL" is BANK1 { export HL1; }
 HL:"HL" is BANK2 { export HL2; }
 HL:"HL" is BANK3 { export HL3; }
 
-CS:"CS" is BANK0 { export CS0; }
-CS:"CS" is BANK1 { export CS1; }
-CS:"CS" is BANK2 { export CS2; }
-CS:"CS" is BANK3 { export CS3; }
+CS:"CS" is epsilon { export CS0; }
 
-ES:"ES" is BANK0 { export ES0; }
-ES:"ES" is BANK1 { export ES1; }
-ES:"ES" is BANK2 { export ES2; }
-ES:"ES" is BANK3 { export ES3; }
+ES:"ES" is epsilon { export ES0; }
 
 DREG_BYTE:^X is X & dreg_byte=0 { export X; }
 DREG_BYTE:^A is A & dreg_byte=1 { export A; }
@@ -217,18 +211,14 @@ brk_addr: loc is opcode [ loc = 0x007F7E; ] {
     export *[ram]:3 loc;
 }
 
-ret_addr: opcode is opcode {
-    local loc:2 = SP;
-    SP = SP + 4;
-    export *:3 loc;
+ret_addr: is epsilon {
+    export *[near]:3 SP;
 }
 
 # Register Ponter tokens - [r]
 
 AddrDE: [DE] is es_prefix=0 & DE {
-    local loc:3;
-    direct_addr(DE, loc);
-    export *[ram]:1 loc;
+    export *[near]:1 DE;
 }
 
 AddrDE: ES:[DE] is es_prefix=1 & DE & ES {
@@ -238,9 +228,7 @@ AddrDE: ES:[DE] is es_prefix=1 & DE & ES {
 }
 
 AddrDEW: [DE] is es_prefix=0 & DE {
-    local loc:3;
-    direct_addr(DE, loc);
-    export *[ram]:2 loc;
+    export *[near]:2 DE;
 }
 
 AddrDEW: ES:[DE] is es_prefix=1 & DE & ES {
@@ -250,10 +238,8 @@ AddrDEW: ES:[DE] is es_prefix=1 & DE & ES {
 }
 
 AddrDEOffset: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
-    local loc:3;
-    direct_addr(DE, loc);
-    loc = loc + uaddr8;
-    export *[ram]:1 loc;
+    loc = DE + uaddr8;
+    export *[near]:1 loc;
 }
 
 AddrDEOffset: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES {
@@ -264,10 +250,8 @@ AddrDEOffset: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES {
 }
 
 AddrDEOffsetW: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
-    local loc:3;
-    direct_addr(DE, loc);
-    loc = loc + uaddr8;
-    export *[ram]:2 loc;
+    loc = DE + uaddr8;
+    export *[near]:2 loc;
 }
 
 AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES {
@@ -278,9 +262,7 @@ AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES {
 }
 
 AddrHL: [HL] is HL & es_prefix=0 {
-    local loc:3;
-    direct_addr(HL, loc);
-    export *[ram]:1 loc;
+    export *[near]:1 HL;
 }
 
 AddrHL: ES:[HL] is HL & es_prefix=1 & ES {
@@ -290,9 +272,7 @@ AddrHL: ES:[HL] is HL & es_prefix=1 & ES {
 }
 
 AddrHLW: [HL] is es_prefix=0 & HL {
-    local loc:3;
-    direct_addr(HL, loc);
-    export *[ram]:2 loc;
+    export *[near]:2 HL;
 }
 
 AddrHLW: ES:[HL] is es_prefix=1 & HL & ES {
@@ -302,10 +282,8 @@ AddrHLW: ES:[HL] is es_prefix=1 & HL & ES {
 }
 
 AddrHLOffset: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
-    local loc:3;
-    direct_addr(HL, loc);
-    loc = loc + uaddr8;
-    export *[ram]:1 loc;
+    loc = HL + uaddr8;
+    export *[near]:1 loc;
 }
 
 AddrHLOffset: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES {
@@ -316,10 +294,8 @@ AddrHLOffset: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES {
 }
 
 AddrHLOffsetW: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
-    local loc:3;
-    direct_addr(HL, loc);
-    loc = loc + uaddr8;
-    export *[ram]:2 loc;
+    loc = HL + uaddr8;
+    export *[near]:2 loc;
 }
 
 AddrHLOffsetW: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES {
@@ -329,11 +305,15 @@ AddrHLOffsetW: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES {
     export *[ram]:2 loc;
 }
 
-AddrHLOffsetB: [HL+B] is es_prefix=0 & HL & B {
+AddrHLOffsetW: ES:[HL] is es_prefix=1 & HL & uaddr8=0 & ES {
     local loc:3;
-    direct_addr(HL, loc);
-    loc = loc + zext(B);
-    export *[ram]:1 loc;
+    direct_addr_es(ES, HL, loc);
+    export *[ram]:2 loc;
+}
+
+AddrHLOffsetB: [HL+B] is es_prefix=0 & HL & B {
+    loc = HL + zext(B);
+    export *[near]:1 loc;
 }
 
 AddrHLOffsetB: ES:[HL+B] is es_prefix=1 & HL & B & ES {
@@ -344,10 +324,8 @@ AddrHLOffsetB: ES:[HL+B] is es_prefix=1 & HL & B & ES {
 }
 
 AddrHLOffsetC: [HL+C] is es_prefix=0 & HL & C {
-    local loc:3;
-    direct_addr(HL, loc);
-    loc = loc + zext(C);
-    export *[ram]:1 loc;
+    loc = HL + zext(C);
+    export *[near]:1 loc;
 }
 
 AddrHLOffsetC: ES:[HL+C] is es_prefix=1 & HL & C & ES {

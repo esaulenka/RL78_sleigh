@@ -16,22 +16,19 @@
         res = (zext(seg) << 16) + zext(addr);
       ]]></body>
     </pcode>
+    <constresolve>
+      <register name="CES"/>
+    </constresolve>
   </segmentop>
   <context_data>
     <tracked_set space="ram">
-      <set name="CS0" val="0x0"/>
-      <set name="ES0" val="0xf"/>
-      <set name="CS1" val="0x0"/>
-      <set name="ES1" val="0xf"/>
-      <set name="CS2" val="0x0"/>
-      <set name="ES2" val="0xf"/>
-      <set name="CS3" val="0x0"/>
-      <set name="ES3" val="0xf"/>
+      <set name="CES" val="0xf"/>
     </tracked_set>
   </context_data>
   <register_data>
     <register name="es_prefix" hidden="true"/>
     <register name="rsb" hidden="true"/>
+    <register name="CES" hidden="true"/>
   </register_data>
   <inferptrbounds>
     <range space="ram" first="0x10000" last="0xffee0"/>   <!-- Don't try to infer pointers from constants in the body of a function -->

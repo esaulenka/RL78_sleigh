@@ -4,121 +4,101 @@
 
 # MOV r, #byte
 :MOV DREG_BYTE, "#"data is op_h=0x5 & DREG_BYTE; data {
-
     DREG_BYTE = data;
 }
 
 # MOV r, A
 :MOV DREG_BYTE, A is op_h=0x7 & A & DREG_BYTE & dreg_byte!=1 {
-
     DREG_BYTE = A;
 }
 
 # MOV A, r
 :MOV A, DREG_BYTE is op_h=0x6 & A & DREG_BYTE & dreg_byte!=1 {
-
     A = DREG_BYTE;
 }
 
 # MOV saddr, #byte
 :MOV saddr, "#"data is opcode=0xCD; saddr; data {
-
     saddr = data;
 }
 
 # MOV sfr, #byte
 :MOV sfr_byte, "#"data is opcode=0xCE; sfr_byte; data {
-
     sfr_byte = data;
 }
 
 # MOV !addr16, #byte
 :MOV addr16, "#"data is opcode=0xCF; addr16; data {
-
     addr16 = data;
 }
 
 # MOV A, saddr
 :MOV A, saddr is opcode=0x8D & A; saddr {
-
     A = saddr;
 }
 
 # MOV saddr, A
 :MOV saddr, A is opcode=0x9D & A; saddr {
-
     saddr = A;
 }
 
 # MOV A, sfr
 :MOV A, sfrp is opcode=0x8E & A; sfrp {
-
     A = sfrp;
 }
 
 # MOV sfr, A
 :MOV sfrp, A is opcode=0x9E & A; sfrp {
-
     sfrp = A;
 }
 
 # MOV A, !addr16
 :MOV A, addr16 is opcode=0x8F & A; addr16 {
-
     A = addr16;
 }
 
 # MOV !addr16, A
 :MOV addr16, A is opcode=0x9F & A; addr16 {
-
     addr16 = A;
 }
 
 # MOV PSW, #byte
 :MOV PSW, "#"data is opcode=0x9F & PSW; opcode=0xFA; data {
-
     PSW = data;
 }
 
 # MOV A, PSW
 :MOV A, PSW is opcode=0x8E & A & PSW; opcode=0xFA {
-
     A = PSW;
 }
 
 # MOV PSW, A
 :MOV PSW, A is opcode=0x9E & A & PSW; opcode=0xFA {
-
     PSW = A;
 }
 
 # MOV ES, #byte
 :MOV ES, "#"data is opcode=0x41 & ES; data {
-
     ES = data;
 }
 
 # MOV ES, saddr
 :MOV ES, saddr is opcode=0x61 & ES; opcode=0xB8; saddr {
-
     ES = saddr & 0xf;
 }
 
 # MOV A, ES
 :MOV A, ES is opcode=0x8E & A & ES; opcode=0xFD {
-
     A = ES;
 }
 
 # MOV ES = A
 :MOV ES, A is opcode=0x9E & A & ES; opcode=0xFD {
-
     ES = A & 0xf;
 }
 
 # MOV CS, #byte
 :MOV CS, "#"data is opcode=0xCE & CS; opcode=0xFC; data {
-
     CS = data & 0xf;
 }
 
@@ -128,205 +108,171 @@
 
 # MOV A, CS
 :MOV A, CS is opcode=0x8E & A & CS; opcode=0xFC {
-
     A = CS;
 }
 
 # MOV CS, A
 :MOV CS, A is opcode=0x9E & A & CS; opcode=0xFC {
-
     CS = A & 0xf;
 }
 
 # MOV A, [DE]
 :MOV A, AddrDE is opcode=0x89 & A & AddrDE {
-
     A = AddrDE;
 }
 
 # MOV [DE], A
 :MOV AddrDE, A is opcode=0x99 & A & AddrDE {
-
     AddrDE = A;
 }
 
 # MOV [DE+byte], #byte
 :MOV AddrDEOffset, "#"data is opcode=0xCA; AddrDEOffset; data {
-
     AddrDEOffset = data;
 }
 
 # MOV A, [DE+byte]
 :MOV A, AddrDEOffset is opcode=0x8A & A; AddrDEOffset {
-
     A = AddrDEOffset;
 }
 
 # MOV [DE+byte], A
 :MOV AddrDEOffset, A is opcode=0x9A & A; AddrDEOffset {
-
     AddrDEOffset = A;
 }
 
 # MOV A, [HL]
 :MOV A, AddrHL is opcode=0x8B & A & AddrHL {
-
     A = AddrHL;
 }
 
 # MOV [HL], A
 :MOV AddrHL, A is opcode=0x9B & A & AddrHL {
-
     AddrHL = A;
 }
 
 # MOV [HL+byte], #byte
 :MOV AddrHLOffset, u8 is opcode=0xCC; AddrHLOffset; u8 {
-
     AddrHLOffset = u8;
 }
 
 # MOV A, [HL+byte]
 :MOV A, AddrHLOffset is opcode=0x8C & A; AddrHLOffset {
-
     A = AddrHLOffset;
 }
 
 # MOV [HL+byte], A
 :MOV AddrHLOffset, A is opcode=0x9C & A; AddrHLOffset {
-
     AddrHLOffset = A;
 }
 
 # MOV A, [HL+B]
 :MOV A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xC9 & AddrHLOffsetB {
-
     A = AddrHLOffsetB;
 }
 
 # MOV [HL+B], A
 :MOV AddrHLOffsetB, A is opcode=0x61 & A; opcode=0xD9 & AddrHLOffsetB {
-
     AddrHLOffsetB = A;
 }
 
 # MOV A, [HL+C]
 :MOV A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xE9 & AddrHLOffsetC {
-
     A = AddrHLOffsetC;
 }
 
 # MOV [HL+C], A
 :MOV AddrHLOffsetC, A is opcode=0x61 & A; opcode=0xF9 & AddrHLOffsetC {
-
     AddrHLOffsetC = A;
 }
 
 # MOV word[B], #byte
 :MOV AddrWordOffsetB, u8 is opcode=0x19; AddrWordOffsetB; u8 {
-
     AddrWordOffsetB = u8;
 }
 
 # MOV A, word[B]
 :MOV A, AddrWordOffsetB is opcode=0x09 & A; AddrWordOffsetB {
-
     A = AddrWordOffsetB;
 }
 
 # MOV word[B], A
 :MOV AddrWordOffsetB, A is opcode=0x18 & A; AddrWordOffsetB {
-
     AddrWordOffsetB = A;
 }
 
 # MOV word[C], #byte
 :MOV AddrWordOffsetC, u8 is opcode=0x38; AddrWordOffsetC; u8 {
-
     AddrWordOffsetC = u8;
 }
 
 # MOV A, word[C]
 :MOV A, AddrWordOffsetC is opcode=0x29 & A; AddrWordOffsetC {
-
     A = AddrWordOffsetC;
 }
 
 # MOV word[C], A
 :MOV AddrWordOffsetC, A is opcode=0x28 & A; AddrWordOffsetC {
-
     AddrWordOffsetC = A;
 }
 
 # MOV word[BC], #byte
 :MOV AddrWordOffsetBC, u8 is opcode=0x39; AddrWordOffsetBC; u8 {
-
     AddrWordOffsetBC = u8;
 }
 
 # MOV A, word[BC]
 :MOV A, AddrWordOffsetBC is opcode=0x49 & A; AddrWordOffsetBC {
-
     A = AddrWordOffsetBC;
 }
 
 # MOV word[BC], A
 :MOV AddrWordOffsetBC, A is opcode=0x48 & A; AddrWordOffsetBC {
-
     AddrWordOffsetBC = A;
 }
 
 # MOV [SP+byte], #byte
 :MOV AddrSPOffset, u8 is opcode=0xC8; AddrSPOffset; u8 {
-
     AddrSPOffset = u8;
 }
 
 # MOV A, [SP+byte]
 :MOV A, AddrSPOffset is opcode=0x88 & A; AddrSPOffset {
-
     A = AddrSPOffset;
 }
 
 # MOV [SP+byte], A
 :MOV AddrSPOffset, A is opcode=0x98 & A; AddrSPOffset {
-
     AddrSPOffset = A;
 }
 
 # MOV B, saddr
 :MOV B, saddr is opcode=0xE8 & B; saddr {
-
     B = saddr;
 }
 
 # MOV B, !addr16
 :MOV B, addr16 is opcode=0xE9 & B; addr16 {
-
     B = addr16;
 }
 
 # MOV C, saddr
 :MOV C, saddr is opcode=0xF8 & C; saddr {
-
     C = saddr;
 }
 
 # MOV C, !addr16
 :MOV C, addr16 is opcode=0xF9 & C; addr16 {
-
     C = addr16;
 }
 
 # MOV X, saddr
 :MOV X, saddr is opcode=0xD8 & X; saddr {
-
     X = saddr;
 }
 
 # MOV X, !addr16
 :MOV X, addr16 is opcode=0xD9 & X; addr16 {
-
     X = addr16;
 }
 
@@ -336,67 +282,56 @@
 
 # XCH A, X
 :XCH A, X is opcode=0x08 & A & X {
-
     inst_xch(A, X);
 }
 
 # XCH A, r
 :XCH A, SREG2_BYTE is opcode=0x61; op2_h=0x11 & SREG2_BYTE & sreg2_byte!=1 & A {
-
     inst_xch(A, SREG2_BYTE);
 }
 
 # XCH A, saddr
 :XCH A, saddr is opcode=0x61 & A; opcode=0xA8; saddr {
-
     inst_xch(A, saddr);
 }
 
 # XCH A, sfr
 :XCH A, sfr_byte is opcode=0x61 & A; opcode=0xAB; sfr_byte {
-
     inst_xch(A, sfr_byte);
 }
 
 # XCH A, !addr16
 :XCH A, addr16 is opcode=0x61 & A; opcode=0xAA; addr16 {
-
     inst_xch(A, addr16);
 }
 
 # XCH A, [DE]
 :XCH A, AddrDE is opcode=0x61 & A; opcode=0xAE & AddrDE {
-
     inst_xch(A, AddrDE);
 }
 
 # XCH A, [DE+byte]
 :XCH A, AddrDEOffset is opcode=0x61 & A; opcode=0xAF; AddrDEOffset {
-
     inst_xch(A, AddrDEOffset);
 }
 
 # XCH A, [HL]
 :XCH A, AddrHL is opcode=0x61 & A; opcode=0xAC & AddrHL {
-
     inst_xch(A, AddrHL);
 }
 
 # XCH A, [HL+byte]
 :XCH A, AddrHLOffset is opcode=0x61 & A; opcode=0xAD; AddrHLOffset {
-
     inst_xch(A, AddrHLOffset);
 }
 
 # XCH A, [HL+B]
 :XCH A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xB9 & AddrHLOffsetB {
-
     inst_xch(A, AddrHLOffsetB);
 }
 
 # XCH A, [HL+C]
 :XCH A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xA9 & AddrHLOffsetC {
-
     inst_xch(A, AddrHLOffsetC);
 }
 
@@ -406,43 +341,36 @@
 
 # ONEB r
 :ONEB DREG_AXBC is op_h=0xE & op_l<4 & DREG_AXBC {
-
     DREG_AXBC = 1;
 }
 
 # ONEB saddr
 :ONEB saddr is opcode=0xE4; saddr {
-
     saddr = 1;
 }
 
 # ONEB !addr16
 :ONEB addr16 is opcode=0xE5; addr16 {
-
     addr16 = 1;
 }
 
 # CLRB r
 :CLRB DREG_AXBC is op_h=0xF & DREG_AXBC & clrb_unused=0  {
-
     DREG_AXBC = 0;
 }
 
 # CLRB saddr
 :CLRB saddr is opcode=0xF4; saddr {
-
     saddr = 0;
 }
 
 # CLRB !addr16
 :CLRB addr16 is opcode=0xF5; addr16 {
-
     addr16 = 0;
 }
 
 # MOVS [HL+byte], X
 :MOVS X, AddrHLOffset ("Check "A" if zero")is opcode=0x61 & X & A; opcode=0xCE; AddrHLOffset {
-
     AddrHLOffset = X;
     $(Z) = (X == 0);
     $(CY) = (X == 0) | (A == 0);
@@ -450,121 +378,101 @@
 
 # MOVW rp, #word
 :MOVW DREG_WORD, u16 is op_h=0x3 & DREG_WORD; u16 {
-
     DREG_WORD = u16;
 }
 
 # MOVW saddrp, #word
 :MOVW saddrp, u16 is opcode=0xC9; saddrp; u16 {
-
     saddrp = u16;
 }
 
 # MOVW sfr, #word
 :MOVW sfrpw, u16 is opcode=0xCB; sfrpw; u16 {
-
     sfrpw = u16;
 }
 
 # MOVW AX, saddrp
 :MOVW AX, saddrp is opcode=0xAD & AX; saddrp {
-
     AX = saddrp;
 }
 
 # MOVW saddrp, AX
 :MOVW saddrp, AX is opcode=0xBD & AX; saddrp {
-
     saddrp = AX;
 }
 
 # MOVW AX, sfrp
 :MOVW AX, sfrpw is opcode=0xAE & AX; sfrpw {
-
     AX = sfrpw;
 }
 
 # MOVW sfrp, AX
 :MOVW sfrpw, AX is opcode=0xBE & AX; sfrpw {
-
     sfrpw = AX;
 }
 
 # MOVW AX, rp
 :MOVW AX, DREG_WORD is op_h=0x1 & AX & DREG_WORD & dreg_word!=0 & rp_source=1 {
-
     AX = DREG_WORD;
 }
 
 # MOVW rp, AX
 :MOVW DREG_WORD, AX is op_h=0x1 & AX & DREG_WORD & dreg_word!=0 & rp_source=0 {
-
     DREG_WORD = AX;
 }
 
 # MOVW AX, !addr16
 :MOVW AX, addr16w is opcode=0xAF & AX; addr16w {
-
     AX = addr16w;
 }
 
 # MOVW !addr16, AX
 :MOVW addr16w, AX is opcode=0xBF & AX; addr16w {
-
     addr16w = AX;
 }
 
 # MOVW AX, [DE]
 :MOVW AX, AddrDEW is opcode=0xA9 & AX & AddrDEW {
-
     AX = AddrDEW;
 }
 
 # MOVW [DE], AX
 :MOVW AddrDEW, AX is opcode=0xB9 & AX & AddrDEW {
-
     AddrDEW = AX;
 }
 
 # MOVW AX, [DE+byte]
 :MOVW AX, AddrDEOffsetW is opcode=0xAA & AX; AddrDEOffsetW {
-
     AX = AddrDEOffsetW;
 }
 
 # MOVW [DE+byte], AX
 :MOVW AddrDEOffsetW, AX is opcode=0xBA & AX; AddrDEOffsetW {
-
     AddrDEOffsetW = AX;
 }
 
 # MOVW AX, [HL]
 :MOVW AX, AddrHLW is opcode=0xAB & AX & AddrHLW {
-
     AX = AddrHLW;
 }
 
 # MOVW [HL], AX
 :MOVW AddrHLW, AX is opcode=0xBB & AX & AddrHLW {
-
     AddrHLW = AX;
 }
 
 # MOVW AX, [HL+byte]
 :MOVW AX, AddrHLOffsetW is opcode=0xAC & AX; AddrHLOffsetW {
-
     AX = AddrHLOffsetW;
 }
 
 # MOVW [HL+byte], AX
 :MOVW AddrHLOffsetW, AX is opcode=0xBC & AX; AddrHLOffsetW {
-
     AddrHLOffsetW = AX;
 }
 
 # MOVW AX, word[B]
 :MOVW AX, AddrWordOffsetBW is opcode=0x59 & AX; AddrWordOffsetBW {
-
     AX = AddrWordOffsetBW;
 }
 
@@ -574,67 +482,56 @@
 
 # MOVW word[B], AX
 :MOVW AddrWordOffsetBW, AX is opcode=0x58 & AX; AddrWordOffsetBW {
-
     AddrWordOffsetBW = AX;
 }
 
 # MOVW AX, word[C]
 :MOVW AX, AddrWordOffsetCW is opcode=0x69 & AX; AddrWordOffsetCW {
-
     AX = AddrWordOffsetCW;
 }
 
 # MOVW word[C], AX
 :MOVW AddrWordOffsetCW, AX is opcode=0x68 & AX; AddrWordOffsetCW {
-
     AddrWordOffsetCW = AX;
 }
 
 # MOVW AX, word[BC]
 :MOVW AX, AddrWordOffsetBCW is opcode=0x79 & AX; AddrWordOffsetBCW {
-
     AX = AddrWordOffsetBCW;
 }
 
 # MOVW AX, [SP+byte]
 :MOVW AX, AddrSPOffsetW is opcode=0xA8 & AX; AddrSPOffsetW {
-
     AX = AddrSPOffsetW;
 }
 
 # MOVW [SP+byte], AX
 :MOVW AddrSPOffsetW, AX is opcode=0xB8 & AX; AddrSPOffsetW {
-
     AddrSPOffsetW = AX;
 }
 
 # MOVW BC, saddrp
 :MOVW BC, saddrp is opcode=0xDA & BC; saddrp {
-
     BC = saddrp;
 }
 
 # MOVW BC, !addr16
 :MOVW BC, addr16w is opcode=0xDB & BC; addr16w {
-
     BC = addr16w;
 }
 
 # MOVW DE, saddrp
 :MOVW DE, saddrp is opcode=0xEA & DE; saddrp {
-
     DE = saddrp;
 }
 
 # MOVW DE, !addr16
 :MOVW DE, addr16w is opcode=0xEB & DE; addr16w {
-
     DE = addr16w;
 }
 
 # MOVW HL, saddrp
 :MOVW HL, saddrp is opcode=0xFA & HL; saddrp {
-
     HL = saddrp;
 }
 
@@ -652,25 +549,21 @@
 
 # ONEW AX
 :ONEW AX is opcode=0xE6 & AX {
-
     AX = 1;
 }
 
 # ONEW BC
 :ONEW BC is opcode=0xE7 & BC {
-
     BC = 1;
 }
 
 # CLRW AX
 :CLRW AX is opcode=0xF6 & AX {
-
     AX = 0;
 }
 
 # CLRW BC
 :CLRW BC is opcode=0xF7 & BC {
-
     BC = 0;
 }
 
@@ -680,91 +573,76 @@
 
 # ADD A, #byte
 :ADD A, u8 is opcode=0x0C & A; u8 {
-
     inst_add(A, u8);
 }
 
 # ADD saddr, #byte
 :ADD saddr, u8 is opcode=0x0A; saddr; u8 {
-
     inst_add(saddr, u8);
 }
 
 # ADD A, r
 :ADD A, "A" is opcode=0x61 & A; opcode=0x1 {
-
     inst_add(A, A);
 }
 
 # ADD A, r
 :ADD A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x01 & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_add(A, SREG2_BYTE);
 }
 
 # ADD r, A
 :ADD SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x00 & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_add(SREG2_BYTE, A);
 }
 
 # ADD A, saddr
 :ADD A, saddr is opcode=0x0B & A; saddr {
-
     inst_add(A, saddr);
 }
 
 # ADD A, !addr16
 :ADD A, addr16 is opcode=0x0F & A; addr16 {
-
     inst_add(A, addr16);
 }
 
 # ADD A, [HL]
 :ADD A, AddrHL is opcode=0x0D & A & AddrHL {
-
     inst_add(A, AddrHL);
 }
 
 # ADD A, [HL+byte]
 :ADD A, AddrHLOffset is opcode=0x0E & A; AddrHLOffset {
-
     inst_add(A, AddrHLOffset);
 }
 
 # ADD A, [HL+B]
 :ADD A, AddrHLOffsetB is opcode=0x61 & A; opcode=0x80 & AddrHLOffsetB {
-
     inst_add(A, AddrHLOffsetB);
 }
 
 # ADD A, [HL+C]
 :ADD A, AddrHLOffsetC is opcode=0x61 & A; opcode=0x82 & AddrHLOffsetC {
-
     inst_add(A, AddrHLOffsetC);
 }
 
 # ADDC A, #byte
 :ADDC A, u8 is opcode=0x1C & A; u8 {
-
     inst_addc(A, u8);
 }
 
 # ADDC saddr, #byte
 :ADDC saddr, u8 is opcode=0x1A; saddr; u8 {
-
     inst_addc(saddr, u8);
 }
 
 # ADDC A, r
 :ADDC A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x3 & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_addc(A, SREG2_BYTE);
 }
 
 # ADDC r, A
 :ADDC SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x2 & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_addc(A, SREG2_BYTE);
 }
 
@@ -774,97 +652,81 @@
 
 # ADDC A, saddr
 :ADDC A, saddr is opcode=0x1B & A; saddr {
-
     inst_addc(A, saddr);
 }
 
 # ADDC A, !uint16
 :ADDC A, addr16 is opcode=0x1F & A; addr16 {
-
     inst_addc(A, addr16);
 }
 
 # ADDC A, [HL]
 :ADDC A, AddrHL is opcode=0x1D & A & AddrHL {
-
     inst_addc(A, AddrHL);
 }
 
 # ADDC A, [HL+byte]
 :ADDC A, AddrHLOffset is opcode=0x1E & A; AddrHLOffset {
-
     inst_addc(A, AddrHLOffset);
 }
 
 # ADDC A, [HL+B]
 :ADDC A, AddrHLOffsetB is opcode=0x61 & A; opcode=0x90 & AddrHLOffsetB {
-
     inst_addc(A, AddrHLOffsetB);
 }
 
 # ADDC A, [HL+C]
 :ADDC A, AddrHLOffsetC is opcode=0x61 & A; opcode=0x92 & AddrHLOffsetC {
-
     inst_addc(A, AddrHLOffsetC);
 }
 
 # SUB A, #byte
 :SUB A, u8 is opcode=0x2C & A; u8 {
-
     inst_sub(A, u8);
 }
 
 # SUB saddr, #byte
 :SUB saddr, u8 is opcode=0x2A; saddr; u8 {
-
     inst_sub(saddr, u8);
 }
 
 # SUB A, r
 :SUB A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x5 & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_sub(A, SREG2_BYTE);
 }
 
 # SUB r, A
 :SUB SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x4 & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_sub(SREG2_BYTE, A);
 }
 
 # SUB A, saddr
 :SUB A, saddr is opcode=0x2B & A; saddr {
-
     inst_sub(A, saddr);
 }
 
 # SUB A, !addr16
 :SUB A, addr16 is opcode=0x2F & A; addr16 {
-
     inst_sub(A, addr16);
 }
 
 # SUB A, [HL]
 :SUB A, AddrHL is opcode=0x2D & A & AddrHL {
-
     inst_sub(A, AddrHL);
 }
 
 # SUB A, [HL+byte]
 :SUB A, AddrHLOffset is opcode=0x2E & A; AddrHLOffset {
-
     inst_sub(A, AddrHLOffset);
 }
 
 # SUB A, [HL+B]
 :SUB A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xA0 & AddrHLOffsetB {
-
     inst_sub(A, AddrHLOffsetB);
 }
 
 # SUB A, [HL+C]
 :SUB A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xA2 & AddrHLOffsetC {
-
     inst_sub(A, AddrHLOffsetC);
 }
 
@@ -874,90 +736,75 @@
 
 # SUBC A, #byte
 :SUBC A, u8 is opcode=0x3C & A; u8 {
-
     inst_subc(A, u8);
 }
 
 # SUBC saddr, #byte
 :SUBC saddr, u8 is opcode=0x3A; saddr; u8 {
-
     inst_subc(saddr, u8);
 }
 
 # SUBC A, r
 :SUBC A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x7 & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_subc(A, SREG2_BYTE);
 }
 
 # SUBC r, A
 :SUBC SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x6 & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_subc(SREG2_BYTE, A);
 }
 
 :SUBC A, "A" is opcode=0x61 & A; opcode=0x31 {
-
     inst_subc(A, A);
 }
 
 # SUBC A, saddr
 :SUBC A, saddr is opcode=0x3B & A; saddr {
-
     inst_subc(A, saddr);
 }
 
 # SUBC A, !addr16
 :SUBC A, addr16 is opcode=0x3F & A; addr16 {
-
     inst_subc(A, addr16);
 }
 
 # SUBC A, [HL]
 :SUBC A, AddrHL is opcode=0x3D & A & AddrHL {
-
     inst_subc(A, AddrHL);
 }
 
 # SUBC A, [HL+byte]
 :SUBC A, AddrHLOffset is opcode=0x3E & A; AddrHLOffset {
-
     inst_subc(A, AddrHLOffset);
 }
 
 # SUBC A, [HL+B]
 :SUBC A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xB0 & AddrHLOffsetB {
-
     inst_subc(A, AddrHLOffsetB);
 }
 
 # SUBC A, [HL+C]
 :SUBC A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xB2 & AddrHLOffsetC {
-
     inst_subc(A, AddrHLOffsetC);
 }
 
 # AND A, #byte
 :AND A, u8 is opcode=0x5C & A; u8 {
-
     inst_and(A, u8);
 }
 
 # AND saddr, #byte
 :AND saddr, u8 is opcode=0x5A; saddr; u8 {
-
     inst_and(saddr, u8);
 }
 
 # AND A, r
 :AND A, SREG2_BYTE is opcode=0x61 & A; op2_h=0xB & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_and(A, SREG2_BYTE);
 }
 
 # AND r, A
 :AND SREG2_BYTE, A is opcode=0x61 & A; op2_h=0xA & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_and(SREG2_BYTE, A);
 }
 
@@ -967,97 +814,81 @@
 
 # AND A, saddr
 :AND A, saddr is opcode=0x5B & A; saddr {
-
     inst_and(A, saddr);
 }
 
 # AND A, !addr16
 :AND A, addr16 is opcode=0x5F & A; addr16 {
-
     inst_and(A, addr16);
 }
 
 # AND A, [HL]
 :AND A, AddrHL is opcode=0x5D & A & AddrHL {
-
     inst_and(A, AddrHL);
 }
 
 # AND A, [HL+byte]
 :AND A, AddrHLOffset is opcode=0x5E & A; AddrHLOffset {
-
     inst_and(A, AddrHLOffset);
 }
 
 # AND A, [HL+B]
 :AND A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xD0 & AddrHLOffsetB {
-
     inst_and(A, AddrHLOffsetB);
 }
 
 # AND A, [HL+C]
 :AND A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xD2 & AddrHLOffsetC {
-
     inst_and(A, AddrHLOffsetC);
 }
 
 # OR A, #byte
 :OR A, u8 is opcode=0x6C & A; u8 {
-
     inst_or(A, u8);
 }
 
 # OR saddr, #byte
 :OR saddr, u8 is opcode=0x6A; saddr; u8 {
-
     inst_or(saddr, u8);
 }
 
 # OR A, r
 :OR A, SREG2_BYTE is opcode=0x61 & A; op2_h=0xD & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_or(A, SREG2_BYTE);
 }
 
 # OR r, A
 :OR SREG2_BYTE, A is opcode=0x61 & A; op2_h=0xC & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_or(SREG2_BYTE, A);
 }
 
 # OR A, saddr
 :OR A, saddr is opcode=0x6B & A; saddr {
-
     inst_or(A, saddr);
 }
 
 # OR A, !addr16
 :OR A, addr16 is opcode=0x6F & A; addr16 {
-
     inst_or(A, addr16);
 }
 
 # OR A, [HL]
 :OR A, AddrHL is opcode=0x6D & A & AddrHL {
-
     inst_or(A, AddrHL);
 }
 
 # OR A, [HL+byte]
 :OR A, AddrHLOffset is opcode=0x6E & A; AddrHLOffset {
-
     inst_or(A, AddrHLOffset);
 }
 
 # OR A, [HL+B]
 :OR A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xE0 & AddrHLOffsetB {
-
     inst_or(A, AddrHLOffsetB);
 }
 
 # OR A, [HL+C]
 :OR A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xE2 & AddrHLOffsetC {
-
     inst_or(A, AddrHLOffsetC);
 }
 
@@ -1067,73 +898,61 @@
 
 # XOR A, #byte
 :XOR A, u8 is opcode=0x7C & A; u8 {
-
     inst_xor(A, u8);
 }
 
 # XOR saddr, #byte
 :XOR saddr, u8 is opcode=0x7A; saddr; u8 {
-
     inst_xor(saddr, u8);
 }
 
 # XOR A, r
 :XOR A, SREG2_BYTE is opcode=0x61 & A; op2_h=0xf & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_xor(A, SREG2_BYTE);
 }
 
 # XOR r, A
 :XOR SREG2_BYTE, A is opcode=0x61 & A; op2_h=0xe & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_xor(SREG2_BYTE, A);
 }
 
 # XOR A, saddr
 :XOR A, saddr is opcode=0x7B & A; saddr {
-
     inst_xor(A, saddr);
 }
 
 # XOR A, !addr16
 :XOR A, addr16 is opcode=0x7f & A; addr16 {
-
     inst_xor(A, addr16);
 }
 
 # XOR A, [HL]
 :XOR A, AddrHL is opcode=0x7D & A & AddrHL {
-
     inst_xor(A, AddrHL);
 }
 
 # XOR A, [HL+byte]
 :XOR A, AddrHLOffset is opcode=0x7E & A; AddrHLOffset {
-
     inst_xor(A, AddrHLOffset);
 }
 
 # XOR A, [HL+B]
 :XOR A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xF0 & AddrHLOffsetB {
-
     inst_xor(A, AddrHLOffsetB);
 }
 
 # XOR A, [HL+C]
 :XOR A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xF2 & AddrHLOffsetC {
-
     inst_xor(A, AddrHLOffsetC);
 }
 
 # CMP A, #byte
 :CMP A, u8 is opcode=0x4C & A; u8 {
-
     inst_cmp(A, u8);
 }
 
 # CMP saddr, #byte
 :CMP saddr, u8 is opcode=0x4A; saddr; u8 {
-
     inst_cmp(saddr, u8);
 }
 
@@ -1143,13 +962,11 @@
 
 # CMP A, r
 :CMP A, SREG2_BYTE is opcode=0x61 & A; op2_h=0x9 & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_cmp(A, SREG2_BYTE);
 }
 
 # CMP r, A
 :CMP SREG2_BYTE, A is opcode=0x61 & A; op2_h=0x8 & SREG2_BYTE & sreg2_byte!=1 {
-
     inst_cmp(SREG2_BYTE, A);
 }
 
@@ -1159,67 +976,56 @@
 
 # CMP A, saddr
 :CMP A, saddr is opcode=0x4B & A; saddr {
-
     inst_cmp(A, saddr);
 }
 
 # CMP A, !addr16
 :CMP A, addr16 is opcode=0x4F & A; addr16 {
-
     inst_cmp(A, addr16);
 }
 
 # CMP A, [HL]
 :CMP A, AddrHL is opcode=0x4D & A & AddrHL {
-
     inst_cmp(A, AddrHL);
 }
 
 # CMP A, [HL+byte]
 :CMP A, AddrHLOffset is opcode=0x4E & A; AddrHLOffset {
-
     inst_cmp(A, AddrHLOffset);
 }
 
 # CMP A, [HL+B]
 :CMP A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xC0 & AddrHLOffsetB {
-
     inst_cmp(A, AddrHLOffsetB);
 }
 
 # CMP A, [HL+C]
 :CMP A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xC2 & AddrHLOffsetC {
-
     inst_cmp(A, AddrHLOffsetC);
 }
 
 # CMP !addr16, #byte
 :CMP addr16, u8 is opcode=0x40; addr16; u8 {
-
     inst_cmp(addr16, u8);
 }
 
 # CMP0, r
 :CMP0 DREG_AXBC is op_h=0xD & op_l<4 & DREG_AXBC {
-
     inst_cmp0(DREG_AXBC);
 }
 
 # CMP0 saddr
 :CMP0 saddr is opcode=0xD4; saddr {
-
     inst_cmp0(saddr);
 }
 
 # CMP0 !addr16
 :CMP0 addr16 is opcode=0xD5; addr16 {
-
     inst_cmp0(addr16);
 }
 
 # CMPS X, [HL+byte]
 :CMPS X, AddrHLOffset is opcode=0x61 & X; opcode=0xDE; AddrHLOffset {
-
     $(Z) = X == AddrHLOffset;
     $(CY) = ($(Z) != 0) | (AddrHLOffset == 0) | (X == 0);
     aux_borrow(X, AddrHLOffset);
@@ -1227,67 +1033,56 @@
 
 # ADDW AX, #word
 :ADDW AX, u16 is opcode=0x04 & AX; u16 {
-
     inst_addw(AX, u16);
 }
 
 # ADDW AX, AX
 :ADDW AX, "AX" is AX & opcode=0x1 {
-
     inst_addw(AX, AX);
 }
 
 # ADDW AX, rp
 :ADDW AX, DREG_WORD is op_h=0x0 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
-
     inst_addw(AX, DREG_WORD);
 }
 
 # ADDW AX, saddrp
 :ADDW AX, saddrp is opcode=0x06 & AX; saddrp {
-
     inst_addw(AX, saddrp);
 }
 
 # ADDW AX, !addr16
 :ADDW AX, addr16w is opcode=0x02 & AX; addr16w {
-
     inst_addw(AX, addr16w);
 }
 
 # ADDW AX, [HL+byte]
 :ADDW AX, AddrHLOffsetW is opcode=0x61 & AX; opcode=0x09; AddrHLOffsetW {
-
     inst_addw(AX, AddrHLOffsetW);
 }
 
 # SUBW AX, #word
 :SUBW AX, u16 is opcode=0x24 & AX; u16 {
-
     inst_subw(AX, u16);
 }
 
 # SUBW AX, rp
 :SUBW AX, DREG_WORD is op_h=0x2 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
-
     inst_subw(AX, DREG_WORD);
 }
 
 # SUBW AX, saddrp
 :SUBW AX, saddrp is opcode=0x26 & AX; saddrp {
-
     inst_subw(AX, saddrp);
 }
 
 # SUBW AX, !addr16
 :SUBW AX, addr16w is opcode=0x22 & AX; addr16w {
-
     inst_subw(AX, addr16w);
 }
 
 # SUBW AX, [HL+byte]
 :SUBW AX, AddrHLOffsetW is opcode=0x61 & AX; opcode=0x29; AddrHLOffsetW {
-
     inst_subw(AX, AddrHLOffsetW);
 }
 
@@ -1297,37 +1092,31 @@
 
 # CMPW AX, #word
 :CMPW AX, u16 is opcode=0x44 & AX; u16 {
-
     inst_cmpw(AX, u16);
 }
 
 # CMPW AX, rp
 :CMPW AX, DREG_WORD is op_h=0x4 & AX & rp_source=1 & movw_op=0 & DREG_WORD & dreg_word!=0 {
-
     inst_cmpw(AX, DREG_WORD);
 }
 
 # CMPW AX, saddrp
 :CMPW AX, saddrp is opcode=0x46 & AX; saddrp {
-
     inst_cmpw(AX, saddrp);
 }
 
 # CMPW AX, !addr16
 :CMPW AX, addr16w is opcode=0x42 & AX; addr16w {
-
     inst_cmpw(AX, addr16w);
 }
 
 # CMPW AX, [HL+byte]
 :CMPW AX, AddrHLOffsetW is opcode=0x61 & AX; opcode=0x49; AddrHLOffsetW {
-
     inst_cmpw(AX, AddrHLOffsetW);
 }
 
 # MULU X
 :MULU X (AX"="A"*X") is opcode=0xD6 & AX & X & A {
-
     local aw:2 = zext(A:1);
     local xw:2 = zext(X:1);
     AX = aw * xw;
@@ -1335,7 +1124,6 @@
 
 # MULHU
 :MULHU ("AXBC="AX"*"BC) is opcode=0xCE; opcode=0xFB; opcode=0x01 & AX & BC {
-
     local axdw:4 = zext(AX:2);
     local bcdw:4 = zext(BC:2);
     local res:4 = axdw * bcdw;
@@ -1349,7 +1137,6 @@
 
 # MULH
 :MULH ("AXBC="AX"*"BC) is opcode=0xCE; opcode=0xFB; opcode=0x02 & AX & BC {
-
     local axdw:4 = sext(AX:2);
     local bcdw:4 = sext(BC:2);
     local res:4 = axdw * bcdw;
@@ -1363,7 +1150,6 @@
 
 # DIVHU
 :DIVHU ("AXDE="AX"/"DE) is opcode=0xCE; opcode=0xFB; opcode=0x03 & AX & DE {
-
     local axdw:4 = zext(AX:2);
     local dedw:4 = zext(DE:2);
 
@@ -1389,49 +1175,41 @@
 
 # INC r
 :INC DREG_BYTE is op_h=0x8 & DREG_BYTE {
-
     inst_inc(DREG_BYTE);
 }
 
 # INC saddr
 :INC saddr is opcode=0xA4; saddr {
-
     inst_inc(saddr);
 }
 
 # INC !addr16
 :INC addr16 is opcode=0xA0; addr16 {
-
     inst_inc(addr16);
 }
 
 # INC [HL+byte]
 :INC AddrHLOffset is opcode=0x61; opcode=0x59; AddrHLOffset {
-
     inst_inc(AddrHLOffset);
 }
 
 # DEC r
 :DEC DREG_BYTE is op_h=0x9 & DREG_BYTE {
-
     inst_dec(DREG_BYTE);
 }
 
 # DEC saddr
 :DEC saddr is opcode=0xB4; saddr {
-
     inst_dec(saddr);
 }
 
 # DEC !addr16
 :DEC addr16 is opcode=0xB0; addr16 {
-
     inst_dec(addr16);
 }
 
 # DEC [HL+byte]
 :DEC AddrHLOffset is opcode=0x61; opcode=0x69; AddrHLOffset {
-
     inst_dec(AddrHLOffset);
 }
 
@@ -1441,61 +1219,51 @@
 
 # INCW rp
 :INCW DREG_WORD is op_h=0xA & DREG_WORD {
-
     inst_incw(DREG_WORD);
 }
 
 # INCW saddrp
 :INCW saddrp is opcode=0xA6; saddrp {
-
     inst_incw(saddrp);
 }
 
 # INCW !addr16
 :INCW addr16w is opcode=0xA2; addr16w {
-
     inst_incw(addr16w);
 }
 
 # INCW [HL+byte]
 :INCW AddrHLOffsetW is opcode=0x61; opcode=0x79; AddrHLOffsetW {
-
     inst_incw(AddrHLOffsetW);
 }
 
 # DECW rp
 :DECW DREG_WORD is op_h=0xB & DREG_WORD {
-
     inst_decw(DREG_WORD);
 }
 
 # DECW saddrp
 :DECW saddrp is opcode=0xB6; saddrp {
-
     inst_decw(saddrp);
 }
 
 # DECW !addr16
 :DECW addr16w is opcode=0xB2; addr16w {
-
     inst_decw(addr16w);
 }
 
 # DECW [HL+byte]
 :DECW AddrHLOffset is opcode=0x61; opcode=0x89; AddrHLOffset {
-
     inst_decw(AddrHLOffset);
 }
 
 # SHR A, n
 :SHR A, shift_n is opcode=0x31 & A; op2_l=0xA & shift_n {
-
     inst_shr(A, shift_n);
 }
 
 # SHRW AX, n
 :SHRW AX, shift_n is opcode=0x31 & AX; op2_l=0xE & shift_n {
-
     inst_shr(AX, shift_n);
 }
 
@@ -1505,31 +1273,26 @@
 
 # SHL A, n
 :SHL A, shift_n is opcode=0x31 & A; op2_l=0x9 & shift_n {
-
     inst_shl(A, shift_n);
 }
 
 # SHL B, n
 :SHL B, shift_n is opcode=0x31 & B; op2_l=0x8 & shift_n {
-
     inst_shl(B, shift_n);
 }
 
 # SHL C, n
 :SHL C, shift_n is opcode=0x31 & C; op2_l=0x7 & shift_n {
-
     inst_shl(C, shift_n);
 }
 
 # SHLW AX, n
 :SHLW AX, shift_n is opcode=0x31 & AX; op2_l=0xD & shift_n {
-
     inst_shlw(AX, shift_n);
 }
 
 # SHLW BC, n
 :SHLW BC, shift_n is opcode=0x31 & BC; op2_l=0xC & shift_n {
-
     inst_shlw(BC, shift_n);
 }
 
@@ -1539,19 +1302,16 @@
 
 # SAR A, n
 :SAR A, shift_n is opcode=0x31 & A; op2_l=0xB & shift_n {
-
     inst_sar(A, shift_n);
 }
 
 # SARW AX, n
 :SARW AX, shift_n is opcode=0x31 & AX; op2_l=0xF & shift_n {
-
     inst_sarw(AX, shift_n);
 }
 
 # ROR A, 1
 :ROR A, 1 is opcode=0x61 & A; opcode=0xDB {
-
     $(CY) = (A & 0x1) == 1;
     A = A >> 1;
     A = A & ($(CY) << 7);
@@ -1559,7 +1319,6 @@
 
 # ROL A, 1
 :ROL A, 1 is opcode=0x61 & A; opcode=0xEB {
-
     $(CY) = A s< 0;
     A = A << 1;
     A = A | $(CY);
@@ -1567,7 +1326,6 @@
 
 # RORC A, 1
 :RORC A, 1 is opcode=0x61 & A; opcode=0xFB {
-
     local lsb:1 = A & 1;
     A = A >> 1;
     A = $(CY) << 7;
@@ -1576,7 +1334,6 @@
 
 # ROLC A, 1
 :ROLC A, 1 is opcode=0x61 & A; opcode=0xDC {
-
     cy:1 = $(CY);
     $(CY) = A s< 0;
     A = A << 1;
@@ -1585,7 +1342,6 @@
 
 # ROLWC AX, 1
 :ROLWC AX, 1 is opcode=0x61 & AX; opcode=0xEE {
-
     cy:2 = zext($(CY));
     $(CY) = AX s< 0;
     AX = AX << 1;
@@ -1594,7 +1350,6 @@
 
 # ROLWC BC, 1
 :ROLWC BC, 1 is opcode=0x61 & BC; opcode=0xFE {
-
     cy:2 = zext($(CY));
     $(CY) = BC s< 0;
     BC = BC << 1;
@@ -1603,7 +1358,6 @@
 
 # MOV1 CY, saddr.n
 :MOV1 "CY", saddr"."bit_op_n is opcode=0x71; op_l=0x4 & bit_op_n & mov1_sreg=0; saddr {
-
     mov1_read_cy(saddr, bit_op_n);
 }
 
@@ -1613,31 +1367,26 @@
 
 # MOV1 CY, sfr.n
 :MOV1 "CY", sfrp"."bit_op_n is opcode=0x71; op_l=0xC & bit_op_n & mov1_sreg=0; sfrp {
-
     mov1_read_cy(sfrp, bit_op_n);
 }
 
 # MOV1 CY, A.n
 :MOV1 "CY", A"."bit_op_n is opcode=0x71 & A; op_l=0xC & bit_op_n & mov1_sreg=1 {
-
     mov1_read_cy(A, bit_op_n);
 }
 
 # MOV1 CY, PSW.n
 :MOV1 "CY", PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xC & bit_op_n; opcode=0xFA {
-
     mov1_read_cy(PSW, bit_op_n);
 }
 
 # MOV1 CY, [HL].0
 :MOV1 "CY", AddrHL"."bit_op_n is opcode=0x71 & AddrHL; op_l=0x4 & bit_op_n & mov1_sreg=1 {
-
     mov1_read_cy(AddrHL, bit_op_n);
 }
 
 # MOV1 saddr.n, CY
 :MOV1 saddr"."bit_op_n, "CY" is opcode=0x71; op_l=0x1 & bit_op_n & mov1_sreg=0; saddr {
-
     mov1_cy_write(saddr, bit_op_n);
 }
 
@@ -1647,25 +1396,21 @@
 
 # MOV1 sfr.n, CY
 :MOV1 sfrp"."bit_op_n, "CY" is opcode=0x71; op_l=0x9 & bit_op_n & mov1_sreg=0; sfrp {
-
     mov1_cy_write(sfrp, bit_op_n);
 }
 
 # MOV1 A.n, CY
 :MOV1 A"."bit_op_n & 0x7, "CY" is opcode=0x71 & A; op_l=0x9 & bit_op_n & mov1_sreg=1 {
-
     mov1_cy_write(A, bit_op_n);
 }
 
 # MOV1 PSW.n, CY
 :MOV1 PSW"."bit_op_n, "CY" is opcode=0x71 & PSW; op_l=0x9 & bit_op_n & mov1_sreg=0; opcode=0xFA {
-
     mov1_cy_write(PSW, bit_op_n);
 }
 
 # MOV1 [HL].n, CY
 :MOV1 AddrHL"."bit_op_n, "CY" is opcode=0x71 & AddrHL; op_l=0x1 & bit_op_n & mov1_sreg=1 {
-
     mov1_cy_write(AddrHL, bit_op_n);
 }
 
@@ -1675,25 +1420,21 @@
 
 # AND1 CY, saddr.n
 :AND1 "CY", saddr"."bit_op_n is opcode=0x71; op_l=0x5 & bit_op_n & mov1_sreg=0; saddr {
-
     inst_and1(saddr, bit_op_n);
 }
 
 # AND1 CY, sfr.n
 :AND1 "CY", sfrp"."bit_op_n is opcode=0x71; op_l=0xD & bit_op_n & mov1_sreg=0; sfrp {
-
     inst_and1(sfrp, bit_op_n);
 }
 
 # AND1 CY, A.n
 :AND1 "CY", A"."bit_op_n is opcode=0x71 & A; op_l=0xD & bit_op_n & mov1_sreg=1 {
-
     inst_and1(A, bit_op_n);
 }
 
 # AND1 CY, PSW.n
 :AND1 "CY", PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xD & bit_op_n & mov1_sreg=0; opcode=0xFA {
-
     inst_and1(PSW, bit_op_n);
 }
 
@@ -1703,25 +1444,21 @@
 
 # AND1 CY, [HL].n
 :AND1 "CY", AddrHL"."bit_op_n is opcode=0x71 & AddrHL; op_l=0x5 & bit_op_n & mov1_sreg=1 {
-
     inst_and1(AddrHL, bit_op_n);
 }
 
 # OR1 CY, saddr.n
 :OR1 "CY", saddr"."bit_op_n is opcode=0x71; op_l=0x6 & bit_op_n & mov1_sreg=0; saddr {
-
     inst_or1(saddr, bit_op_n);
 }
 
 # OR1 CY, sfr.n
 :OR1 "CY", sfrp"."bit_op_n is opcode=0x71; op_l=0xE & bit_op_n & mov1_sreg=0; sfrp {
-
     inst_or1(sfrp, bit_op_n);
 }
 
 # OR1 CY, A.n
 :OR1 "CY", A"."bit_op_n is opcode=0x71 & A; op_l=0xE & bit_op_n & mov1_sreg=1 {
-
     inst_or1(A, bit_op_n);
 }
 
@@ -1731,25 +1468,21 @@
 
 # OR1 CY, PSW.n
 :OR1 "CY", PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xE & bit_op_n & mov1_sreg=0; opcode=0xFA {
-
     inst_or1(PSW, bit_op_n);
 }
 
 # OR1 CY, [HL].n
 :OR1 "CY", AddrHL"."bit_op_n is opcode=0x71 & AddrHL; op_l=0x6 & bit_op_n & mov1_sreg=1 {
-
     inst_or1(AddrHL, bit_op_n);
 }
 
 # XOR1 CY, saddr.n
 :XOR1 "CY", saddr"."bit_op_n is opcode=0x71; op_l=0x7 & bit_op_n & mov1_sreg=0; saddr {
-
     inst_xor1(saddr, bit_op_n);
 }
 
 # XOR1 CY, sfr.n
 :XOR1 "CY", sfrp"."bit_op_n is opcode=0x71; op_l=0xF & bit_op_n & mov1_sreg=0; sfrp {
-
     inst_xor(sfrp, bit_op_n);
 }
 
@@ -1759,25 +1492,21 @@
 
 # XOR1 CY, A.n
 :XOR1 "CY", A"."bit_op_n is opcode=0x71 & A; op_l=0xF & bit_op_n & mov1_sreg=1 {
-
     inst_xor(A, bit_op_n);
 }
 
 # XOR1 CY, PSW.n
 :XOR1 "CY", PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xF & bit_op_n & mov1_sreg=0; opcode=0xFA {
-
     inst_xor(PSW, bit_op_n);
 }
 
 # XOR1 CY, [HL].n
 :XOR1 "CY", AddrHL"."bit_op_n is opcode=0x71 & AddrHL; op_l=0x7 & bit_op_n & mov1_sreg=1 {
-
     inst_xor(PSW, bit_op_n);
 }
 
 # SET1 saddr.n
 :SET1 saddr"."bit_op_n is opcode=0x71; op_l=0x2 & bit_op_n & mov1_sreg=0; saddr {
-
     inst_set1(saddr, bit_op_n);
 }
 
@@ -1787,31 +1516,26 @@
 
 # SET1 sfr.n
 :SET1 sfrp"."bit_op_n is opcode=0x71; op_l=0xA & bit_op_n & mov1_sreg=0; sfrp {
-
     inst_set1(sfrp, bit_op_n);
 }
 
 # SET1 A.n
 :SET1 A"."bit_op_n is opcode=0x71 & A; op_l=0xA & bit_op_n & mov1_sreg=1 {
-
     inst_set1(A, bit_op_n);
 }
 
 # SET1 !addr16.n
 :SET1 addr16"."bit_op_n is opcode=0x71; op_l=0 & bit_op_n & mov1_sreg=0; addr16 {
-
     inst_set1(addr16, bit_op_n);
 }
 
 # SET1 PSW.n
 :SET1 PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xA & bit_op_n & mov1_sreg=0; opcode=0xFA {
-
     inst_set1(PSW, bit_op_n);
 }
 
 # SET1 [HL].n
 :SET1 AddrHL"."bit_op_n is opcode=0x71; op_l=0x2 & bit_op_n & mov1_sreg=1 & AddrHL {
-
     inst_set1(AddrHL, bit_op_n);
 }
 
@@ -1821,19 +1545,16 @@
 
 # CLR1 saddr.n
 :CLR1 saddr"."bit_op_n is opcode=0x71; op_l=0x3 & bit_op_n & mov1_sreg=0; saddr {
-
     inst_clr1(saddr, bit_op_n);
 }
 
 # CLR1 sfr.n
 :CLR1 sfrp"."bit_op_n is opcode=0x71; op_l=0xB & bit_op_n & mov1_sreg=0; sfrp {
-
     inst_clr1(sfrp, bit_op_n);
 }
 
 # CLR1 A.n
 :CLR1 A"."bit_op_n is opcode=0x71 & A; op_l=0xB & bit_op_n & mov1_sreg=1 {
-
     inst_clr1(A, bit_op_n);
 }
 
@@ -1843,37 +1564,31 @@
 
 # CLR1 !addr16.n
 :CLR1 addr16"."bit_op_n is opcode=0x71; op_l=0x8 & bit_op_n & mov1_sreg=0; addr16 {
-
     inst_clr1(addr16, bit_op_n);
 }
 
 # CLR1 PSW.n
 :CLR1 PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xB & bit_op_n & mov1_sreg=0; opcode=0xFA {
-
     inst_clr1(PSW, bit_op_n);
 }
 
 # CLR1 [HL].n
 :CLR1 AddrHL"."bit_op_n is opcode=0x71 & AddrHL; op_l=0x3 & bit_op_n & mov1_sreg=1 {
-
     inst_clr1(AddrHL, bit_op_n);
 }
 
 # SET1 CY
 :SET1 "CY" is opcode=0x71; opcode=0x80 {
-
     inst_set1($(CY), 0);
 }
 
 # CLR1 CY
 :CLR1 "CY" is opcode=0x71; opcode=0x88 {
-
     inst_clr1($(CY), 0);
 }
 
 # NOT1 CY
 :NOT1 "CY" is opcode=0x71; opcode=0xC0 {
-
     $(CY) = ~$(CY) & 0x1;
 }
 
@@ -1909,7 +1624,6 @@
 # BRK
 :BRK is opcode=0x61; opcode=0xCC & brk_addr {
 
-
     $(IE) = 0;
     PSW = PSW & 0x7f;
 
@@ -1924,19 +1638,11 @@
 
 # RETI
 :RETI (PC) is opcode=0x61; opcode=0xFC & PC {
-    PC = *[stackspace] SP;
-    SP = SP + 3;
-    PSW = *[stackspace] SP;
-    SP = SP + 1;
     return [PC];
 }
 
 # RETB
 :RETB (PC) is opcode=0x61; opcode=0xEC & PC {
-    PC = *[stackspace] SP;
-    SP = SP + 3;
-    PSW = *[stackspace] SP;
-    SP = SP + 1;
     return [PC];
 }
 
@@ -1946,25 +1652,25 @@
 
 # PUSH PSW
 :PUSH PSW is opcode=0x61 & PSW; opcode=0xDD {
-    *[stackspace] SP = PSW;
+    *[near] SP = PSW;
     SP = SP - 2;
 }
 
 # PUSH rp
 :PUSH DREG_WORD is op_h=0xC & DREG_WORD & rp_source=1 {
-    *[stackspace]:2 SP = DREG_WORD;
+    *[near]:2 SP = DREG_WORD;
     SP = SP - 2;
 }
 
 # POP PSW
 :POP PSW is opcode=0x61 & PSW; opcode=0xCD {
-    PSW = *[stackspace] SP;
+    PSW = *[near] SP;
     SP = SP + 2;
 }
 
 # POP rp
 :POP DREG_WORD is op_h=0xC & DREG_WORD & rp_source=0 {
-    DREG_WORD = *[stackspace] SP;
+    DREG_WORD = *[near] SP;
     SP = SP + 2;
 }
 
@@ -2002,25 +1708,21 @@
 
 # BR $addr20
 :BR jdisp8 is opcode=0xEF; jdisp8 {
-
     branch(jdisp8);
 }
 
 # BR $!addr20
 :BR jdisp16 is opcode=0xEE; jdisp16 {
-
     branch(jdisp16);
 }
 
 # BR !addr16
 :BR jaddr16 is opcode=0xED; jaddr16 {
-
     branch(jaddr16);
 }
 
 # BR !!addr20
 :BR addr20 is opcode=0xEC; addr20 {
-
     branch(addr20);
 }
 
@@ -2036,7 +1738,6 @@
 
 # BNC $addr20
 :BNC jdisp8 is opcode=0xDE; jdisp8 {
-
     if (!$(CY)) goto <b>;
     goto inst_next;
     <b>
@@ -2045,7 +1746,6 @@
 
 # BZ $addr20
 :BZ jdisp8 is opcode=0xDD; jdisp8 {
-
     if ($(Z)) goto <b>;
     goto inst_next;
     <b>
@@ -2054,7 +1754,6 @@
 
 # BNZ $addr20
 :BNZ jdisp8 is opcode=0xDF; jdisp8 {
-
     if (!$(Z)) goto <b>;
     goto inst_next;
     <b>
@@ -2063,7 +1762,6 @@
 
 # BH $addr20
 :BH jdisp8 is opcode=0x61; opcode=0xC3; jdisp8 {
-
     if (!($(Z) | $(CY))) goto <b>;
     goto inst_next;
     <b>
@@ -2072,7 +1770,6 @@
 
 # BNH $addr20
 :BNH jdisp8 is opcode=0x61; opcode=0xD3; jdisp8 {
-
     if ($(Z) | $(CY)) goto <b>;
     goto inst_next;
     <b>
@@ -2081,13 +1778,11 @@
 
 # BT saddr.n, $addr20
 :BT saddr"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x2 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
-
     inst_bt(saddr, bit_op_n, jdisp8);
 }
 
 # BT sfr.n, $addr20
 :BT sfrp"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x2 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
-
     inst_bt(sfrp, bit_op_n, jdisp8);
 }
 
@@ -2097,25 +1792,21 @@
 
 # BT A.n, $addr20
 :BT A"."bit_op_n, jdisp8 is opcode=0x31 & A; op_l=0x3 & bit_op_n & mov1_sreg=0; jdisp8 {
-
     inst_bt(A, bit_op_n, jdisp8);
 }
 
 # BT PSW.n, $addr20
 :BT PSW"."bit_op_n, jdisp8 is opcode=0x31 & PSW; op_l=0x2 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
-
     inst_bt(PSW, bit_op_n, jdisp8);
 }
 
 # BT [HL].n, $addr20
 :BT AddrHL"."bit_op_n, jdisp8 is opcode=0x31 & AddrHL; op_l=0x3 & bit_op_n & mov1_sreg=1; jdisp8 {
-
     inst_bt(AddrHL, bit_op_n, jdisp8);
 }
 
 # BF saddr.n, $addr20
 :BF saddr"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x4 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
-
     inst_bf(saddr, bit_op_n, jdisp8);
 }
 
@@ -2128,25 +1819,21 @@
 ############################################
 # BF sfr.n, $addr20
 :BF sfrp"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x4 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
-
     inst_bf(sfrp, bit_op_n, jdisp8);
 }
 
 # BF A.n, $addr20
 :BF A"."bit_op_n, jdisp8 is opcode=0x31 & A; op_l=0x5 & bit_op_n & mov1_sreg=0; jdisp8 {
-
     inst_bf(A, bit_op_n, jdisp8);
 }
 
 # BF PSW.n, $addr20
 :BF PSW"."bit_op_n, jdisp8 is opcode=0x31 & PSW; op_l=0x4 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
-
     inst_bf(PSW, bit_op_n, jdisp8);
 }
 
 # BF [HL].n, $addr20
 :BF AddrHL"."bit_op_n, jdisp8 is opcode=0x31 & AddrHL; op_l=0x5 & bit_op_n & mov1_sreg=1; jdisp8 {
-
     inst_bf(AddrHL, bit_op_n, jdisp8);
 }
 
@@ -2156,31 +1843,26 @@
 
 # BTCLR saddr.n, $addr20
 :BTCLR saddr"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x0 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
-
     inst_btclr(saddr, bit_op_n, jdisp8);
 }
 
 # BTCLR sfr.n, $addr20
 :BTCLR sfrp"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x0 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
-
     inst_btclr(sfrp, bit_op_n, jdisp8);
 }
 
 # BTCRL A.n, $addr20
 :BTCLR A"."bit_op_n, jdisp8 is opcode=0x31 & A; op_l=0x1 & bit_op_n & mov1_sreg=0; jdisp8 {
-
     inst_btclr(A, bit_op_n, jdisp8);
 }
 
 # BTCLR PSW.n, $addr20
 :BTCLR PSW"."bit_op_n, jdisp8 is opcode=0x31 & PSW; op_l=0x0 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
-
     inst_btclr(PSW, bit_op_n, jdisp8);
 }
 
 # BTCRL [HL].n, $addr20
 :BTCLR AddrHL"."bit_op_n, jdisp8 is opcode=0x31 & AddrHL; op_l=0x1 & bit_op_n & mov1_sreg=1; jdisp8 {
-
     inst_btclr(AddrHL, bit_op_n, jdisp8);
 }
 
@@ -2267,23 +1949,21 @@ SKIP_TARGET: loc is skip_mode=5 [ loc = inst_next + 5; ] {
 
 # EI
 :EI is opcode=0x71; opcode=0x7A; opcode=0xFA {
-
     $(IE) = 1;
     enable_interrupts();
 }
 
 # DI
 :DI is opcode=0x71; opcode=0x7B; opcode=0xFA {
-
     $(IE) = 0;
     disable_interrupts();
 }
 
 # HALT
-:HALT is opcode=0x61; opcode=0xED {  halt(); }
+:HALT is opcode=0x61; opcode=0xED { halt(); }
 
 # STOP
-:STOP is opcode=0x61; opcode=0xFD {  stop(); }
+:STOP is opcode=0x61; opcode=0xFD { stop(); }
 
 # PREFIX
 :^instruction is es_prefix=0 & opcode=0x11; epsilon ... & instruction [ es_prefix=1; ] {

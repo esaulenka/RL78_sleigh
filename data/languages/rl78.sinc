@@ -14,7 +14,8 @@ define register offset=0x8 size=2 [AX2 BC2 DE2 HL2];  #16-bit
 define register offset=0 size=1 [X3 A3 C3 B3 E3 D3 L3 H3];  # 8-bit
 define register offset=0 size=2 [AX3 BC3 DE3 HL3];  #16-bit
 
-define register offset=0x30 size=1 [CS0 CS1 CS2 CS3 ES0 ES1 ES2 ES3];
+define register offset=0x30 size=2 CES;
+define register offset=0x30 size=1 [ES0 CS0];
 
 # Special purpose registers
 define register offset=0x40 size=3 [PC];
@@ -276,10 +277,12 @@ define token data24 (24)
 
 attach names [ rbs_op_n ] [ RBS0 RBS1 RBS2 RBS3 ];
 
-attach variables [ fixed_sfr ] [ SPL SPH PSW _ CS0 ES0 PMC MEM ];
+#attach variables [ fixed_sfr ] [ SPL SPH PSW _ CS0 ES0 PMC MEM ];
+attach variables [ fixed_sfr ] [ SPL SPH PSW _ _ _ PMC MEM ];
 attach variables [ fixed_sfr_w ] [ SP _ _ _ _ _ _ _ ];
 
-attach variables [ a16_sfr_reg ] [ SPL SPH PSW _ CS0 ES0 PMC MEM ];
+#attach variables [ a16_sfr_reg ] [ SPL SPH PSW _ CS0 ES0 PMC MEM ];
+attach variables [ a16_sfr_reg ] [ SPL SPH PSW _ _ _ PMC MEM ];
 attach variables [ a16w_sfr_reg ] [ SP _ _ _ _ _ _ _ ];
 
 attach variables [ sfr_byte ] [
@@ -377,4 +380,4 @@ define pcodeop mach;
 
 define pcodeop disable_interrupts;
 define pcodeop enable_interrupts;
-define pcodeop segment; # res:3 = segment(seg:1, addr:2);
+define pcodeop segment;

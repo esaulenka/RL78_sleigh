@@ -5,48 +5,64 @@
 <compiler_spec>
   <data_organization>
     <!-- char has an alignment of 2 -->
-    <absolute_max_alignment value="0" />
-    <machine_alignment value="2" />
-    <default_alignment value="2" />
-    <default_pointer_alignment value="2" />
-    <pointer_size value="3" />
-    <wchar_size value="2" />
-    <short_size value="2" />
-    <integer_size value="2" />
-    <long_size value="4" />
-    <long_long_size value="8" />
-    <float_size value="4" />
-    <double_size value="4" />
-    <long_double_size value="8" />
+    <absolute_max_alignment value="0"/>
+    <machine_alignment value="2"/>
+    <default_alignment value="2"/>
+    <default_pointer_alignment value="2"/>
+    <pointer_size value="3"/>
+    <wchar_size value="2"/>
+    <short_size value="2"/>
+    <integer_size value="2"/>
+    <long_size value="4"/>
+    <long_long_size value="8"/>
+    <float_size value="4"/>
+    <double_size value="4"/>
+    <long_double_size value="8"/>
   </data_organization>
   <global>
     <range space="ram"/>
   </global>
-  <stackpointer register="SP" space="stackspace" growth="negative"/>
+  <stackpointer register="SP" space="near" growth="negative"/>
+  <funcptr align="2"/>
   <returnaddress>
     <varnode space="stack" offset="0" size="4"/>
   </returnaddress>
   <default_proto>
     <prototype name="__v2_call" strategy="register" extrapop="4" stackshift="4">
     <input killedbycall="true" pointermax="4">
-      <pentry minsize="1" maxsize="2">
-        <register name="AX0"/>
-      </pentry>
-      <pentry minsize="1" maxsize="2">
-        <register name="BC0"/>
-      </pentry>
+      <group>
+        <pentry minsize="1" maxsize="1">
+          <register name="A0"/>
+        </pentry>
+        <pentry minsize="2" maxsize="2">
+          <register name="AX0"/>
+        </pentry>
+      </group>
+      <group>
+        <pentry minsize="1" maxsize="1">
+          <register name="B0"/>
+        </pentry>
+        <pentry minsize="2" maxsize="2">
+          <register name="BC0"/>
+        </pentry>
+      </group>
       <pentry minsize="3" maxsize="3" metatype="pointer">
         <addr space="join" piece1="C0" piece2="AX0"/>
       </pentry>
-      <pentry minsize="2" maxsize="2">
-        <register name="DE0"/>
-      </pentry>
+      <group>
+        <pentry minsize="1" maxsize="1">
+          <register name="D0"/>
+        </pentry>
+        <pentry minsize="2" maxsize="2">
+          <register name="DE0"/>
+        </pentry>
+      </group>
       <pentry minsize="4" maxsize="4">
         <addr space="join" piece1="DE0" piece2="BC0"/>
       </pentry>
 
       <pentry minsize="1" maxsize="500" align="2">
-        <addr offset="4" space="stackspace"/>
+        <addr offset="4" space="stack"/>
       </pentry>
     </input>
       <output killedbycall="true">
@@ -56,19 +72,25 @@
         <pentry minsize="2" maxsize="2">
           <register name="AX0"/>
         </pentry>
+        <pentry minsize="3" maxsize="3" metatype="ptr">
+          <addr space="join" piece1="A0" piece2="DE0"/>
+        </pentry>
+        <pentry minsize="3" maxsize="3" metatype="struct">
+          <addr space="join" piece1="C0" piece2="AX0"/>
+        </pentry>
+        <pentry minsize="4" maxsize="4">
+          <addr space="join" piece1="BC0" piece2="AX0"/>
+        </pentry>
       </output>
       <killedbycall>
-        <register name="ES0"/>
-        <register name="CS0"/>
+        <register name="CES"/>
       </killedbycall>
       <unaffected>
+        <varnode space="ram" offset="0" size="4"/>
         <register name="SP"/>
         <register name="PSW"/>
         <register name="HL0"/>
       </unaffected>
-      <localrange>
-        <range space="stackspace"/>
-      </localrange>
     </prototype>
   </default_proto>
 </compiler_spec>
