@@ -532,7 +532,8 @@
 
 # BF A.n, $addr20
 :BF A"."0, jdisp8 is opcode=0x31 & A; op_l=0x5 & op_h=0x0; jdisp8 {
-    if (A[0, 1]) goto jdisp8;
+    if (A[0, 1]) goto inst_next;
+    goto jdisp8;
 }
 
 :BF A"."1, jdisp8 is opcode=0x31 & A; op_l=0x5 & op_h=0x1; jdisp8 {
