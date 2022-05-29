@@ -184,7 +184,7 @@ sfrp: fixed_sfr is fixed_sfr & fixed_sfr_offset=0x1f {
 }
 
 sfrp: sfr_byte is sfr_byte {
-    export *[ram]:1 sfr_byte;
+    export *sfr_byte;
 }
 
 sfrpw: fixed_sfr_w is fixed_sfr_w & fixed_sfr_offset=0x1f {

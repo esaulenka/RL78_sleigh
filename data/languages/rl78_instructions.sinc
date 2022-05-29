@@ -1257,59 +1257,6 @@
     inst_decw(AddrHLOffset);
 }
 
-# SHR A, n
-:SHR A, shift_n is opcode=0x31 & A; op2_l=0xA & shift_n {
-    inst_shr(A, shift_n);
-}
-
-# SHRW AX, n
-:SHRW AX, shift_n is opcode=0x31 & AX; op2_l=0xE & shift_n {
-    inst_shr(AX, shift_n);
-}
-
-#
-# Table 14/30
-#
-
-# SHL A, n
-:SHL A, shift_n is opcode=0x31 & A; op2_l=0x9 & shift_n {
-    inst_shl(A, shift_n);
-}
-
-# SHL B, n
-:SHL B, shift_n is opcode=0x31 & B; op2_l=0x8 & shift_n {
-    inst_shl(B, shift_n);
-}
-
-# SHL C, n
-:SHL C, shift_n is opcode=0x31 & C; op2_l=0x7 & shift_n {
-    inst_shl(C, shift_n);
-}
-
-# SHLW AX, n
-:SHLW AX, shift_n is opcode=0x31 & AX; op2_l=0xD & shift_n {
-    inst_shlw(AX, shift_n);
-}
-
-# SHLW BC, n
-:SHLW BC, shift_n is opcode=0x31 & BC; op2_l=0xC & shift_n {
-    inst_shlw(BC, shift_n);
-}
-
-#
-# Table 15/30
-#
-
-# SAR A, n
-:SAR A, shift_n is opcode=0x31 & A; op2_l=0xB & shift_n {
-    inst_sar(A, shift_n);
-}
-
-# SARW AX, n
-:SARW AX, shift_n is opcode=0x31 & AX; op2_l=0xF & shift_n {
-    inst_sarw(AX, shift_n);
-}
-
 # ROR A, 1
 :ROR A, 1 is opcode=0x61 & A; opcode=0xDB {
     $(CY) = (A & 0x1) == 1;
@@ -1356,242 +1303,6 @@
     BC = BC | cy;
 }
 
-# MOV1 CY, saddr.n
-:MOV1 "CY", saddr"."bit_op_n is opcode=0x71; op_l=0x4 & bit_op_n & mov1_sreg=0; saddr {
-    mov1_read_cy(saddr, bit_op_n);
-}
-
-#
-# Table 16/30
-#
-
-# MOV1 CY, sfr.n
-:MOV1 "CY", sfrp"."bit_op_n is opcode=0x71; op_l=0xC & bit_op_n & mov1_sreg=0; sfrp {
-    mov1_read_cy(sfrp, bit_op_n);
-}
-
-# MOV1 CY, A.n
-:MOV1 "CY", A"."bit_op_n is opcode=0x71 & A; op_l=0xC & bit_op_n & mov1_sreg=1 {
-    mov1_read_cy(A, bit_op_n);
-}
-
-# MOV1 CY, PSW.n
-:MOV1 "CY", PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xC & bit_op_n; opcode=0xFA {
-    mov1_read_cy(PSW, bit_op_n);
-}
-
-# MOV1 CY, [HL].0
-:MOV1 "CY", AddrHL"."bit_op_n is opcode=0x71 & AddrHL; op_l=0x4 & bit_op_n & mov1_sreg=1 {
-    mov1_read_cy(AddrHL, bit_op_n);
-}
-
-# MOV1 saddr.n, CY
-:MOV1 saddr"."bit_op_n, "CY" is opcode=0x71; op_l=0x1 & bit_op_n & mov1_sreg=0; saddr {
-    mov1_cy_write(saddr, bit_op_n);
-}
-
-#
-# Table 17/30
-#
-
-# MOV1 sfr.n, CY
-:MOV1 sfrp"."bit_op_n, "CY" is opcode=0x71; op_l=0x9 & bit_op_n & mov1_sreg=0; sfrp {
-    mov1_cy_write(sfrp, bit_op_n);
-}
-
-# MOV1 A.n, CY
-:MOV1 A"."bit_op_n & 0x7, "CY" is opcode=0x71 & A; op_l=0x9 & bit_op_n & mov1_sreg=1 {
-    mov1_cy_write(A, bit_op_n);
-}
-
-# MOV1 PSW.n, CY
-:MOV1 PSW"."bit_op_n, "CY" is opcode=0x71 & PSW; op_l=0x9 & bit_op_n & mov1_sreg=0; opcode=0xFA {
-    mov1_cy_write(PSW, bit_op_n);
-}
-
-# MOV1 [HL].n, CY
-:MOV1 AddrHL"."bit_op_n, "CY" is opcode=0x71 & AddrHL; op_l=0x1 & bit_op_n & mov1_sreg=1 {
-    mov1_cy_write(AddrHL, bit_op_n);
-}
-
-#
-# Table 18/30
-#
-
-# AND1 CY, saddr.n
-:AND1 "CY", saddr"."bit_op_n is opcode=0x71; op_l=0x5 & bit_op_n & mov1_sreg=0; saddr {
-    inst_and1(saddr, bit_op_n);
-}
-
-# AND1 CY, sfr.n
-:AND1 "CY", sfrp"."bit_op_n is opcode=0x71; op_l=0xD & bit_op_n & mov1_sreg=0; sfrp {
-    inst_and1(sfrp, bit_op_n);
-}
-
-# AND1 CY, A.n
-:AND1 "CY", A"."bit_op_n is opcode=0x71 & A; op_l=0xD & bit_op_n & mov1_sreg=1 {
-    inst_and1(A, bit_op_n);
-}
-
-# AND1 CY, PSW.n
-:AND1 "CY", PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xD & bit_op_n & mov1_sreg=0; opcode=0xFA {
-    inst_and1(PSW, bit_op_n);
-}
-
-#
-# Table 19/30
-#
-
-# AND1 CY, [HL].n
-:AND1 "CY", AddrHL"."bit_op_n is opcode=0x71 & AddrHL; op_l=0x5 & bit_op_n & mov1_sreg=1 {
-    inst_and1(AddrHL, bit_op_n);
-}
-
-# OR1 CY, saddr.n
-:OR1 "CY", saddr"."bit_op_n is opcode=0x71; op_l=0x6 & bit_op_n & mov1_sreg=0; saddr {
-    inst_or1(saddr, bit_op_n);
-}
-
-# OR1 CY, sfr.n
-:OR1 "CY", sfrp"."bit_op_n is opcode=0x71; op_l=0xE & bit_op_n & mov1_sreg=0; sfrp {
-    inst_or1(sfrp, bit_op_n);
-}
-
-# OR1 CY, A.n
-:OR1 "CY", A"."bit_op_n is opcode=0x71 & A; op_l=0xE & bit_op_n & mov1_sreg=1 {
-    inst_or1(A, bit_op_n);
-}
-
-#
-# Table 20/30
-#
-
-# OR1 CY, PSW.n
-:OR1 "CY", PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xE & bit_op_n & mov1_sreg=0; opcode=0xFA {
-    inst_or1(PSW, bit_op_n);
-}
-
-# OR1 CY, [HL].n
-:OR1 "CY", AddrHL"."bit_op_n is opcode=0x71 & AddrHL; op_l=0x6 & bit_op_n & mov1_sreg=1 {
-    inst_or1(AddrHL, bit_op_n);
-}
-
-# XOR1 CY, saddr.n
-:XOR1 "CY", saddr"."bit_op_n is opcode=0x71; op_l=0x7 & bit_op_n & mov1_sreg=0; saddr {
-    inst_xor1(saddr, bit_op_n);
-}
-
-# XOR1 CY, sfr.n
-:XOR1 "CY", sfrp"."bit_op_n is opcode=0x71; op_l=0xF & bit_op_n & mov1_sreg=0; sfrp {
-    inst_xor(sfrp, bit_op_n);
-}
-
-#
-# Table 21/30
-#
-
-# XOR1 CY, A.n
-:XOR1 "CY", A"."bit_op_n is opcode=0x71 & A; op_l=0xF & bit_op_n & mov1_sreg=1 {
-    inst_xor(A, bit_op_n);
-}
-
-# XOR1 CY, PSW.n
-:XOR1 "CY", PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xF & bit_op_n & mov1_sreg=0; opcode=0xFA {
-    inst_xor(PSW, bit_op_n);
-}
-
-# XOR1 CY, [HL].n
-:XOR1 "CY", AddrHL"."bit_op_n is opcode=0x71 & AddrHL; op_l=0x7 & bit_op_n & mov1_sreg=1 {
-    inst_xor(PSW, bit_op_n);
-}
-
-# SET1 saddr.n
-:SET1 saddr"."bit_op_n is opcode=0x71; op_l=0x2 & bit_op_n & mov1_sreg=0; saddr {
-    inst_set1(saddr, bit_op_n);
-}
-
-#
-# Table 22/30
-#
-
-# SET1 sfr.n
-:SET1 sfrp"."bit_op_n is opcode=0x71; op_l=0xA & bit_op_n & mov1_sreg=0; sfrp {
-    inst_set1(sfrp, bit_op_n);
-}
-
-# SET1 A.n
-:SET1 A"."bit_op_n is opcode=0x71 & A; op_l=0xA & bit_op_n & mov1_sreg=1 {
-    inst_set1(A, bit_op_n);
-}
-
-# SET1 !addr16.n
-:SET1 addr16"."bit_op_n is opcode=0x71; op_l=0 & bit_op_n & mov1_sreg=0; addr16 {
-    inst_set1(addr16, bit_op_n);
-}
-
-# SET1 PSW.n
-:SET1 PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xA & bit_op_n & mov1_sreg=0; opcode=0xFA {
-    inst_set1(PSW, bit_op_n);
-}
-
-# SET1 [HL].n
-:SET1 AddrHL"."bit_op_n is opcode=0x71; op_l=0x2 & bit_op_n & mov1_sreg=1 & AddrHL {
-    inst_set1(AddrHL, bit_op_n);
-}
-
-#
-# Table 23/30
-#
-
-# CLR1 saddr.n
-:CLR1 saddr"."bit_op_n is opcode=0x71; op_l=0x3 & bit_op_n & mov1_sreg=0; saddr {
-    inst_clr1(saddr, bit_op_n);
-}
-
-# CLR1 sfr.n
-:CLR1 sfrp"."bit_op_n is opcode=0x71; op_l=0xB & bit_op_n & mov1_sreg=0; sfrp {
-    inst_clr1(sfrp, bit_op_n);
-}
-
-# CLR1 A.n
-:CLR1 A"."bit_op_n is opcode=0x71 & A; op_l=0xB & bit_op_n & mov1_sreg=1 {
-    inst_clr1(A, bit_op_n);
-}
-
-#
-# Table 24/30
-#
-
-# CLR1 !addr16.n
-:CLR1 addr16"."bit_op_n is opcode=0x71; op_l=0x8 & bit_op_n & mov1_sreg=0; addr16 {
-    inst_clr1(addr16, bit_op_n);
-}
-
-# CLR1 PSW.n
-:CLR1 PSW"."bit_op_n is opcode=0x71 & PSW; op_l=0xB & bit_op_n & mov1_sreg=0; opcode=0xFA {
-    inst_clr1(PSW, bit_op_n);
-}
-
-# CLR1 [HL].n
-:CLR1 AddrHL"."bit_op_n is opcode=0x71 & AddrHL; op_l=0x3 & bit_op_n & mov1_sreg=1 {
-    inst_clr1(AddrHL, bit_op_n);
-}
-
-# SET1 CY
-:SET1 "CY" is opcode=0x71; opcode=0x80 {
-    inst_set1($(CY), 0);
-}
-
-# CLR1 CY
-:CLR1 "CY" is opcode=0x71; opcode=0x88 {
-    inst_clr1($(CY), 0);
-}
-
-# NOT1 CY
-:NOT1 "CY" is opcode=0x71; opcode=0xC0 {
-    $(CY) = ~$(CY) & 0x1;
-}
-
 #
 # Table 25/30
 #
@@ -1623,11 +1334,8 @@
 
 # BRK
 :BRK is opcode=0x61; opcode=0xCC & brk_addr {
-
     $(IE) = 0;
-    PSW = PSW & 0x7f;
-
-    PC = brk_addr;
+    disable_interrupts();
     call brk_addr;
 }
 
@@ -1708,162 +1416,52 @@
 
 # BR $addr20
 :BR jdisp8 is opcode=0xEF; jdisp8 {
-    branch(jdisp8);
+    goto jdisp8;
 }
 
 # BR $!addr20
 :BR jdisp16 is opcode=0xEE; jdisp16 {
-    branch(jdisp16);
+    goto jdisp16;
 }
 
 # BR !addr16
 :BR jaddr16 is opcode=0xED; jaddr16 {
-    branch(jaddr16);
+    goto jaddr16;
 }
 
 # BR !!addr20
 :BR addr20 is opcode=0xEC; addr20 {
-    branch(addr20);
+    goto addr20;
 }
 
 # BC $addr20
-# P-code doesn't allow for conditional register updates
-# Only a conditional goto
 :BC jdisp8 is opcode=0xDC; jdisp8 {
-    if ($(CY)) goto <b>;
-    goto inst_next;
-    <b>
-    branch(jdisp8);
+    if ($(CY)) goto jdisp8;
 }
 
 # BNC $addr20
 :BNC jdisp8 is opcode=0xDE; jdisp8 {
-    if (!$(CY)) goto <b>;
-    goto inst_next;
-    <b>
-    branch(jdisp8);
+    if (!$(CY)) goto jdisp8;
 }
 
 # BZ $addr20
 :BZ jdisp8 is opcode=0xDD; jdisp8 {
-    if ($(Z)) goto <b>;
-    goto inst_next;
-    <b>
-    branch(jdisp8);
+    if ($(Z)) goto jdisp8;
 }
 
 # BNZ $addr20
 :BNZ jdisp8 is opcode=0xDF; jdisp8 {
-    if (!$(Z)) goto <b>;
-    goto inst_next;
-    <b>
-    branch(jdisp8);
+    if (!$(Z)) goto jdisp8;
 }
 
 # BH $addr20
 :BH jdisp8 is opcode=0x61; opcode=0xC3; jdisp8 {
-    if (!($(Z) | $(CY))) goto <b>;
-    goto inst_next;
-    <b>
-    branch(jdisp8);
+    if (!($(Z) | $(CY))) goto jdisp8;
 }
 
 # BNH $addr20
 :BNH jdisp8 is opcode=0x61; opcode=0xD3; jdisp8 {
-    if ($(Z) | $(CY)) goto <b>;
-    goto inst_next;
-    <b>
-    branch(jdisp8);
-}
-
-# BT saddr.n, $addr20
-:BT saddr"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x2 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
-    inst_bt(saddr, bit_op_n, jdisp8);
-}
-
-# BT sfr.n, $addr20
-:BT sfrp"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x2 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
-    inst_bt(sfrp, bit_op_n, jdisp8);
-}
-
-#
-# Table 27/30
-#
-
-# BT A.n, $addr20
-:BT A"."bit_op_n, jdisp8 is opcode=0x31 & A; op_l=0x3 & bit_op_n & mov1_sreg=0; jdisp8 {
-    inst_bt(A, bit_op_n, jdisp8);
-}
-
-# BT PSW.n, $addr20
-:BT PSW"."bit_op_n, jdisp8 is opcode=0x31 & PSW; op_l=0x2 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
-    inst_bt(PSW, bit_op_n, jdisp8);
-}
-
-# BT [HL].n, $addr20
-:BT AddrHL"."bit_op_n, jdisp8 is opcode=0x31 & AddrHL; op_l=0x3 & bit_op_n & mov1_sreg=1; jdisp8 {
-    inst_bt(AddrHL, bit_op_n, jdisp8);
-}
-
-# BF saddr.n, $addr20
-:BF saddr"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x4 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
-    inst_bf(saddr, bit_op_n, jdisp8);
-}
-
-#
-# Table 28/30
-#
-
-############################################
-########## TODO THIS IS WRONG! #############
-############################################
-# BF sfr.n, $addr20
-:BF sfrp"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x4 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
-    inst_bf(sfrp, bit_op_n, jdisp8);
-}
-
-# BF A.n, $addr20
-:BF A"."bit_op_n, jdisp8 is opcode=0x31 & A; op_l=0x5 & bit_op_n & mov1_sreg=0; jdisp8 {
-    inst_bf(A, bit_op_n, jdisp8);
-}
-
-# BF PSW.n, $addr20
-:BF PSW"."bit_op_n, jdisp8 is opcode=0x31 & PSW; op_l=0x4 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
-    inst_bf(PSW, bit_op_n, jdisp8);
-}
-
-# BF [HL].n, $addr20
-:BF AddrHL"."bit_op_n, jdisp8 is opcode=0x31 & AddrHL; op_l=0x5 & bit_op_n & mov1_sreg=1; jdisp8 {
-    inst_bf(AddrHL, bit_op_n, jdisp8);
-}
-
-#
-# Table 29/30
-#
-
-# BTCLR saddr.n, $addr20
-:BTCLR saddr"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x0 & bit_op_n & mov1_sreg=0; saddr; jdisp8 {
-    inst_btclr(saddr, bit_op_n, jdisp8);
-}
-
-# BTCLR sfr.n, $addr20
-:BTCLR sfrp"."bit_op_n, jdisp8 is opcode=0x31; op_l=0x0 & bit_op_n & mov1_sreg=1; sfrp; jdisp8 {
-    inst_btclr(sfrp, bit_op_n, jdisp8);
-}
-
-# BTCRL A.n, $addr20
-:BTCLR A"."bit_op_n, jdisp8 is opcode=0x31 & A; op_l=0x1 & bit_op_n & mov1_sreg=0; jdisp8 {
-    inst_btclr(A, bit_op_n, jdisp8);
-}
-
-# BTCLR PSW.n, $addr20
-:BTCLR PSW"."bit_op_n, jdisp8 is opcode=0x31 & PSW; op_l=0x0 & bit_op_n & mov1_sreg=1; opcode=0xFA; jdisp8 {
-    inst_btclr(PSW, bit_op_n, jdisp8);
-}
-
-# BTCRL [HL].n, $addr20
-:BTCLR AddrHL"."bit_op_n, jdisp8 is opcode=0x31 & AddrHL; op_l=0x1 & bit_op_n & mov1_sreg=1; jdisp8 {
-    inst_btclr(AddrHL, bit_op_n, jdisp8);
+    if (!($(Z) | $(CY))) goto jdisp8;
 }
 
 SKIP_TARGET: loc is skip_mode=1 [ loc = inst_next + 1; ] {
@@ -1895,7 +1493,7 @@ SKIP_TARGET: loc is skip_mode=5 [ loc = inst_next + 5; ] {
     if ($(CY)) goto <skip>;
     goto inst_next;
     <skip>
-    branch(SKIP_TARGET);
+    goto SKIP_TARGET;
 }
 
 # SKNC
@@ -1903,7 +1501,7 @@ SKIP_TARGET: loc is skip_mode=5 [ loc = inst_next + 5; ] {
     if (!$(CY)) goto <skip>;
     goto inst_next;
     <skip>
-    branch(SKIP_TARGET);
+    goto SKIP_TARGET;
 }
 
 # SKZ
@@ -1911,7 +1509,7 @@ SKIP_TARGET: loc is skip_mode=5 [ loc = inst_next + 5; ] {
     if ($(Z)) goto <skip>;
     goto inst_next;
     <skip>
-    branch(SKIP_TARGET);
+    goto SKIP_TARGET;
 }
 
 # SKNZ
@@ -1919,7 +1517,7 @@ SKIP_TARGET: loc is skip_mode=5 [ loc = inst_next + 5; ] {
     if (!$(Z)) goto <skip>;
     goto inst_next;
     <skip>
-    branch(SKIP_TARGET);
+    goto SKIP_TARGET;
 }
 
 # SKH
@@ -1927,7 +1525,7 @@ SKIP_TARGET: loc is skip_mode=5 [ loc = inst_next + 5; ] {
     if ($(Z) | $(CY)) goto <skip>;
     goto inst_next;
     <skip>
-    branch(SKIP_TARGET);
+    goto SKIP_TARGET;
 }
 
 # SKNH
@@ -1935,7 +1533,7 @@ SKIP_TARGET: loc is skip_mode=5 [ loc = inst_next + 5; ] {
     if (!($(Z) | $(CY))) goto <skip>;
     goto inst_next;
     <skip>
-    branch(SKIP_TARGET);
+    goto SKIP_TARGET;
 }
 
 # SEL RBn
@@ -1946,18 +1544,6 @@ SKIP_TARGET: loc is skip_mode=5 [ loc = inst_next + 5; ] {
 
 # NOP
 :NOP is opcode=0x00 {}
-
-# EI
-:EI is opcode=0x71; opcode=0x7A; opcode=0xFA {
-    $(IE) = 1;
-    enable_interrupts();
-}
-
-# DI
-:DI is opcode=0x71; opcode=0x7B; opcode=0xFA {
-    $(IE) = 0;
-    disable_interrupts();
-}
 
 # HALT
 :HALT is opcode=0x61; opcode=0xED { halt(); }

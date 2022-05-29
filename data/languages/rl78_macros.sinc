@@ -130,55 +130,6 @@ macro inst_clr1(dst, bit) {
     dst = dst & ~(1 << bit);
 }
 
-macro mov1_read(dst, src, bit) {
-    dst = (src & (1 << bit)) != 0;
-}
-
-macro mov1_read_cy(src, bit) {
-    $(CY) = (src & (1 << bit)) != 0;
-}
-
-macro mov1_write(dst, src, bit) {
-    inst_clr1(dst, bit);
-    dst = dst | (src & (1 << bit));
-}
-
-macro mov1_cy_write(dst, bit) {
-    inst_clr1(dst, bit);
-    dst = dst | ($(CY) << bit);
-}
-
-# Destination for AND1 is always $(CY)
-macro inst_and1(src, bit) {
-    $(CY) = $(CY) && ((src & (1 << bit)) != 0);
-}
-
-# Destination for OR1 is always $(CY)
-macro inst_or1(src, bit) {
-    $(CY) = $(CY) || ((src & (1 << bit)) != 0);
-}
-
-# Destination for XOR1 is always $(CY)
-macro inst_xor1(src, bit) {
-    $(CY) = $(CY) ^ ((src & (1 << bit)) != 0);
-}
-
-macro inst_set1(dst, bit) {
-    dst = dst | (1 << bit);
-}
-
-macro branch(target) {
-    PC = target;
-    goto target;
-}
-
-macro inst_bt(src, bit, target) {
-    if (src & (1 << bit)) goto target;
-}
-
-macro inst_bf(src, bit, target) {
-    if (!(src & (1 << bit))) goto target;
-}
 
 macro inst_btclr(src, bit, target) {
     if (!(src & (1 << bit))) goto inst_next;

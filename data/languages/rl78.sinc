@@ -226,6 +226,7 @@ define token base (8)
     mov1_sreg   = (7, 7)
     # The n'th bit to use for *1 instructions
     bit_op_n = (4, 6)
+    bit_n = (4, 6)
     # Register bank selection also uses the same bits
     # as the bitwise operators
     rbs_op_n = (4, 5)
