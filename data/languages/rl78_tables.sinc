@@ -147,12 +147,20 @@ saddrp: uaddr8 is uaddr8 & saddr_val {
 
 direct_addr_val: val is uaddr16 [val = 0xF0000 + uaddr16; ] { export *[const]:3 val; }
 
-addr16: "!"uaddr16 is es_prefix=0 & uaddr16 & direct_addr_val {
-    export *[ram]:1 direct_addr_val;
+#addr16: "!"uaddr16 is es_prefix=0 & uaddr16 & direct_addr_val {
+#    export *[ram]:1 direct_addr_val;
+#}
+
+addr16: ext_sfr is es_prefix=0 & ext_sfr {
+    export ext_sfr;
 }
 
 addr16: a16_sfr_reg is es_prefix=0 & a16_sfr_reg & a16_sfr_offset=0x1fff {
     export a16_sfr_reg;
+}
+
+addr16: uaddr16 is es_prefix=0 & uaddr16 & (a16_bit7=1 |a16_bit4_6!=0) & direct_addr_val {
+    export *[ram]:1 direct_addr_val;
 }
 
 addr16: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
@@ -161,7 +169,15 @@ addr16: ES:"!"uaddr16 is es_prefix=1 & uaddr16 & ES {
     export *[ram]:1 loc;
 }
 
-addr16w: "!"uaddr16 is es_prefix=0 & uaddr16 & direct_addr_val {
+#addr16w: "!"uaddr16 is es_prefix=0 & uaddr16 & direct_addr_val {
+#    export *[ram]:2 direct_addr_val;
+#}
+
+addr16w: ext_sfrw is es_prefix=0 & ext_sfrw {
+    export ext_sfrw;
+}
+
+addr16w: uaddr16 is uaddr16 & (a16_bit7=1 |a16_bit4_6!=0) & direct_addr_val {
     export *[ram]:2 direct_addr_val;
 }
 
@@ -254,7 +270,13 @@ AddrDEOffsetW: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
     export *[near]:2 loc;
 }
 
-AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES {
+AddrDEOffsetW: ES:[DE] is es_prefix=1 & DE & data=0 & ES {
+    local loc:3;
+    direct_addr_es(ES, DE, loc);
+    export *[ram]:2 loc;
+}
+
+AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & data!=0 & ES {
     local loc:3;
     direct_addr_es(ES, DE, loc);
     loc = loc + uaddr8;

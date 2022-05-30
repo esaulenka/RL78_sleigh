@@ -500,6 +500,11 @@
     AX = AddrWordOffsetBCW;
 }
 
+# MOVW word[BC], AX
+:MOVW AX, AddrWordOffsetBCW is opcode=0x78 & AX; AddrWordOffsetBCW {
+    AddrWordOffsetBCW = AX;
+}
+
 # MOVW AX, [SP+byte]
 :MOVW AX, AddrSPOffsetW is opcode=0xA8 & AX; AddrSPOffsetW {
     AX = AddrSPOffsetW;
