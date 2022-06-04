@@ -30,33 +30,15 @@
   <default_proto>
     <prototype name="__v2_call" strategy="register" extrapop="4" stackshift="4">
     <input killedbycall="true" pointermax="4">
-      <group>
-        <pentry minsize="1" maxsize="1">
-          <register name="A0"/>
-        </pentry>
-        <pentry minsize="2" maxsize="2">
-          <register name="AX0"/>
-        </pentry>
-      </group>
-      <group>
-        <pentry minsize="1" maxsize="1">
-          <register name="B0"/>
-        </pentry>
-        <pentry minsize="2" maxsize="2">
-          <register name="BC0"/>
-        </pentry>
-      </group>
+      <pentry minsize="1" maxsize="2">
+        <register name="AX0"/>
+      </pentry>
+      <pentry minsize="1" maxsize="2">
+        <register name="BC0"/>
+      </pentry>
       <pentry minsize="3" maxsize="3" metatype="pointer">
         <addr space="join" piece1="C0" piece2="AX0"/>
       </pentry>
-      <group>
-        <pentry minsize="1" maxsize="1">
-          <register name="D0"/>
-        </pentry>
-        <pentry minsize="2" maxsize="2">
-          <register name="DE0"/>
-        </pentry>
-      </group>
       <pentry minsize="4" maxsize="4">
         <addr space="join" piece1="DE0" piece2="BC0"/>
       </pentry>
@@ -70,27 +52,21 @@
           <register name="A0"/>
         </pentry>
         <pentry minsize="2" maxsize="2">
-          <register name="AX0"/>
-        </pentry>
-        <pentry minsize="3" maxsize="3" metatype="ptr">
-          <addr space="join" piece1="A0" piece2="DE0"/>
-        </pentry>
-        <pentry minsize="3" maxsize="3" metatype="struct">
-          <addr space="join" piece1="C0" piece2="AX0"/>
-        </pentry>
-        <pentry minsize="4" maxsize="4">
-          <addr space="join" piece1="BC0" piece2="AX0"/>
+          <register name="BC0"/>
         </pentry>
       </output>
       <killedbycall>
         <register name="CES"/>
       </killedbycall>
       <unaffected>
-        <varnode space="ram" offset="0" size="4"/>
+        <varnode space="stack" offset="0" size="4"/>
         <register name="SP"/>
         <register name="PSW"/>
         <register name="HL0"/>
       </unaffected>
+      <localrange>
+        <range space="stack" first="0x8000" last="0xffff"/>
+      </localrange>
     </prototype>
   </default_proto>
 </compiler_spec>

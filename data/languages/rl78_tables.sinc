@@ -253,6 +253,20 @@ AddrDEW: ES:[DE] is es_prefix=1 & DE & ES {
     export *[ram]:2 loc;
 }
 
+AddrDEOffset: [DE] is es_prefix=0 & DE & uaddr8=0 {
+    export *[near]:1 DE;
+}
+
+AddrDEOffset: ES:[DE] is es_prefix=1 & DE & uaddr8=0 & ES {
+    local loc:3;
+    direct_addr_es(ES, DE, loc);
+    export *[ram]:1 loc;
+}
+
+AddrDEOffsetW: [DE] is es_prefix=0 & DE & uaddr8=0 {
+    export *[near]:2 DE;
+}
+
 AddrDEOffset: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
     loc = DE + uaddr8;
     export *[near]:1 loc;
@@ -260,8 +274,8 @@ AddrDEOffset: [DE+uaddr8] is es_prefix=0 & DE & uaddr8 {
 
 AddrDEOffset: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & ES {
     local loc:3;
-    direct_addr_es(ES, DE, loc);
-    loc = loc + uaddr8;
+    tmp:2 = DE + uaddr8;
+    direct_addr_es(ES, tmp, loc);
     export *[ram]:1 loc;
 }
 
@@ -278,8 +292,8 @@ AddrDEOffsetW: ES:[DE] is es_prefix=1 & DE & data=0 & ES {
 
 AddrDEOffsetW: ES:[DE+uaddr8] is es_prefix=1 & DE & uaddr8 & data!=0 & ES {
     local loc:3;
-    direct_addr_es(ES, DE, loc);
-    loc = loc + uaddr8;
+    tmp:2 = DE + uaddr8;
+    direct_addr_es(ES, tmp, loc);
     export *[ram]:2 loc;
 }
 
@@ -303,6 +317,16 @@ AddrHLW: ES:[HL] is es_prefix=1 & HL & ES {
     export *[ram]:2 loc;
 }
 
+AddrHLOffset: [HL] is es_prefix=0 & HL & uaddr8=0 {
+    export *[near]:1 HL;
+}
+
+AddrHLOffset: ES:[HL] is es_prefix=1 & HL & uaddr8=0 & ES {
+    local loc:3;
+    direct_addr_es(ES, HL, loc);
+    export *[ram]:1 loc;
+}
+
 AddrHLOffset: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
     loc = HL + uaddr8;
     export *[near]:1 loc;
@@ -310,8 +334,8 @@ AddrHLOffset: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
 
 AddrHLOffset: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES {
     local loc:3;
-    direct_addr_es(ES, HL, loc);
-    loc = loc + uaddr8;
+    tmp:2 = HL + uaddr8;
+    direct_addr_es(ES, tmp, loc);
     export *[ram]:1 loc;
 }
 
@@ -322,8 +346,8 @@ AddrHLOffsetW: [HL+uaddr8] is es_prefix=0 & HL & uaddr8 {
 
 AddrHLOffsetW: ES:[HL+uaddr8] is es_prefix=1 & HL & uaddr8 & ES {
     local loc:3;
-    direct_addr_es(ES, HL, loc);
-    loc = loc + uaddr8;
+    tmp:2 = HL + uaddr8;
+    direct_addr_es(ES, tmp, loc);
     export *[ram]:2 loc;
 }
 
@@ -340,8 +364,8 @@ AddrHLOffsetB: [HL+B] is es_prefix=0 & HL & B {
 
 AddrHLOffsetB: ES:[HL+B] is es_prefix=1 & HL & B & ES {
     local loc:3;
-    direct_addr_es(ES, HL, loc);
-    loc = loc + zext(B);
+    tmp:2 = HL + zext(B);
+    direct_addr_es(ES, tmp, loc);
     export *[ram]:1 loc;
 }
 
@@ -352,8 +376,8 @@ AddrHLOffsetC: [HL+C] is es_prefix=0 & HL & C {
 
 AddrHLOffsetC: ES:[HL+C] is es_prefix=1 & HL & C & ES {
     local loc:3;
-    direct_addr_es(ES, HL, loc);
-    loc = loc + zext(C);
+    tmp:2 = HL + zext(C);
+    direct_addr_es(ES, tmp, loc);
     export *[ram]:1 loc;
 }
 
@@ -364,8 +388,8 @@ AddrWordOffsetB: uaddr16[B] is es_prefix=0 & uaddr16 & B & direct_addr_val {
 
 AddrWordOffsetB: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
     local loc:3;
-    direct_addrb_es(ES, uaddr16:2, loc);
-    loc = loc + zext(B);
+    tmp:2 = uaddr16 + zext(B);
+    direct_addrb_es(ES, tmp, loc);
     export *[ram]:1 loc;
 }
 
@@ -376,8 +400,8 @@ AddrWordOffsetBW: uaddr16[B] is es_prefix=0 & uaddr16 & B & direct_addr_val {
 
 AddrWordOffsetBW: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
     local loc:3;
-    direct_addrb_es(ES, uaddr16:2, loc);
-    loc = loc + zext(B);
+    tmp:2 = uaddr16 + zext(B);
+    direct_addrb_es(ES, tmp, loc);
     export *[ram]:2 loc;
 }
 
@@ -400,8 +424,8 @@ AddrWordOffsetCW: uaddr16[C] is es_prefix=0 & uaddr16 & C & direct_addr_val {
 
 AddrWordOffsetCW: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
     local loc:3;
-    direct_addrb_es(ES, uaddr16:2, loc);
-    loc = loc + zext(C);
+    tmp:2 = uaddr16 + zext(C);
+    direct_addrb_es(ES, tmp, loc);
     export *[ram]:2 loc;
 }
 
@@ -412,7 +436,7 @@ AddrWordOffsetBC: uaddr16[BC] is es_prefix=0 & uaddr16 & BC & direct_addr_val {
 
 AddrWordOffsetBC: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
     local loc:3;
-    direct_addr_es(ES, uaddr16:2, loc);
+    direct_addr_es(ES, BC, loc);
     loc = loc + zext(BC);
     export *[ram]:1 loc;
 }
@@ -424,19 +448,27 @@ AddrWordOffsetBCW: uaddr16[BC] is es_prefix=0 & uaddr16 & BC & direct_addr_val {
 
 AddrWordOffsetBCW: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
     local loc:3;
-    direct_addr_es(ES, uaddr16:2, loc);
-    loc = loc + zext(BC);
+    tmp:2 = BC + uaddr16:2;
+    direct_addr_es(ES, tmp, loc);
     export *[ram]:2 loc;
+}
+
+AddrSPOffset: [SP] is uaddr8=0 & SP {
+    export *[near]:1 SP;
+}
+
+AddrSPOffsetW: [SP] is uaddr8=0 & SP {
+    export *[near]:2 SP;
 }
 
 AddrSPOffset: [SP+uaddr8] is uaddr8 & SP {
     local loc:2 = SP + uaddr8;
-    export *:1 loc;
+    export *[near]:1 loc;
 }
 
 AddrSPOffsetW: [SP+uaddr8] is uaddr8 & SP {
     local loc:2 = SP + uaddr8;
-    export *:2 loc;
+    export *[near]:2 loc;
 }
 
 ct_entry: val is op2_callt_low & op2_callt_hi
