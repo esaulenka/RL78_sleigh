@@ -64,67 +64,67 @@
 }
 
 # BTCLR sfr.n, $addr20
-:BTCLR sfrp"."0, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x8; sfrp; jdisp8 {
-    if (sfrp[0, 1]) goto <clear>;
+:BTCLR sfr"."0, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x8; sfr; jdisp8 {
+    if (sfr[0, 1]) goto <clear>;
     goto inst_next;
     <clear>
-    sfrp[0, 1] = 0;
+    sfr[0, 1] = 0;
     goto jdisp8;
 }
 
-:BTCLR sfrp"."1, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x9; sfrp; jdisp8 {
-    if (sfrp[1, 1]) goto <clear>;
+:BTCLR sfr"."1, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x9; sfr; jdisp8 {
+    if (sfr[1, 1]) goto <clear>;
     goto inst_next;
     <clear>
-    sfrp[1, 1] = 0;
+    sfr[1, 1] = 0;
     goto jdisp8;
 }
 
-:BTCLR sfrp"."2, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xA; sfrp; jdisp8 {
-    if (sfrp[2, 1]) goto <clear>;
+:BTCLR sfr"."2, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xA; sfr; jdisp8 {
+    if (sfr[2, 1]) goto <clear>;
     goto inst_next;
     <clear>
-    sfrp[2, 1] = 0;
+    sfr[2, 1] = 0;
     goto jdisp8;
 }
 
-:BTCLR sfrp"."3, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xB; sfrp; jdisp8 {
-    if (sfrp[3, 1]) goto <clear>;
+:BTCLR sfr"."3, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xB; sfr; jdisp8 {
+    if (sfr[3, 1]) goto <clear>;
     goto inst_next;
     <clear>
-    sfrp[3, 1] = 0;
+    sfr[3, 1] = 0;
     goto jdisp8;
 }
 
-:BTCLR sfrp"."4, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xC; sfrp; jdisp8 {
-    if (sfrp[4, 1]) goto <clear>;
+:BTCLR sfr"."4, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xC; sfr; jdisp8 {
+    if (sfr[4, 1]) goto <clear>;
     goto inst_next;
     <clear>
-    sfrp[4, 1] = 0;
+    sfr[4, 1] = 0;
     goto jdisp8;
 }
 
-:BTCLR sfrp"."5, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xD; sfrp; jdisp8 {
-    if (sfrp[5, 1]) goto <clear>;
+:BTCLR sfr"."5, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xD; sfr; jdisp8 {
+    if (sfr[5, 1]) goto <clear>;
     goto inst_next;
     <clear>
-    sfrp[5, 1] = 0;
+    sfr[5, 1] = 0;
     goto jdisp8;
 }
 
-:BTCLR sfrp"."6, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xE; sfrp; jdisp8 {
-    if (sfrp[6, 1]) goto <clear>;
+:BTCLR sfr"."6, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xE; sfr; jdisp8 {
+    if (sfr[6, 1]) goto <clear>;
     goto inst_next;
     <clear>
-    sfrp[6, 1] = 0;
+    sfr[6, 1] = 0;
     goto jdisp8;
 }
 
-:BTCLR sfrp"."7, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xF; sfrp; jdisp8 {
-    if (sfrp[7, 1]) goto <clear>;
+:BTCLR sfr"."7, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xF; sfr; jdisp8 {
+    if (sfr[7, 1]) goto <clear>;
     goto inst_next;
     <clear>
-    sfrp[7, 1] = 0;
+    sfr[7, 1] = 0;
     goto jdisp8;
 }
 
@@ -332,36 +332,36 @@
 }
 
 # BT sfr.n, $addr20
-:BT sfrp"."0, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x8; sfrp; jdisp8 {
-    if (sfrp[0, 1]) goto jdisp8;
+:BT sfr"."0, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x8; sfr; jdisp8 {
+    if (sfr[0, 1]) goto jdisp8;
 }
 
-:BT sfrp"."1, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x9; sfrp; jdisp8 {
-    if (sfrp[1, 1]) goto jdisp8;
+:BT sfr"."1, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x9; sfr; jdisp8 {
+    if (sfr[1, 1]) goto jdisp8;
 }
 
-:BT sfrp"."2, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xA; sfrp; jdisp8 {
-    if (sfrp[2, 1]) goto jdisp8;
+:BT sfr"."2, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xA; sfr; jdisp8 {
+    if (sfr[2, 1]) goto jdisp8;
 }
 
-:BT sfrp"."3, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xB; sfrp; jdisp8 {
-    if (sfrp[3, 1]) goto jdisp8;
+:BT sfr"."3, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xB; sfr; jdisp8 {
+    if (sfr[3, 1]) goto jdisp8;
 }
 
-:BT sfrp"."4, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xC; sfrp; jdisp8 {
-    if (sfrp[4, 1]) goto jdisp8;
+:BT sfr"."4, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xC; sfr; jdisp8 {
+    if (sfr[4, 1]) goto jdisp8;
 }
 
-:BT sfrp"."5, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xD; sfrp; jdisp8 {
-    if (sfrp[5, 1]) goto jdisp8;
+:BT sfr"."5, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xD; sfr; jdisp8 {
+    if (sfr[5, 1]) goto jdisp8;
 }
 
-:BT sfrp"."6, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xE; sfrp; jdisp8 {
-    if (sfrp[6, 1]) goto jdisp8;
+:BT sfr"."6, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xE; sfr; jdisp8 {
+    if (sfr[6, 1]) goto jdisp8;
 }
 
-:BT sfrp"."7, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xF; sfrp; jdisp8 {
-    if (sfrp[7, 1]) goto jdisp8;
+:BT sfr"."7, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xF; sfr; jdisp8 {
+    if (sfr[7, 1]) goto jdisp8;
 }
 
 :BT "AC", jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xB; sfr_byte=0xFA; jdisp8 {
@@ -489,43 +489,43 @@
 }
 
 # BF sfr.n, $addr20
-:BF sfrp"."0, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x8; sfrp; jdisp8 {
-    if (sfrp[0, 1]) goto inst_next;
+:BF sfr"."0, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x8; sfr; jdisp8 {
+    if (sfr[0, 1]) goto inst_next;
     goto jdisp8;
 }
 
-:BF sfrp"."1, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x9; sfrp; jdisp8 {
-    if (sfrp[1, 1]) goto inst_next;
+:BF sfr"."1, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x9; sfr; jdisp8 {
+    if (sfr[1, 1]) goto inst_next;
     goto jdisp8;
 }
 
-:BF sfrp"."2, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xA; sfrp; jdisp8 {
-    if (sfrp[2, 1]) goto inst_next;
+:BF sfr"."2, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xA; sfr; jdisp8 {
+    if (sfr[2, 1]) goto inst_next;
     goto jdisp8;
 }
 
-:BF sfrp"."3, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xB; sfrp; jdisp8 {
-    if (sfrp[3, 1]) goto inst_next;
+:BF sfr"."3, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xB; sfr; jdisp8 {
+    if (sfr[3, 1]) goto inst_next;
     goto jdisp8;
 }
 
-:BF sfrp"."4, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xC; sfrp; jdisp8 {
-    if (sfrp[4, 1]) goto inst_next;
+:BF sfr"."4, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xC; sfr; jdisp8 {
+    if (sfr[4, 1]) goto inst_next;
     goto jdisp8;
 }
 
-:BF sfrp"."5, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xD; sfrp; jdisp8 {
-    if (sfrp[5, 1]) goto inst_next;
+:BF sfr"."5, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xD; sfr; jdisp8 {
+    if (sfr[5, 1]) goto inst_next;
     goto jdisp8;
 }
 
-:BF sfrp"."6, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xE; sfrp; jdisp8 {
-    if (sfrp[6, 1]) goto inst_next;
+:BF sfr"."6, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xE; sfr; jdisp8 {
+    if (sfr[6, 1]) goto inst_next;
     goto jdisp8;
 }
 
-:BF sfrp"."7, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xF; sfrp; jdisp8 {
-    if (sfrp[7, 1]) goto inst_next;
+:BF sfr"."7, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xF; sfr; jdisp8 {
+    if (sfr[7, 1]) goto inst_next;
     goto jdisp8;
 }
 

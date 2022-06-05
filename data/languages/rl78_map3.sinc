@@ -557,36 +557,36 @@
 }
 
 # MOV1 sfr.n, CY
-:MOV1 sfrp"."0, "CY" is opcode=0x71; op_l=0x9 & op_h=0x0; sfrp {
-    sfrp[0, 1] = $(CY);
+:MOV1 sfr"."0, "CY" is opcode=0x71; op_l=0x9 & op_h=0x0; sfr {
+    sfr[0, 1] = $(CY);
 }
 
-:MOV1 sfrp"."1, "CY" is opcode=0x71; op_l=0x9 & op_h=0x1; sfrp {
-    sfrp[1, 1] = $(CY);
+:MOV1 sfr"."1, "CY" is opcode=0x71; op_l=0x9 & op_h=0x1; sfr {
+    sfr[1, 1] = $(CY);
 }
 
-:MOV1 sfrp"."2, "CY" is opcode=0x71; op_l=0x9 & op_h=0x2; sfrp {
-    sfrp[2, 1] = $(CY);
+:MOV1 sfr"."2, "CY" is opcode=0x71; op_l=0x9 & op_h=0x2; sfr {
+    sfr[2, 1] = $(CY);
 }
 
-:MOV1 sfrp"."3, "CY" is opcode=0x71; op_l=0x9 & op_h=0x3; sfrp {
-    sfrp[3, 1] = $(CY);
+:MOV1 sfr"."3, "CY" is opcode=0x71; op_l=0x9 & op_h=0x3; sfr {
+    sfr[3, 1] = $(CY);
 }
 
-:MOV1 sfrp"."4, "CY" is opcode=0x71; op_l=0x9 & op_h=0x4; sfrp {
-    sfrp[4, 1] = $(CY);
+:MOV1 sfr"."4, "CY" is opcode=0x71; op_l=0x9 & op_h=0x4; sfr {
+    sfr[4, 1] = $(CY);
 }
 
-:MOV1 sfrp"."5, "CY" is opcode=0x71; op_l=0x9 & op_h=0x5; sfrp {
-    sfrp[5, 1] = $(CY);
+:MOV1 sfr"."5, "CY" is opcode=0x71; op_l=0x9 & op_h=0x5; sfr {
+    sfr[5, 1] = $(CY);
 }
 
-:MOV1 sfrp"."6, "CY" is opcode=0x71; op_l=0x9 & op_h=0x6; sfrp {
-    sfrp[6, 1] = $(CY);
+:MOV1 sfr"."6, "CY" is opcode=0x71; op_l=0x9 & op_h=0x6; sfr {
+    sfr[6, 1] = $(CY);
 }
 
-:MOV1 sfrp"."7, "CY" is opcode=0x71; op_l=0x9 & op_h=0x7; sfrp {
-    sfrp[7, 1] = $(CY);
+:MOV1 sfr"."7, "CY" is opcode=0x71; op_l=0x9 & op_h=0x7; sfr {
+    sfr[7, 1] = $(CY);
 }
 
 :NOP is opcode=0x71; op_l=0x9 & op_h=0x0; sfr_byte=0xFA {
@@ -645,36 +645,36 @@
 }
 
 # SET1 sfr.n
-:SET1 sfrp"."0 is opcode=0x71; op_l=0xA & op_h=0x0; sfrp {
-    sfrp[0, 1] = 1;
+:SET1 sfr"."0 is opcode=0x71; op_l=0xA & op_h=0x0; sfr {
+    sfr[0, 1] = 1;
 }
 
-:SET1 sfrp"."1 is opcode=0x71; op_l=0xA & op_h=0x1; sfrp {
-    sfrp[1, 1] = 1;
+:SET1 sfr"."1 is opcode=0x71; op_l=0xA & op_h=0x1; sfr {
+    sfr[1, 1] = 1;
 }
 
-:SET1 sfrp"."2 is opcode=0x71; op_l=0xA & op_h=0x2; sfrp {
-    sfrp[2, 1] = 1;
+:SET1 sfr"."2 is opcode=0x71; op_l=0xA & op_h=0x2; sfr {
+    sfr[2, 1] = 1;
 }
 
-:SET1 sfrp"."3 is opcode=0x71; op_l=0xA & op_h=0x3; sfrp {
-    sfrp[3, 1] = 1;
+:SET1 sfr"."3 is opcode=0x71; op_l=0xA & op_h=0x3; sfr {
+    sfr[3, 1] = 1;
 }
 
-:SET1 sfrp"."4 is opcode=0x71; op_l=0xA & op_h=0x4; sfrp {
-    sfrp[4, 1] = 1;
+:SET1 sfr"."4 is opcode=0x71; op_l=0xA & op_h=0x4; sfr {
+    sfr[4, 1] = 1;
 }
 
-:SET1 sfrp"."5 is opcode=0x71; op_l=0xA & op_h=0x5; sfrp {
-    sfrp[5, 1] = 1;
+:SET1 sfr"."5 is opcode=0x71; op_l=0xA & op_h=0x5; sfr {
+    sfr[5, 1] = 1;
 }
 
-:SET1 sfrp"."6 is opcode=0x71; op_l=0xA & op_h=0x6; sfrp {
-    sfrp[6, 1] = 1;
+:SET1 sfr"."6 is opcode=0x71; op_l=0xA & op_h=0x6; sfr {
+    sfr[6, 1] = 1;
 }
 
-:SET1 sfrp"."7 is opcode=0x71; op_l=0xA & op_h=0x7; sfrp {
-    sfrp[7, 1] = 1;
+:SET1 sfr"."7 is opcode=0x71; op_l=0xA & op_h=0x7; sfr {
+    sfr[7, 1] = 1;
 }
 
 :SET1 "CY" is opcode=0x71; op_l=0xA & op_h=0x0; sfr_byte=0xFA {
@@ -729,36 +729,36 @@
 }
 
 # CLR1 sfr.n
-:CLR1 sfrp"."0 is opcode=0x71; op_l=0xB & op_h=0x0; sfrp {
-    sfrp[0, 1] = 0;
+:CLR1 sfr"."0 is opcode=0x71; op_l=0xB & op_h=0x0; sfr {
+    sfr[0, 1] = 0;
 }
 
-:CLR1 sfrp"."1 is opcode=0x71; op_l=0xB & op_h=0x1; sfrp {
-    sfrp[1, 1] = 0;
+:CLR1 sfr"."1 is opcode=0x71; op_l=0xB & op_h=0x1; sfr {
+    sfr[1, 1] = 0;
 }
 
-:CLR1 sfrp"."2 is opcode=0x71; op_l=0xB & op_h=0x2; sfrp {
-    sfrp[2, 1] = 0;
+:CLR1 sfr"."2 is opcode=0x71; op_l=0xB & op_h=0x2; sfr {
+    sfr[2, 1] = 0;
 }
 
-:CLR1 sfrp"."3 is opcode=0x71; op_l=0xB & op_h=0x3; sfrp {
-    sfrp[3, 1] = 0;
+:CLR1 sfr"."3 is opcode=0x71; op_l=0xB & op_h=0x3; sfr {
+    sfr[3, 1] = 0;
 }
 
-:CLR1 sfrp"."4 is opcode=0x71; op_l=0xB & op_h=0x4; sfrp {
-    sfrp[4, 1] = 0;
+:CLR1 sfr"."4 is opcode=0x71; op_l=0xB & op_h=0x4; sfr {
+    sfr[4, 1] = 0;
 }
 
-:CLR1 sfrp"."5 is opcode=0x71; op_l=0xB & op_h=0x5; sfrp {
-    sfrp[5, 1] = 0;
+:CLR1 sfr"."5 is opcode=0x71; op_l=0xB & op_h=0x5; sfr {
+    sfr[5, 1] = 0;
 }
 
-:CLR1 sfrp"."6 is opcode=0x71; op_l=0xB & op_h=0x6; sfrp {
-    sfrp[6, 1] = 0;
+:CLR1 sfr"."6 is opcode=0x71; op_l=0xB & op_h=0x6; sfr {
+    sfr[6, 1] = 0;
 }
 
-:CLR1 sfrp"."7 is opcode=0x71; op_l=0xB & op_h=0x7; sfrp {
-    sfrp[7, 1] = 0;
+:CLR1 sfr"."7 is opcode=0x71; op_l=0xB & op_h=0x7; sfr {
+    sfr[7, 1] = 0;
 }
 
 :CLR1 "CY" is opcode=0x71; op_l=0xB & op_h=0x0; sfr_byte=0xFA {
@@ -813,36 +813,36 @@
 }
 
 
-:MOV1 "CY", sfrp"."0 is opcode=0x71; op_l=0xC & op_h=0x0; sfrp {
-    $(CY) = sfrp[0, 1];
+:MOV1 "CY", sfr"."0 is opcode=0x71; op_l=0xC & op_h=0x0; sfr {
+    $(CY) = sfr[0, 1];
 }
 
-:MOV1 "CY", sfrp"."1 is opcode=0x71; op_l=0xC & op_h=0x1; sfrp {
-    $(CY) = sfrp[1, 1];
+:MOV1 "CY", sfr"."1 is opcode=0x71; op_l=0xC & op_h=0x1; sfr {
+    $(CY) = sfr[1, 1];
 }
 
-:MOV1 "CY", sfrp"."2 is opcode=0x71; op_l=0xC & op_h=0x2; sfrp {
-    $(CY) = sfrp[2, 1];
+:MOV1 "CY", sfr"."2 is opcode=0x71; op_l=0xC & op_h=0x2; sfr {
+    $(CY) = sfr[2, 1];
 }
 
-:MOV1 "CY", sfrp"."3 is opcode=0x71; op_l=0xC & op_h=0x3; sfrp {
-    $(CY) = sfrp[3, 1];
+:MOV1 "CY", sfr"."3 is opcode=0x71; op_l=0xC & op_h=0x3; sfr {
+    $(CY) = sfr[3, 1];
 }
 
-:MOV1 "CY", sfrp"."4 is opcode=0x71; op_l=0xC & op_h=0x4; sfrp {
-    $(CY) = sfrp[4, 1];
+:MOV1 "CY", sfr"."4 is opcode=0x71; op_l=0xC & op_h=0x4; sfr {
+    $(CY) = sfr[4, 1];
 }
 
-:MOV1 "CY", sfrp"."5 is opcode=0x71; op_l=0xC & op_h=0x5; sfrp {
-    $(CY) = sfrp[5, 1];
+:MOV1 "CY", sfr"."5 is opcode=0x71; op_l=0xC & op_h=0x5; sfr {
+    $(CY) = sfr[5, 1];
 }
 
-:MOV1 "CY", sfrp"."6 is opcode=0x71; op_l=0xC & op_h=0x6; sfrp {
-    $(CY) = sfrp[6, 1];
+:MOV1 "CY", sfr"."6 is opcode=0x71; op_l=0xC & op_h=0x6; sfr {
+    $(CY) = sfr[6, 1];
 }
 
-:MOV1 "CY", sfrp"."7 is opcode=0x71; op_l=0xC & op_h=0x7; sfrp {
-    $(CY) = sfrp[7, 1];
+:MOV1 "CY", sfr"."7 is opcode=0x71; op_l=0xC & op_h=0x7; sfr {
+    $(CY) = sfr[7, 1];
 }
 
 :NOP is opcode=0x71; op_l=0xC & op_h=0x0; sfr_byte=0xFA {
@@ -894,36 +894,36 @@
 }
 
 
-:AND1 "CY", sfrp"."0 is opcode=0x71; op_l=0xD & op_h=0x0; sfrp {
-    $(CY) = $(CY) & sfrp[0, 1];
+:AND1 "CY", sfr"."0 is opcode=0x71; op_l=0xD & op_h=0x0; sfr {
+    $(CY) = $(CY) & sfr[0, 1];
 }
 
-:AND1 "CY", sfrp"."1 is opcode=0x71; op_l=0xD & op_h=0x1; sfrp {
-    $(CY) = $(CY) & sfrp[1, 1];
+:AND1 "CY", sfr"."1 is opcode=0x71; op_l=0xD & op_h=0x1; sfr {
+    $(CY) = $(CY) & sfr[1, 1];
 }
 
-:AND1 "CY", sfrp"."2 is opcode=0x71; op_l=0xD & op_h=0x2; sfrp {
-    $(CY) = $(CY) & sfrp[2, 1];
+:AND1 "CY", sfr"."2 is opcode=0x71; op_l=0xD & op_h=0x2; sfr {
+    $(CY) = $(CY) & sfr[2, 1];
 }
 
-:AND1 "CY", sfrp"."3 is opcode=0x71; op_l=0xD & op_h=0x3; sfrp {
-    $(CY) = $(CY) & sfrp[3, 1];
+:AND1 "CY", sfr"."3 is opcode=0x71; op_l=0xD & op_h=0x3; sfr {
+    $(CY) = $(CY) & sfr[3, 1];
 }
 
-:AND1 "CY", sfrp"."4 is opcode=0x71; op_l=0xD & op_h=0x4; sfrp {
-    $(CY) = $(CY) & sfrp[4, 1];
+:AND1 "CY", sfr"."4 is opcode=0x71; op_l=0xD & op_h=0x4; sfr {
+    $(CY) = $(CY) & sfr[4, 1];
 }
 
-:AND1 "CY", sfrp"."5 is opcode=0x71; op_l=0xD & op_h=0x5; sfrp {
-    $(CY) = $(CY) & sfrp[5, 1];
+:AND1 "CY", sfr"."5 is opcode=0x71; op_l=0xD & op_h=0x5; sfr {
+    $(CY) = $(CY) & sfr[5, 1];
 }
 
-:AND1 "CY", sfrp"."6 is opcode=0x71; op_l=0xD & op_h=0x6; sfrp {
-    $(CY) = $(CY) & sfrp[6, 1];
+:AND1 "CY", sfr"."6 is opcode=0x71; op_l=0xD & op_h=0x6; sfr {
+    $(CY) = $(CY) & sfr[6, 1];
 }
 
-:AND1 "CY", sfrp"."7 is opcode=0x71; op_l=0xD & op_h=0x7; sfrp {
-    $(CY) = $(CY) & sfrp[7, 1];
+:AND1 "CY", sfr"."7 is opcode=0x71; op_l=0xD & op_h=0x7; sfr {
+    $(CY) = $(CY) & sfr[7, 1];
 }
 
 :NOP is opcode=0x71; op_l=0xD & op_h=0x0; sfr_byte=0xFA {
@@ -975,36 +975,36 @@
 }
 
 
-:OR1 "CY", sfrp"."0 is opcode=0x71; op_l=0xE & op_h=0x0; sfrp {
-    $(CY) = $(CY) | sfrp[0, 1];
+:OR1 "CY", sfr"."0 is opcode=0x71; op_l=0xE & op_h=0x0; sfr {
+    $(CY) = $(CY) | sfr[0, 1];
 }
 
-:OR1 "CY", sfrp"."1 is opcode=0x71; op_l=0xE & op_h=0x1; sfrp {
-    $(CY) = $(CY) | sfrp[1, 1];
+:OR1 "CY", sfr"."1 is opcode=0x71; op_l=0xE & op_h=0x1; sfr {
+    $(CY) = $(CY) | sfr[1, 1];
 }
 
-:OR1 "CY", sfrp"."2 is opcode=0x71; op_l=0xE & op_h=0x2; sfrp {
-    $(CY) = $(CY) | sfrp[2, 1];
+:OR1 "CY", sfr"."2 is opcode=0x71; op_l=0xE & op_h=0x2; sfr {
+    $(CY) = $(CY) | sfr[2, 1];
 }
 
-:OR1 "CY", sfrp"."3 is opcode=0x71; op_l=0xE & op_h=0x3; sfrp {
-    $(CY) = $(CY) | sfrp[3, 1];
+:OR1 "CY", sfr"."3 is opcode=0x71; op_l=0xE & op_h=0x3; sfr {
+    $(CY) = $(CY) | sfr[3, 1];
 }
 
-:OR1 "CY", sfrp"."4 is opcode=0x71; op_l=0xE & op_h=0x4; sfrp {
-    $(CY) = $(CY) | sfrp[4, 1];
+:OR1 "CY", sfr"."4 is opcode=0x71; op_l=0xE & op_h=0x4; sfr {
+    $(CY) = $(CY) | sfr[4, 1];
 }
 
-:OR1 "CY", sfrp"."5 is opcode=0x71; op_l=0xE & op_h=0x5; sfrp {
-    $(CY) = $(CY) | sfrp[5, 1];
+:OR1 "CY", sfr"."5 is opcode=0x71; op_l=0xE & op_h=0x5; sfr {
+    $(CY) = $(CY) | sfr[5, 1];
 }
 
-:OR1 "CY", sfrp"."6 is opcode=0x71; op_l=0xE & op_h=0x6; sfrp {
-    $(CY) = $(CY) | sfrp[6, 1];
+:OR1 "CY", sfr"."6 is opcode=0x71; op_l=0xE & op_h=0x6; sfr {
+    $(CY) = $(CY) | sfr[6, 1];
 }
 
-:OR1 "CY", sfrp"."7 is opcode=0x71; op_l=0xE & op_h=0x7; sfrp {
-    $(CY) = $(CY) | sfrp[7, 1];
+:OR1 "CY", sfr"."7 is opcode=0x71; op_l=0xE & op_h=0x7; sfr {
+    $(CY) = $(CY) | sfr[7, 1];
 }
 
 :NOP is opcode=0x71; op_l=0xE & op_h=0x0; sfr_byte=0xFA {
@@ -1056,36 +1056,36 @@
 }
 
 
-:XOR1 "CY", sfrp"."0 is opcode=0x71; op_l=0xF & op_h=0x0; sfrp {
-    $(CY) = $(CY) ^ sfrp[0, 1];
+:XOR1 "CY", sfr"."0 is opcode=0x71; op_l=0xF & op_h=0x0; sfr {
+    $(CY) = $(CY) ^ sfr[0, 1];
 }
 
-:XOR1 "CY", sfrp"."1 is opcode=0x71; op_l=0xF & op_h=0x1; sfrp {
-    $(CY) = $(CY) ^ sfrp[1, 1];
+:XOR1 "CY", sfr"."1 is opcode=0x71; op_l=0xF & op_h=0x1; sfr {
+    $(CY) = $(CY) ^ sfr[1, 1];
 }
 
-:XOR1 "CY", sfrp"."2 is opcode=0x71; op_l=0xF & op_h=0x2; sfrp {
-    $(CY) = $(CY) ^ sfrp[2, 1];
+:XOR1 "CY", sfr"."2 is opcode=0x71; op_l=0xF & op_h=0x2; sfr {
+    $(CY) = $(CY) ^ sfr[2, 1];
 }
 
-:XOR1 "CY", sfrp"."3 is opcode=0x71; op_l=0xF & op_h=0x3; sfrp {
-    $(CY) = $(CY) ^ sfrp[3, 1];
+:XOR1 "CY", sfr"."3 is opcode=0x71; op_l=0xF & op_h=0x3; sfr {
+    $(CY) = $(CY) ^ sfr[3, 1];
 }
 
-:XOR1 "CY", sfrp"."4 is opcode=0x71; op_l=0xF & op_h=0x4; sfrp {
-    $(CY) = $(CY) ^ sfrp[4, 1];
+:XOR1 "CY", sfr"."4 is opcode=0x71; op_l=0xF & op_h=0x4; sfr {
+    $(CY) = $(CY) ^ sfr[4, 1];
 }
 
-:XOR1 "CY", sfrp"."5 is opcode=0x71; op_l=0xF & op_h=0x5; sfrp {
-    $(CY) = $(CY) ^ sfrp[5, 1];
+:XOR1 "CY", sfr"."5 is opcode=0x71; op_l=0xF & op_h=0x5; sfr {
+    $(CY) = $(CY) ^ sfr[5, 1];
 }
 
-:XOR1 "CY", sfrp"."6 is opcode=0x71; op_l=0xF & op_h=0x6; sfrp {
-    $(CY) = $(CY) ^ sfrp[6, 1];
+:XOR1 "CY", sfr"."6 is opcode=0x71; op_l=0xF & op_h=0x6; sfr {
+    $(CY) = $(CY) ^ sfr[6, 1];
 }
 
-:XOR1 "CY", sfrp"."7 is opcode=0x71; op_l=0xF & op_h=0x7; sfrp {
-    $(CY) = $(CY) ^ sfrp[7, 1];
+:XOR1 "CY", sfr"."7 is opcode=0x71; op_l=0xF & op_h=0x7; sfr {
+    $(CY) = $(CY) ^ sfr[7, 1];
 }
 
 :XOR1 "CY", "CY" is opcode=0x71; op_l=0xF & op_h=0x0; sfr_byte=0xFA {

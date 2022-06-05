@@ -43,13 +43,13 @@
 }
 
 # MOV A, sfr
-:MOV A, sfrp is opcode=0x8E & A; sfrp {
-    A = sfrp;
+:MOV A, sfr is opcode=0x8E & A; sfr {
+    A = sfr;
 }
 
 # MOV sfr, A
-:MOV sfrp, A is opcode=0x9E & A; sfrp {
-    sfrp = A;
+:MOV sfr, A is opcode=0x9E & A; sfr {
+    sfr = A;
 }
 
 # MOV A, !addr16
@@ -387,8 +387,8 @@
 }
 
 # MOVW sfr, #word
-:MOVW sfrpw, u16 is opcode=0xCB; sfrpw; u16 {
-    sfrpw = u16;
+:MOVW sfrp, u16 is opcode=0xCB; sfrp; u16 {
+    sfrp = u16;
 }
 
 # MOVW AX, saddrp
@@ -401,14 +401,14 @@
     saddrp = AX;
 }
 
-# MOVW AX, sfrp
-:MOVW AX, sfrpw is opcode=0xAE & AX; sfrpw {
-    AX = sfrpw;
+# MOVW AX, sfr
+:MOVW AX, sfrp is opcode=0xAE & AX; sfrp {
+    AX = sfrp;
 }
 
-# MOVW sfrp, AX
-:MOVW sfrpw, AX is opcode=0xBE & AX; sfrpw {
-    sfrpw = AX;
+# MOVW sfr, AX
+:MOVW sfrp, AX is opcode=0xBE & AX; sfrp {
+    sfrp = AX;
 }
 
 # MOVW AX, rp

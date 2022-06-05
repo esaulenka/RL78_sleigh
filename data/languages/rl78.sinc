@@ -55,6 +55,19 @@ define ram offset=0x80 size=2 [
     CALLTB8 CALLTBA CALLTBC CALLTBE
 ];
 
+define ram offset=0x0 size=2 RESET;
+define ram offset=0x4 size=2 [
+    INTWDTI INTLVI INTP0 INTP1 INTP2 INTP3 INTP4
+    INTP5 INTST2 INTSR2 INTSRE2 INTDMA0 INTDMA1 INTST0 INTSR0
+    INTSRE0 INTST1 INTSR1 INTSRE1 INTIICA0 INTTM00 INTTM01 INTTM02
+    INTTM03 INTAD INTRTC INTIT INTKR INTST3 INTSR3 INTTM13
+    INTTM04 INTTM05 INTTM06 INTTM07 INTP6 INTP7 INTP8 INTP9
+    INTP10 INTP11 INTTM10 INTTM11 INTTM12 INTSRE3 INTMD INTIICA1
+    INTFL INTDMA2 INTDMA3 INTTM14 INTTM15 INTTM16 INTTM17
+];
+
+define ram offset=0x7E size=2 BRK;
+
 define token base (8)
     opcode = (0, 7)
     op_h = (4, 7)
@@ -101,7 +114,8 @@ define token data8 (8)
     sfr_word    = (0, 7)
     fixed_sfr_offset = (3, 7)
     fixed_sfr   = (0, 2)
-    fixed_sfr_w   = (0, 2);
+    fixed_sfr_w   = (0, 2)
+    bit8_0=(0, 0);
 
 define token data16 (16)
     dataw = (0, 15)
@@ -114,7 +128,8 @@ define token data16 (16)
     saddr16 = (0, 15) signed
     a16_sfr_offset = (3, 15)
     a16_sfr_reg = (0, 2)
-    a16w_sfr_reg = (0, 2);
+    a16w_sfr_reg = (0, 2)
+    bit16_0=(0, 0);
 
 define token data24 (24)
     uaddr20 = (0, 19);
