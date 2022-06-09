@@ -145,7 +145,9 @@ saddrp: uaddr8 is uaddr8 & saddr_val & bit8_0=0 {
     export *[ram]:2 saddr_val;
 }
 
-direct_addr_val: val is uaddr16 [val = 0xF0000 + uaddr16; ] { export *[const]:3 val; }
+uaddr16: uaddr16_data is uaddr16_data { export *[const]:2 uaddr16_data; }
+
+direct_addr_val: is uaddr16 { dst:3 = segment(0xf:1, uaddr16); export dst; }
 
 #addr16: "!"uaddr16 is es_prefix=0 & uaddr16 & direct_addr_val {
 #    export *[ram]:1 direct_addr_val;
@@ -177,7 +179,7 @@ addr16w: ext_sfrw is es_prefix=0 & ext_sfrw & bit16_0=0 {
     export ext_sfrw;
 }
 
-addr16w: uaddr16 is uaddr16 & (a16_bit7=1 |a16_bit4_6!=0) & direct_addr_val & bit16_0=0 {
+addr16w: uaddr16 is uaddr16 & (a16_bit7=1 | a16_bit4_6!=0) & direct_addr_val & bit16_0=0 {
     export *[ram]:2 direct_addr_val;
 }
 
@@ -200,7 +202,7 @@ sfr: fixed_sfr is fixed_sfr & fixed_sfr_offset=0x1f {
 }
 
 sfr: sfr_byte is sfr_byte {
-    export *sfr_byte;
+    export sfr_byte;
 }
 
 sfrp: fixed_sfr_w is fixed_sfr_w & fixed_sfr_offset=0x1f {
@@ -208,7 +210,7 @@ sfrp: fixed_sfr_w is fixed_sfr_w & fixed_sfr_offset=0x1f {
 }
 
 sfrp: sfr_word is sfr_word {
-    export *[ram]:2 sfr_word;
+    export sfr_word;
 }
 
 jdisp8: "$"loc is saddr8 [ loc = inst_next + saddr8; ] {
@@ -388,8 +390,8 @@ AddrWordOffsetB: uaddr16[B] is es_prefix=0 & uaddr16 & B & direct_addr_val {
 
 AddrWordOffsetB: ES:uaddr16[B] is es_prefix=1 & uaddr16 & B & ES {
     local loc:3;
-    tmp:2 = uaddr16 + zext(B);
-    direct_addrb_es(ES, tmp, loc);
+    direct_addrb_es(ES, uaddr16, loc);
+    loc = loc + zext(B);
     export *[ram]:1 loc;
 }
 
@@ -412,8 +414,8 @@ AddrWordOffsetC: uaddr16[C] is es_prefix=0 & uaddr16 & C & direct_addr_val {
 
 AddrWordOffsetC: ES:uaddr16[C] is es_prefix=1 & uaddr16 & C & ES {
     local loc:3;
-    direct_addrb_es(ES, uaddr16:2, loc);
-    loc = loc + zext(C);
+    tmp:2 = uaddr16 + zext(C);
+    direct_addrb_es(ES, tmp, loc);
     export *[ram]:1 loc;
 }
 
@@ -474,9 +476,4 @@ AddrSPOffsetW: [SP+uaddr8] is uaddr8 & SP {
 ct_entry: val is op2_callt_low & op2_callt_hi
         [ val = 0x80 | ((op2_callt_hi << 4) | op2_callt_low << 1); ] {
     export *[const]:3 val;
-}
-
-CALLT_Entry: [ct_entry] is ct_entry {
-    local loc:3 = segment(0:1, *[ram]:2 ct_entry);
-    export loc;
 }

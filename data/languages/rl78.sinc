@@ -119,7 +119,7 @@ define token data8 (8)
 
 define token data16 (16)
     dataw = (0, 15)
-    uaddr16 = (0, 15)
+    uaddr16_data = (0, 15)
     a16_bit7 = (7, 7)
     a16_bit4_6 = (4, 6)
     ext_sfr  = (0, 9)
