@@ -1028,25 +1028,22 @@
 
 # CALL $!addr20
 :CALL jdisp16 is opcode=0xFE; jdisp16 {
-    SP = SP - 1;
+    SP = SP - 4;
     *[near]:3 SP = inst_next;
-    SP = SP - 3;
     call jdisp16;
 }
 
 # CALL !addr16
 :CALL jaddr16 is opcode=0xFD; jaddr16 {
-    SP = SP - 1;
+    SP = SP - 4;
     *[near]:3 SP = inst_next;
-    SP = SP - 3;
     call jaddr16;
 }
 
 # CALL !!addr20
 :CALL addr20 is opcode=0xFC; addr20 {
-    SP = SP - 1;
+    SP = SP - 4;
     *[near]:3 SP = inst_next;
-    SP = SP - 3;
     call addr20;
 }
 
@@ -1054,8 +1051,8 @@
 
 # RET
 :RET is opcode=0xD7 {
-    PC = *[near] SP;
     SP = SP + 4;
+    PC = *[near] SP;
     return [PC];
 }
 
@@ -1063,16 +1060,16 @@
 
 # PUSH rp
 :PUSH DREG_WORD is op_h=0xC & DREG_WORD & rp_source=1 {
-    *[near]:2 SP = DREG_WORD;
     SP = SP - 2;
+    *[near]:2 SP = DREG_WORD;
 }
 
 
 
 # POP rp
 :POP DREG_WORD is op_h=0xC & DREG_WORD & rp_source=0 {
-    DREG_WORD = *[near] SP;
     SP = SP + 2;
+    DREG_WORD = *[near] SP;
 }
 
 # MOVW SP, #word

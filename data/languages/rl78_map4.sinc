@@ -1,384 +1,385 @@
 # BTCLR saddr.n, $addr20
 :BTCLR saddr"."0, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x0; saddr; jdisp8 {
-    if (saddr[0, 1]) goto <clear>;
+    if (saddr & 0x1) goto <clear>;
     goto inst_next;
     <clear>
-    saddr[0, 1] = 0;
+    saddr = saddr & 0xFE;
     goto jdisp8;
 }
 
 :BTCLR saddr"."1, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x1; saddr; jdisp8 {
-    if (saddr[1, 1]) goto <clear>;
+    if (saddr & 0x2) goto <clear>;
     goto inst_next;
     <clear>
-    saddr[1, 1] = 0;
+    saddr = saddr & 0xFD;
     goto jdisp8;
 }
 
 :BTCLR saddr"."2, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x2; saddr; jdisp8 {
-    if (saddr[2, 1]) goto <clear>;
+    if (saddr & 0x4) goto <clear>;
     goto inst_next;
     <clear>
-    saddr[2, 1] = 0;
+    saddr = saddr & 0xFB;
     goto jdisp8;
 }
 
 :BTCLR saddr"."3, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x3; saddr; jdisp8 {
-    if (saddr[3, 1]) goto <clear>;
+    if (saddr & 0x8) goto <clear>;
     goto inst_next;
     <clear>
-    saddr[3, 1] = 0;
+    saddr = saddr & 0xF7;
     goto jdisp8;
 }
 
 :BTCLR saddr"."4, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x4; saddr; jdisp8 {
-    if (saddr[4, 1]) goto <clear>;
+    if (saddr & 0x10) goto <clear>;
     goto inst_next;
     <clear>
-    saddr[4, 1] = 0;
+    saddr = saddr & 0xEF;
     goto jdisp8;
 }
 
 :BTCLR saddr"."5, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x5; saddr; jdisp8 {
-    if (saddr[5, 1]) goto <clear>;
+    if (saddr & 0x20) goto <clear>;
     goto inst_next;
     <clear>
-    saddr[5, 1] = 0;
+    saddr = saddr & 0xDF;
     goto jdisp8;
 }
 
 :BTCLR saddr"."6, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x6; saddr; jdisp8 {
-    if (saddr[6, 1]) goto <clear>;
+    if (saddr & 0x40) goto <clear>;
     goto inst_next;
     <clear>
-    saddr[6, 1] = 0;
+    saddr = saddr & 0xBF;
     goto jdisp8;
 }
 
 :BTCLR saddr"."7, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x7; saddr; jdisp8 {
-    if (saddr[7, 1]) goto <clear>;
+    if (saddr & 0x80) goto <clear>;
     goto inst_next;
     <clear>
-    saddr[7, 1] = 0;
+    saddr = saddr & 0x7F;
     goto jdisp8;
 }
 
 # BTCLR sfr.n, $addr20
 :BTCLR sfr"."0, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x8; sfr; jdisp8 {
-    if (sfr[0, 1]) goto <clear>;
+    if (sfr & 0x1) goto <clear>;
     goto inst_next;
     <clear>
-    sfr[0, 1] = 0;
+    sfr = sfr & 0xFE;
     goto jdisp8;
 }
 
 :BTCLR sfr"."1, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x9; sfr; jdisp8 {
-    if (sfr[1, 1]) goto <clear>;
+    if (sfr & 0x2) goto <clear>;
     goto inst_next;
     <clear>
-    sfr[1, 1] = 0;
+    sfr = sfr & 0xFD;
     goto jdisp8;
 }
 
 :BTCLR sfr"."2, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xA; sfr; jdisp8 {
-    if (sfr[2, 1]) goto <clear>;
+    if (sfr & 0x4) goto <clear>;
     goto inst_next;
     <clear>
-    sfr[2, 1] = 0;
+    sfr = sfr & 0xFB;
     goto jdisp8;
 }
 
 :BTCLR sfr"."3, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xB; sfr; jdisp8 {
-    if (sfr[3, 1]) goto <clear>;
+    if (sfr & 0x8) goto <clear>;
     goto inst_next;
     <clear>
-    sfr[3, 1] = 0;
+    sfr = sfr & 0xF7;
     goto jdisp8;
 }
 
 :BTCLR sfr"."4, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xC; sfr; jdisp8 {
-    if (sfr[4, 1]) goto <clear>;
+    if (sfr & 0x10) goto <clear>;
     goto inst_next;
     <clear>
-    sfr[4, 1] = 0;
+    sfr = sfr & 0xEF;
     goto jdisp8;
 }
 
 :BTCLR sfr"."5, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xD; sfr; jdisp8 {
-    if (sfr[5, 1]) goto <clear>;
+    if (sfr & 0x20) goto <clear>;
     goto inst_next;
     <clear>
-    sfr[5, 1] = 0;
+    sfr = sfr & 0xDF;
     goto jdisp8;
 }
 
 :BTCLR sfr"."6, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xE; sfr; jdisp8 {
-    if (sfr[6, 1]) goto <clear>;
+    if (sfr & 0x40) goto <clear>;
     goto inst_next;
     <clear>
-    sfr[6, 1] = 0;
+    sfr = sfr & 0xBF;
     goto jdisp8;
 }
 
 :BTCLR sfr"."7, jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xF; sfr; jdisp8 {
-    if (sfr[7, 1]) goto <clear>;
+    if (sfr & 0x80) goto <clear>;
     goto inst_next;
     <clear>
-    sfr[7, 1] = 0;
+    sfr = sfr & 0x7F;
     goto jdisp8;
 }
 
 # BTCLR PSW.n, $addr20
 :BTCLR "CY", jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x8; sfr_byte=0xFA; jdisp8 {
-    if ($(CY_)) goto <clear>;
+    if (CY) goto <clear>;
     goto inst_next;
     <clear>
-    $(CY_) = 0;
+    CY = 0;
     goto jdisp8;
 }
 
 :BTCLR "AC", jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xB; sfr_byte=0xFA; jdisp8 {
-    if ($(AC_)) goto <clear>;
+    if (AC) goto <clear>;
     goto inst_next;
     <clear>
-    $(AC_) = 0;
+    AC = 0;
     goto jdisp8;
 }
 
 :BTCLR "Z", jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xE; sfr_byte=0xFA; jdisp8 {
-    if ($(Z_)) goto <clear>;
+    if (Z) goto <clear>;
     goto inst_next;
     <clear>
-    $(Z_) = 0;
+    Z = 0;
     goto jdisp8;
 }
 
 :BTCLR "IE", jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xF; sfr_byte=0xFA; jdisp8 {
-    if ($(IE_)) goto <clear>;
+    if (IE) goto <clear>;
     goto inst_next;
     <clear>
-    $(IE_) = 0;
+    IE = 0;
+    disable_interrupts();
     goto jdisp8;
 }
 
 # BTCRL A.n, $addr20
 :BTCLR A"."0, jdisp8 is opcode=0x31 & A; op_l=0x1 & op_h=0x0; jdisp8 {
-    if (A[0, 1]) goto <clear>;
+    if (A & 0x1) goto <clear>;
     goto inst_next;
     <clear>
-    A[0, 1] = 0;
+    A = A & 0xFE;
     goto jdisp8;
 }
 
 # BTCRL A.n, $addr20
 :BTCLR A"."1, jdisp8 is opcode=0x31 & A; op_l=0x1 & op_h=0x1; jdisp8 {
-    if (A[1, 1]) goto <clear>;
+    if (A & 0x2) goto <clear>;
     goto inst_next;
     <clear>
-    A[1, 1] = 0;
+    A = A & 0xFD;
     goto jdisp8;
 }
 
 # BTCRL A.n, $addr20
 :BTCLR A"."2, jdisp8 is opcode=0x31 & A; op_l=0x1 & op_h=0x2; jdisp8 {
-    if (A[2, 1]) goto <clear>;
+    if (A & 0x4) goto <clear>;
     goto inst_next;
     <clear>
-    A[2, 1] = 0;
+    A = A & 0xFB;
     goto jdisp8;
 }
 
 # BTCRL A.n, $addr20
 :BTCLR A"."3, jdisp8 is opcode=0x31 & A; op_l=0x1 & op_h=0x3; jdisp8 {
-    if (A[3, 1]) goto <clear>;
+    if (A & 0x8) goto <clear>;
     goto inst_next;
     <clear>
-    A[3, 1] = 0;
+    A = A & 0xF7;
     goto jdisp8;
 }
 
 # BTCRL A.n, $addr20
 :BTCLR A"."4, jdisp8 is opcode=0x31 & A; op_l=0x1 & op_h=0x4; jdisp8 {
-    if (A[4, 1]) goto <clear>;
+    if (A & 0x10) goto <clear>;
     goto inst_next;
     <clear>
-    A[4, 1] = 0;
+    A = A & 0xEF;
     goto jdisp8;
 }
 
 # BTCRL A.n, $addr20
 :BTCLR A"."5, jdisp8 is opcode=0x31 & A; op_l=0x1 & op_h=0x5; jdisp8 {
-    if (A[5, 1]) goto <clear>;
+    if (A & 0x20) goto <clear>;
     goto inst_next;
     <clear>
-    A[5, 1] = 0;
+    A = A & 0xDF;
     goto jdisp8;
 }
 
 # BTCRL A.n, $addr20
 :BTCLR A"."6, jdisp8 is opcode=0x31 & A; op_l=0x1 & op_h=0x6; jdisp8 {
-    if (A[6, 1]) goto <clear>;
+    if (A & 0x40) goto <clear>;
     goto inst_next;
     <clear>
-    A[6, 1] = 0;
+    A = A & 0xBF;
     goto jdisp8;
 }
 
 # BTCRL A.n, $addr20
 :BTCLR A"."7, jdisp8 is opcode=0x31 & A; op_l=0x1 & op_h=0x7; jdisp8 {
-    if (A[7, 1]) goto <clear>;
+    if (A & 0x80) goto <clear>;
     goto inst_next;
     <clear>
-    A[7, 1] = 0;
+    A = A & 0x7F;
     goto jdisp8;
 }
 
 # BTCRL [HL].n, $addr20
 :BTCLR AddrHL"."0, jdisp8 is opcode=0x31 & AddrHL; op_l=0x1 & op_h=0x8; jdisp8 {
-    if (AddrHL[0, 1]) goto <clear>;
+    if (AddrHL & 0x1) goto <clear>;
     goto inst_next;
     <clear>
-    AddrHL[0, 1] = 0;
+    AddrHL = AddrHL & 0xFE;
     goto jdisp8;
 }
 
 :BTCLR AddrHL"."1, jdisp8 is opcode=0x31 & AddrHL; op_l=0x1 & op_h=0x9; jdisp8 {
-    if (AddrHL[1, 1]) goto <clear>;
+    if (AddrHL & 0x2) goto <clear>;
     goto inst_next;
     <clear>
-    AddrHL[1, 1] = 0;
+    AddrHL = AddrHL & 0xFD;
     goto jdisp8;
 }
 
 :BTCLR AddrHL"."2, jdisp8 is opcode=0x31 & AddrHL; op_l=0x1 & op_h=0xA; jdisp8 {
-    if (AddrHL[2, 1]) goto <clear>;
+    if (AddrHL & 0x4) goto <clear>;
     goto inst_next;
     <clear>
-    AddrHL[2, 1] = 0;
+    AddrHL = AddrHL & 0xFB;
     goto jdisp8;
 }
 
 :BTCLR AddrHL"."3, jdisp8 is opcode=0x31 & AddrHL; op_l=0x1 & op_h=0xB; jdisp8 {
-    if (AddrHL[3, 1]) goto <clear>;
+    if (AddrHL & 0x8) goto <clear>;
     goto inst_next;
     <clear>
-    AddrHL[3, 1] = 0;
+    AddrHL = AddrHL & 0xF7;
     goto jdisp8;
 }
 
 :BTCLR AddrHL"."4, jdisp8 is opcode=0x31 & AddrHL; op_l=0x1 & op_h=0xC; jdisp8 {
-    if (AddrHL[4, 1]) goto <clear>;
+    if (AddrHL & 0x10) goto <clear>;
     goto inst_next;
     <clear>
-    AddrHL[4, 1] = 0;
+    AddrHL = AddrHL & 0xEF;
     goto jdisp8;
 }
 
 :BTCLR AddrHL"."5, jdisp8 is opcode=0x31 & AddrHL; op_l=0x1 & op_h=0xD; jdisp8 {
-    if (AddrHL[5, 1]) goto <clear>;
+    if (AddrHL & 0x20) goto <clear>;
     goto inst_next;
     <clear>
-    AddrHL[5, 1] = 0;
+    AddrHL = AddrHL & 0xDF;
     goto jdisp8;
 }
 
 :BTCLR AddrHL"."6, jdisp8 is opcode=0x31 & AddrHL; op_l=0x1 & op_h=0xE; jdisp8 {
-    if (AddrHL[6, 1]) goto <clear>;
+    if (AddrHL & 0x40) goto <clear>;
     goto inst_next;
     <clear>
-    AddrHL[6, 1] = 0;
+    AddrHL = AddrHL & 0xBF;
     goto jdisp8;
 }
 
 :BTCLR AddrHL"."7, jdisp8 is opcode=0x31 & AddrHL; op_l=0x1 & op_h=0xF; jdisp8 {
-    if (AddrHL[7, 1]) goto <clear>;
+    if (AddrHL & 0x80) goto <clear>;
     goto inst_next;
     <clear>
-    AddrHL[7, 1] = 0;
+    AddrHL = AddrHL & 0x7F;
     goto jdisp8;
 }
 
 # BT saddr.n, $addr20
 :BT saddr"."0, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x0; saddr; jdisp8 {
-    if (saddr[0, 1]) goto jdisp8;
+    if (saddr & 0x1) goto jdisp8;
 }
 
 :BT saddr"."1, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x1; saddr; jdisp8 {
-    if (saddr[1, 1]) goto jdisp8;
+    if (saddr & 0x2) goto jdisp8;
 }
 
 :BT saddr"."2, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x2; saddr; jdisp8 {
-    if (saddr[2, 1]) goto jdisp8;
+    if (saddr & 0x4) goto jdisp8;
 }
 
 :BT saddr"."3, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x3; saddr; jdisp8 {
-    if (saddr[3, 1]) goto jdisp8;
+    if (saddr & 0x8) goto jdisp8;
 }
 
 :BT saddr"."4, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x4; saddr; jdisp8 {
-    if (saddr[4, 1]) goto jdisp8;
+    if (saddr & 0x10) goto jdisp8;
 }
 
 :BT saddr"."5, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x5; saddr; jdisp8 {
-    if (saddr[5, 1]) goto jdisp8;
+    if (saddr & 0x20) goto jdisp8;
 }
 
 :BT saddr"."6, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x6; saddr; jdisp8 {
-    if (saddr[6, 1]) goto jdisp8;
+    if (saddr & 0x40) goto jdisp8;
 }
 
 :BT saddr"."7, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x7; saddr; jdisp8 {
-    if (saddr[7, 1]) goto jdisp8;
+    if (saddr & 0x80) goto jdisp8;
 }
 
 # BT sfr.n, $addr20
 :BT sfr"."0, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x8; sfr; jdisp8 {
-    if (sfr[0, 1]) goto jdisp8;
+    if (sfr & 0x1) goto jdisp8;
 }
 
 :BT sfr"."1, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x9; sfr; jdisp8 {
-    if (sfr[1, 1]) goto jdisp8;
+    if (sfr & 0x2) goto jdisp8;
 }
 
 :BT sfr"."2, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xA; sfr; jdisp8 {
-    if (sfr[2, 1]) goto jdisp8;
+    if (sfr & 0x4) goto jdisp8;
 }
 
 :BT sfr"."3, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xB; sfr; jdisp8 {
-    if (sfr[3, 1]) goto jdisp8;
+    if (sfr & 0x8) goto jdisp8;
 }
 
 :BT sfr"."4, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xC; sfr; jdisp8 {
-    if (sfr[4, 1]) goto jdisp8;
+    if (sfr & 0x10) goto jdisp8;
 }
 
 :BT sfr"."5, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xD; sfr; jdisp8 {
-    if (sfr[5, 1]) goto jdisp8;
+    if (sfr & 0x20) goto jdisp8;
 }
 
 :BT sfr"."6, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xE; sfr; jdisp8 {
-    if (sfr[6, 1]) goto jdisp8;
+    if (sfr & 0x40) goto jdisp8;
 }
 
 :BT sfr"."7, jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xF; sfr; jdisp8 {
-    if (sfr[7, 1]) goto jdisp8;
+    if (sfr & 0x80) goto jdisp8;
 }
 
 :BT "AC", jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xB; sfr_byte=0xFA; jdisp8 {
-    if ($(AC_)) goto jdisp8;
+    if (AC) goto jdisp8;
 }
 
 :BT "IE", jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xF; sfr_byte=0xFA; jdisp8 {
-    if ($(IE_)) goto jdisp8;
+    if (IE) goto jdisp8;
 }
 
 # BF PSW.n, $addr20
 :BC jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x8 & mov1_sreg=1; sfr_byte=0xFA; jdisp8 {
-    if ($(CY_)) goto jdisp8;
+    if (CY) goto jdisp8;
 }
 
 :BZ jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xE & mov1_sreg=1; sfr_byte=0xFA; jdisp8 {
-    if ($(Z_)) goto jdisp8;
+    if (Z) goto jdisp8;
 }
 
 # BT A.n, $addr20
@@ -449,184 +450,184 @@
 
 # BF saddr.n, $addr20
 :BF saddr"."0, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x0; saddr; jdisp8 {
-    if (saddr[0, 1]) goto inst_next;
+    if (saddr & 0x1) goto inst_next;
     goto jdisp8;
 }
 
 :BF saddr"."1, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x1; saddr; jdisp8 {
-    if (saddr[1, 1]) goto inst_next;
+    if (saddr & 0x2) goto inst_next;
     goto jdisp8;
 }
 
 :BF saddr"."2, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x2; saddr; jdisp8 {
-    if (saddr[2, 1]) goto inst_next;
+    if (saddr & 0x4) goto inst_next;
     goto jdisp8;
 }
 
 :BF saddr"."3, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x3; saddr; jdisp8 {
-    if (saddr[3, 1]) goto inst_next;
+    if (saddr & 0x8) goto inst_next;
     goto jdisp8;
 }
 
 :BF saddr"."4, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x4; saddr; jdisp8 {
-    if (saddr[4, 1]) goto inst_next;
+    if (saddr & 0x10) goto inst_next;
     goto jdisp8;
 }
 
 :BF saddr"."5, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x5; saddr; jdisp8 {
-    if (saddr[5, 1]) goto inst_next;
+    if (saddr & 0x20) goto inst_next;
     goto jdisp8;
 }
 
 :BF saddr"."6, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x6; saddr; jdisp8 {
-    if (saddr[6, 1]) goto inst_next;
+    if (saddr & 0x40) goto inst_next;
     goto jdisp8;
 }
 
 :BF saddr"."7, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x7; saddr; jdisp8 {
-    if (saddr[7, 1]) goto inst_next;
+    if (saddr & 0x80) goto inst_next;
     goto jdisp8;
 }
 
 # BF sfr.n, $addr20
 :BF sfr"."0, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x8; sfr; jdisp8 {
-    if (sfr[0, 1]) goto inst_next;
+    if (sfr & 0x1) goto inst_next;
     goto jdisp8;
 }
 
 :BF sfr"."1, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x9; sfr; jdisp8 {
-    if (sfr[1, 1]) goto inst_next;
+    if (sfr & 0x2) goto inst_next;
     goto jdisp8;
 }
 
 :BF sfr"."2, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xA; sfr; jdisp8 {
-    if (sfr[2, 1]) goto inst_next;
+    if (sfr & 0x4) goto inst_next;
     goto jdisp8;
 }
 
 :BF sfr"."3, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xB; sfr; jdisp8 {
-    if (sfr[3, 1]) goto inst_next;
+    if (sfr & 0x8) goto inst_next;
     goto jdisp8;
 }
 
 :BF sfr"."4, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xC; sfr; jdisp8 {
-    if (sfr[4, 1]) goto inst_next;
+    if (sfr & 0x10) goto inst_next;
     goto jdisp8;
 }
 
 :BF sfr"."5, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xD; sfr; jdisp8 {
-    if (sfr[5, 1]) goto inst_next;
+    if (sfr & 0x20) goto inst_next;
     goto jdisp8;
 }
 
 :BF sfr"."6, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xE; sfr; jdisp8 {
-    if (sfr[6, 1]) goto inst_next;
+    if (sfr & 0x40) goto inst_next;
     goto jdisp8;
 }
 
 :BF sfr"."7, jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xF; sfr; jdisp8 {
-    if (sfr[7, 1]) goto inst_next;
+    if (sfr & 0x80) goto inst_next;
     goto jdisp8;
 }
 
 :BF "AC", jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xB; sfr_byte=0xFA; jdisp8 {
-    if ($(AC_)) goto inst_next;
+    if (AC) goto inst_next;
     goto jdisp8;
 }
 
 :BF "IE", jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xF; sfr_byte=0xFA; jdisp8 {
-    if ($(IE_)) goto inst_next;
+    if (IE) goto inst_next;
     goto jdisp8;
 }
 
 # BF PSW.n, $addr20
 :BNC jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x8 & mov1_sreg=1; sfr_byte=0xFA; jdisp8 {
-    if (!$(CY_)) goto jdisp8;
+    if (!CY) goto jdisp8;
 }
 
 :BNZ jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xE & mov1_sreg=1; sfr_byte=0xFA; jdisp8 {
-    if (!$(Z_)) goto jdisp8;
+    if (!Z) goto jdisp8;
 }
 
 # BF A.n, $addr20
 :BF A"."0, jdisp8 is opcode=0x31 & A; op_l=0x5 & op_h=0x0; jdisp8 {
-    if (A[0, 1]) goto inst_next;
+    if (A & 0x1) goto inst_next;
     goto jdisp8;
 }
 
 :BF A"."1, jdisp8 is opcode=0x31 & A; op_l=0x5 & op_h=0x1; jdisp8 {
-    if (A[1, 1]) goto inst_next;
+    if (A & 0x2) goto inst_next;
     goto jdisp8;
 }
 
 :BF A"."2, jdisp8 is opcode=0x31 & A; op_l=0x5 & op_h=0x2; jdisp8 {
-    if (A[2, 1]) goto inst_next;
+    if (A & 0x4) goto inst_next;
     goto jdisp8;
 }
 
 :BF A"."3, jdisp8 is opcode=0x31 & A; op_l=0x5 & op_h=0x3; jdisp8 {
-    if (A[3, 1]) goto inst_next;
+    if (A & 0x8) goto inst_next;
     goto jdisp8;
 }
 
 :BF A"."4, jdisp8 is opcode=0x31 & A; op_l=0x5 & op_h=0x4; jdisp8 {
-    if (A[4, 1]) goto inst_next;
+    if (A & 0x10) goto inst_next;
     goto jdisp8;
 }
 
 :BF A"."5, jdisp8 is opcode=0x31 & A; op_l=0x5 & op_h=0x5; jdisp8 {
-    if (A[5, 1]) goto inst_next;
+    if (A & 0x20) goto inst_next;
     goto jdisp8;
 }
 
 :BF A"."6, jdisp8 is opcode=0x31 & A; op_l=0x5 & op_h=0x6; jdisp8 {
-    if (A[6, 1]) goto inst_next;
+    if (A & 0x40) goto inst_next;
     goto jdisp8;
 }
 
 :BF A"."7, jdisp8 is opcode=0x31 & A; op_l=0x5 & op_h=0x7; jdisp8 {
-    if (A[7, 1]) goto inst_next;
+    if (A & 0x80) goto inst_next;
     goto jdisp8;
 }
 
 # BF [HL].n, $addr20
 :BF AddrHL"."0, jdisp8 is opcode=0x31 & AddrHL; op_l=0x5 & op_h=0x8; jdisp8 {
-    if (AddrHL[0, 1]) goto inst_next;
+    if (AddrHL & 0x1) goto inst_next;
     goto jdisp8;
 }
 
 :BF AddrHL"."1, jdisp8 is opcode=0x31 & AddrHL; op_l=0x5 & op_h=0x9; jdisp8 {
-    if (AddrHL[1, 1]) goto inst_next;
+    if (AddrHL & 0x2) goto inst_next;
     goto jdisp8;
 }
 
 :BF AddrHL"."2, jdisp8 is opcode=0x31 & AddrHL; op_l=0x5 & op_h=0xA; jdisp8 {
-    if (AddrHL[2, 1]) goto inst_next;
+    if (AddrHL & 0x4) goto inst_next;
     goto jdisp8;
 }
 
 :BF AddrHL"."3, jdisp8 is opcode=0x31 & AddrHL; op_l=0x5 & op_h=0xB; jdisp8 {
-    if (AddrHL[3, 1]) goto inst_next;
+    if (AddrHL & 0x8) goto inst_next;
     goto jdisp8;
 }
 
 :BF AddrHL"."4, jdisp8 is opcode=0x31 & AddrHL; op_l=0x5 & op_h=0xC; jdisp8 {
-    if (AddrHL[4, 1]) goto inst_next;
+    if (AddrHL & 0x10) goto inst_next;
     goto jdisp8;
 }
 
 :BF AddrHL"."5, jdisp8 is opcode=0x31 & AddrHL; op_l=0x5 & op_h=0xD; jdisp8 {
-    if (AddrHL[5, 1]) goto inst_next;
+    if (AddrHL & 0x20) goto inst_next;
     goto jdisp8;
 }
 
 :BF AddrHL"."6, jdisp8 is opcode=0x31 & AddrHL; op_l=0x5 & op_h=0xE; jdisp8 {
-    if (AddrHL[6, 1]) goto inst_next;
+    if (AddrHL & 0x40) goto inst_next;
     goto jdisp8;
 }
 
 :BF AddrHL"."7, jdisp8 is opcode=0x31 & AddrHL; op_l=0x5 & op_h=0xF; jdisp8 {
-    if (AddrHL[7, 1]) goto inst_next;
+    if (AddrHL & 0x80) goto inst_next;
     goto jdisp8;
 }
 
@@ -636,108 +637,108 @@ ABC: A is op_l=0x9 & A { export A; }
 
 # SHL ABC, n
 :SHL ABC, 1 is opcode=0x31; ABC & op_h=0x1 {
-    $(CY_) = ABC[7, 1];
+    CY = ABC[7, 1];
     ABC = ABC << 1;
 }
 
 :SHL ABC, 2 is opcode=0x31; ABC & op_h=0x2 {
-    $(CY_) = ABC[6, 1];
+    CY = ABC[6, 1];
     ABC = ABC << 2;
 }
 
 :SHL ABC, 3 is opcode=0x31; ABC & op_h=0x3 {
-    $(CY_) = ABC[5, 1];
+    CY = ABC[5, 1];
     ABC = ABC << 3;
 }
 
 :SHL ABC, 4 is opcode=0x31; ABC & op_h=0x4 {
-    $(CY_) = ABC[4, 1];
+    CY = ABC[4, 1];
     ABC = ABC << 4;
 }
 
 :SHL ABC, 5 is opcode=0x31; ABC & op_h=0x5 {
-    $(CY_) = ABC[3, 1];
+    CY = ABC[3, 1];
     ABC = ABC << 5;
 }
 
 :SHL ABC, 6 is opcode=0x31; ABC & op_h=0x6 {
-    $(CY_) = ABC[2, 1];
+    CY = ABC[2, 1];
     ABC = ABC << 6;
 }
 
 :SHL ABC, 7 is opcode=0x31; ABC & op_h=0x7 {
-    $(CY_) = ABC[1, 1];
+    CY = ABC[1, 1];
     ABC = ABC << 7;
 }
 
 # SHR A, n
 :SHR A, 1 is opcode=0x31 & A; op_l=0xA & op_h=0x1 {
-    $(CY_) = A[0, 1];
+    CY = A[0, 1];
     A = A >> 1;
 }
 
 :SHR A, 2 is opcode=0x31 & A; op_l=0xA & op_h=0x2 {
-    $(CY_) = A[1, 1];
+    CY = A[1, 1];
     A = A >> 2;
 }
 
 :SHR A, 3 is opcode=0x31 & A; op_l=0xA & op_h=0x3 {
-    $(CY_) = A[2, 1];
+    CY = A[2, 1];
     A = A >> 3;
 }
 
 :SHR A, 4 is opcode=0x31 & A; op_l=0xA & op_h=0x4 {
-    $(CY_) = A[3, 1];
+    CY = A[3, 1];
     A = A >> 4;
 }
 
 :SHR A, 5 is opcode=0x31 & A; op_l=0xA & op_h=0x5 {
-    $(CY_) = A[4, 1];
+    CY = A[4, 1];
     A = A >> 5;
 }
 
 :SHR A, 5 is opcode=0x31 & A; op_l=0xA & op_h=0x6 {
-    $(CY_) = A[5, 1];
+    CY = A[5, 1];
     A = A >> 6;
 }
 
 :SHR A, 6 is opcode=0x31 & A; op_l=0xA & op_h=0x7 {
-    $(CY_) = A[6, 1];
+    CY = A[6, 1];
     A = A >> 7;
 }
 
 :SAR A, 1 is opcode=0x31 & A; op_l=0xB & op_h=0x1 {
-    $(CY_) = A[0, 1];
+    CY = A[0, 1];
     A = A s>> 1;
 }
 
 :SAR A, 2 is opcode=0x31 & A; op_l=0xB & op_h=0x2 {
-    $(CY_) = A[1, 1];
+    CY = A[1, 1];
     A = A s>> 2;
 }
 
 :SAR A, 3 is opcode=0x31 & A; op_l=0xB & op_h=0x3 {
-    $(CY_) = A[2, 1];
+    CY = A[2, 1];
     A = A s>> 3;
 }
 
 :SAR A, 4 is opcode=0x31 & A; op_l=0xB & op_h=0x4 {
-    $(CY_) = A[3, 1];
+    CY = A[3, 1];
     A = A s>> 4;
 }
 
 :SAR A, 5 is opcode=0x31 & A; op_l=0xB & op_h=0x5 {
-    $(CY_) = A[4, 1];
+    CY = A[4, 1];
     A = A s>> 5;
 }
 
 :SAR A, 5 is opcode=0x31 & A; op_l=0xB & op_h=0x6 {
-    $(CY_) = A[5, 1];
+    CY = A[5, 1];
     A = A s>> 6;
 }
 
 :SAR A, 6 is opcode=0x31 & A; op_l=0xB & op_h=0x7 {
-    $(CY_) = A[6, 1];
+    CY = A[6, 1];
     A = A s>> 7;
 }
 
@@ -746,227 +747,227 @@ AXBC: AX is op_l=0xD & AX { export AX; }
 
 # SHLW AX, n
 :SHLW AXBC, 1 is opcode=0x31; AXBC & op_h=0x1 {
-    $(CY_) = AXBC[15, 1];
+    CY = (AXBC & 0x8000) != 0;
     AXBC = AXBC << 1;
 }
 
 :SHLW AXBC, 2 is opcode=0x31; AXBC & op_h=0x2 {
-    $(CY_) = AXBC[14, 1];
+    CY = (AXBC & 0x4000) != 0;
     AXBC = AXBC << 2;
 }
 
 :SHLW AXBC, 3 is opcode=0x31; AXBC & op_h=0x3 {
-    $(CY_) = AXBC[13, 1];
+    CY = (AXBC & 0x2000) != 0;
     AXBC = AXBC << 3;
 }
 
 :SHLW AXBC, 4 is opcode=0x31; AXBC & op_h=0x4 {
-    $(CY_) = AXBC[12, 1];
+    CY = (AXBC & 0x1000) != 0;
     AXBC = AXBC << 4;
 }
 
 :SHLW AXBC, 5 is opcode=0x31; AXBC & op_h=0x5 {
-    $(CY_) = AXBC[11, 1];
+    CY = (AXBC & 0x800) != 0;
     AXBC = AXBC << 5;
 }
 
 :SHLW AXBC, 6 is opcode=0x31; AXBC & op_h=0x6 {
-    $(CY_) = AXBC[10, 1];
+    CY = (AXBC & 0x400) != 0;
     AXBC = AXBC << 6;
 }
 
 :SHLW AXBC, 7 is opcode=0x31; AXBC & op_h=0x7 {
-    $(CY_) = AXBC[9, 1];
+    CY = (AXBC & 0x200) != 0;
     AXBC = AXBC << 7;
 }
 
 :SHLW AXBC, 8 is opcode=0x31; AXBC & op_h=0x8 {
-    $(CY_) = AXBC[8, 1];
+    CY = (AXBC & 0x100) != 0;
     AXBC = AXBC << 8;
 }
 
 :SHLW AXBC, 9 is opcode=0x31; AXBC & op_h=0x9 {
-    $(CY_) = AXBC[7, 1];
+    CY = (AXBC & 0x80) != 0;
     AXBC = AXBC << 9;
 }
 
 :SHLW AXBC, 10 is opcode=0x31; AXBC & op_h=0xA {
-    $(CY_) = AXBC[6, 1];
+    CY = (AXBC & 0x40) != 0;
     AXBC = AXBC << 10;
 }
 
 :SHLW AXBC, 11 is opcode=0x31; AXBC & op_h=0xB {
-    $(CY_) = AXBC[5, 1];
+    CY = (AXBC & 0x20) != 0;
     AXBC = AXBC << 11;
 }
 
 :SHLW AXBC, 12 is opcode=0x31; AXBC & op_h=0xC {
-    $(CY_) = AXBC[4, 1];
+    CY = (AXBC & 0x10) != 0;
     AXBC = AXBC << 12;
 }
 
 :SHLW AXBC, 13 is opcode=0x31; AXBC & op_h=0xD {
-    $(CY_) = AXBC[3, 1];
+    CY = (AXBC & 0x8) != 0;
     AXBC = AXBC << 13;
 }
 
 :SHLW AXBC, 14 is opcode=0x31; AXBC & op_h=0xE {
-    $(CY_) = AXBC[2, 1];
+    CY = (AXBC & 0x4) != 0;
     AXBC = AXBC << 14;
 }
 
 :SHLW AXBC, 15 is opcode=0x31; AXBC & op_h=0xF {
-    $(CY_) = AXBC[1, 1];
+    CY = (AXBC & 0x2) != 0;
     AXBC = AXBC << 15;
 }
 
 # SHRW AX, n
 :SHRW AX, 1 is opcode=0x31 & AX; op_l=0xE & op_h=0x1 {
-    $(CY_) = AX[0, 1];
+    CY = (AX & 0x1) != 0;
     AX = AX >> 1;
 }
 
 :SHRW AX, 2 is opcode=0x31 & AX; op_l=0xE & op_h=0x2 {
-    $(CY_) = AX[1, 1];
+    CY = (AX & 0x2) != 0;
     AX = AX >> 2;
 }
 
 :SHRW AX, 3 is opcode=0x31 & AX; op_l=0xE & op_h=0x3 {
-    $(CY_) = AX[2, 1];
+    CY = (AX & 0x4) != 0;
     AX = AX >> 3;
 }
 
 :SHRW AX, 4 is opcode=0x31 & AX; op_l=0xE & op_h=0x4 {
-    $(CY_) = AX[3, 1];
+    CY = (AX & 0x8) != 0;
     AX = AX >> 4;
 }
 
 :SHRW AX, 5 is opcode=0x31 & AX; op_l=0xE & op_h=0x5 {
-    $(CY_) = AX[4, 1];
+    CY = (AX & 0x10) != 0;
     AX = AX >> 5;
 }
 
 :SHRW AX, 6 is opcode=0x31 & AX; op_l=0xE & op_h=0x6 {
-    $(CY_) = AX[5, 1];
+    CY = (AX & 0x20) != 0;
     AX = AX >> 6;
 }
 
 :SHRW AX, 7 is opcode=0x31 & AX; op_l=0xE & op_h=0x7 {
-    $(CY_) = AX[6, 1];
+    CY = (AX & 0x40) != 0;
     AX = AX >> 7;
 }
 
 :SHRW AX, 8 is opcode=0x31 & AX; op_l=0xE & op_h=0x8 {
-    $(CY_) = AX[7, 1];
+    CY = (AX & 0x80) != 0;
     AX = AX >> 8;
 }
 
 :SHRW AX, 9 is opcode=0x31 & AX; op_l=0xE & op_h=0x9 {
-    $(CY_) = AX[8, 1];
+    CY = (AX & 0x100) != 0;
     AX = AX >> 9;
 }
 
 :SHRW AX, 10 is opcode=0x31 & AX; op_l=0xE & op_h=0xA {
-    $(CY_) = AX[9, 1];
+    CY = (AX & 0x200) != 0;
     AX = AX >> 10;
 }
 
 :SHRW AX, 11 is opcode=0x31 & AX; op_l=0xE & op_h=0xB {
-    $(CY_) = AX[10, 1];
+    CY = (AX & 0x400) != 0;
     AX = AX >> 11;
 }
 
 :SHRW AX, 12 is opcode=0x31 & AX; op_l=0xE & op_h=0xC {
-    $(CY_) = AX[11, 1];
+    CY = (AX & 0x800) != 0;
     AX = AX >> 12;
 }
 
 :SHRW AX, 13 is opcode=0x31 & AX; op_l=0xE & op_h=0xD {
-    $(CY_) = AX[12, 1];
+    CY = (AX & 0x1000) != 0;
     AX = AX >> 13;
 }
 
 :SHRW AX, 14 is opcode=0x31 & AX; op_l=0xE & op_h=0xE {
-    $(CY_) = AX[13, 1];
+    CY = (AX & 0x2000) != 0;
     AX = AX >> 14;
 }
 
 :SHRW AX, 15 is opcode=0x31 & AX; op_l=0xE & op_h=0xF {
-    $(CY_) = AX[14, 1];
+    CY = (AX & 0x4000) != 0;
     AX = AX >> 15;
 }
 
 :SARW AX, 1 is opcode=0x31 & AX; op_l=0xF & op_h=0x1 {
-    $(CY_) = AX[0, 1];
+    CY = (AX & 0x1) != 0;
     AX = AX s>> 1;
 }
 
 :SARW AX, 2 is opcode=0x31 & AX; op_l=0xF & op_h=0x2 {
-    $(CY_) = AX[1, 1];
+    CY = (AX & 0x2) != 0;
     AX = AX s>> 2;
 }
 
 :SARW AX, 3 is opcode=0x31 & AX; op_l=0xF & op_h=0x3 {
-    $(CY_) = AX[2, 1];
+    CY = (AX & 0x4) != 0;
     AX = AX s>> 3;
 }
 
 :SARW AX, 4 is opcode=0x31 & AX; op_l=0xF & op_h=0x4 {
-    $(CY_) = AX[3, 1];
+    CY = (AX & 0x8) != 0;
     AX = AX s>> 4;
 }
 
 :SARW AX, 5 is opcode=0x31 & AX; op_l=0xF & op_h=0x5 {
-    $(CY_) = AX[4, 1];
+    CY = (AX & 0x10) != 0;
     AX = AX s>> 5;
 }
 
 :SARW AX, 6 is opcode=0x31 & AX; op_l=0xF & op_h=0x6 {
-    $(CY_) = AX[5, 1];
+    CY = (AX & 0x20) != 0;
     AX = AX s>> 6;
 }
 
 :SARW AX, 7 is opcode=0x31 & AX; op_l=0xF & op_h=0x7 {
-    $(CY_) = AX[6, 1];
+    CY = (AX & 0x40) != 0;
     AX = AX s>> 7;
 }
 
 :SARW AX, 8 is opcode=0x31 & AX; op_l=0xF & op_h=0x8 {
-    $(CY_) = AX[7, 1];
+    CY = (AX & 0x80) != 0;
     AX = AX s>> 8;
 }
 
 :SARW AX, 9 is opcode=0x31 & AX; op_l=0xF & op_h=0x9 {
-    $(CY_) = AX[8, 1];
+    CY = (AX & 0x100) != 0;
     AX = AX s>> 9;
 }
 
 :SARW AX, 10 is opcode=0x31 & AX; op_l=0xF & op_h=0xA {
-    $(CY_) = AX[9, 1];
+    CY = (AX & 0x200) != 0;
     AX = AX s>> 10;
 }
 
 :SARW AX, 11 is opcode=0x31 & AX; op_l=0xF & op_h=0xB {
-    $(CY_) = AX[10, 1];
+    CY = (AX & 0x400) != 0;
     AX = AX s>> 11;
 }
 
 :SARW AX, 12 is opcode=0x31 & AX; op_l=0xF & op_h=0xC {
-    $(CY_) = AX[11, 1];
+    CY = (AX & 0x800) != 0;
     AX = AX s>> 12;
 }
 
 :SARW AX, 13 is opcode=0x31 & AX; op_l=0xF & op_h=0xD {
-    $(CY_) = AX[12, 1];
+    CY = (AX & 0x1000) != 0;
     AX = AX s>> 13;
 }
 
 :SARW AX, 14 is opcode=0x31 & AX; op_l=0xF & op_h=0xE {
-    $(CY_) = AX[13, 1];
+    CY = (AX & 0x2000) != 0;
     AX = AX s>> 14;
 }
 
 :SARW AX, 15 is opcode=0x31 & AX; op_l=0xF & op_h=0xF {
-    $(CY_) = AX[14, 1];
+    CY = (AX & 0x4000) != 0;
     AX = AX s>> 15;
 }

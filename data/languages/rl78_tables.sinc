@@ -111,14 +111,14 @@ offset8: uaddr8 is uaddr8 {
     export *[const]:1 uaddr8;
 }
 
-saddr_val: val is uaddr8 [val = 0xFFE00 + uaddr8;] { export *[const]:3 val; }
+saddr_val: val is uaddr8 [val = 0xFE00 + uaddr8;] { export *[const]:3 val; }
 
 saddr: uaddr8 is uaddr8 & saddr_val {
-    export *[ram]:1 saddr_val;
+    export *[near]:1 saddr_val;
 }
 
 saddrp: uaddr8 is uaddr8 & saddr_val & bit8_0=0 {
-    export *[ram]:2 saddr_val;
+    export *[near]:2 saddr_val;
 }
 
 uaddr16: uaddr16_data is uaddr16_data { export *[const]:2 uaddr16_data; }
@@ -375,7 +375,7 @@ AddrWordOffsetBCW: uaddr16[BC] is es_prefix=0 & uaddr16 & BC {
 }
 
 AddrWordOffsetBCW: ES:uaddr16[BC] is es_prefix=1 & uaddr16 & BC & ES {
-    local loc:3 = segment(ES, uaddr16) + zext(BC);
+    local loc:3 = segment(ES, uaddr16 + zext(BC));
     export *[ram]:2 loc;
 }
 

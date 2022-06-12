@@ -293,7 +293,7 @@
 }
 
 :POP PSW is opcode=0x61 & PSW; opcode=0xCD {
-    SP = SP + 1;
+    SP = SP + 2;
     PSW = *[near] SP;
     CY = PSW[0, 1];
     ISP0 = PSW[1, 1];
@@ -303,7 +303,6 @@
     RBS1 = PSW[5, 1];
     Z = PSW[6, 1];
     IE = PSW[7, 1];
-    SP = SP + 1;
 }
 
 :MOVS AddrHLOffset, X is opcode=0x61 & X & A; opcode=0xCE; AddrHLOffset {
@@ -373,7 +372,6 @@
 }
 
 :PUSH PSW is opcode=0x61 & PSW; opcode=0xDD {
-    SP = SP - 1;
     PSW[0, 1] = CY;
     PSW[1, 1] = ISP0;
     PSW[2, 1] = ISP1;
@@ -382,8 +380,10 @@
     PSW[5, 1] = RBS1;
     PSW[6, 1] = Z;
     PSW[7, 1] = IE;
+    SP = SP - 1;
     *[near] SP = PSW;
     SP = SP - 1;
+    *[near] SP = 0:1;
 }
 
 
@@ -450,8 +450,9 @@
 }
 
 :RETB (PC) is opcode=0x61 & PC; opcode=0xEC {
-    PC = *[near] SP;
     SP = SP + 3;
+    PC = *[near] SP;
+    SP = SP + 1;
     PSW = *[near] SP;
     CY = PSW[0, 1];
     ISP0 = PSW[1, 1];
@@ -461,7 +462,6 @@
     RBS1 = PSW[5, 1];
     Z = PSW[6, 1];
     IE = PSW[7, 1];
-    SP = SP + 1;
     return [PC];
 }
 
@@ -531,10 +531,10 @@
 }
 
 :RETI (PC) is opcode=0x61; opcode=0xFC & PC {
-    PC = *[near] SP;
     SP = SP + 3;
-    PSW = *[near] SP;
+    PC = *[near] SP;
     SP = SP + 1;
+    PSW = *[near] SP;
     return [PC];
 }
 

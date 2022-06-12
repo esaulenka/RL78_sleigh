@@ -24,15 +24,6 @@ define register offset=0x50 size=1 [SPL SPH PSW];
 
 define register offset=0xe0 size=1 [CY ISP0 ISP1 RBS0 AC RBS1 Z IE];
 
-@define IE_ 	    "PSW[7,1]"	# Interrupt Enable (IE)
-@define Z_          "PSW[6,1]" 	# Zero Flag (Z)
-@define PSW_RBS1_   "PSW[5,1]"	# Register Bank Select Hi-Bit (RBS1)
-@define AC_ 	    "PSW[4,1]"  # Auxiliary Carry Flag (AC)
-@define PSW_RBS0_	"PSW[3,1]" 	# Register Bank Select Lo-Bit (RBS0)
-@define ISP1_     	"PSW[2,1]" 	# In-service priority flag Hi-Bit (ISP1)
-@define ISP0_ 	    "PSW[1,1]"  # In-service priority flag Lo-Bit (ISP0)
-@define CY_   	    "PSW[0,1]"  # Carry flag (CY)
-
 # For storing processor context
 define register offset=0x80 size=4 contextreg;
 define register offset=0x84 size=1 skipflag;

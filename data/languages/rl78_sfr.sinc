@@ -10,7 +10,7 @@ define near offset=0x0 size=2 [
     _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _
-    _ _ _ _ _ _ _ _
+    _ _ _ _ ESFR184 _ _ _
     _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _
     MDCL MDCH _ _ _ _ _ _
@@ -51,7 +51,7 @@ define near offset=0x0 size=2 [
 
 define near offset=0x0 size=1 [
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    ADM2 ADUL ADLL ADTES _ _ _ SFR2_23 _ _ _ _ _ _ _ _
+    ADM2 ADUL ADLL ADTES _ _ _ ESFR23 _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     PU0 PU1 _ PU3 PU4 PU5 PU6 PU7 PU8 PU9 PU10 PU11 PU12 _ PU14 _
     PIM0 PIM1 _ _ PIM4 PIM5 _ _ PIM8 _ _ _ _ _ PIM14 _
@@ -60,12 +60,12 @@ define near offset=0x0 size=1 [
     NFEN0 NFEN1 NFEN2 ISC TIS0 _ ADPC PIOR IAWCTL _ _ _ _ GDIDIS _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     DFLCTL _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    HIOTRM _ _ _ _ _ _ _ HOCODIV _ _ _ _ _ _ _
-    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    HIOTRM ESFR161 _ _ _ _ _ _ HOCODIV _ _ _ _ _ _ _
+    _ _ _ _ _ _ _ _ _ _ ESFR186 _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ MDUC _ _ _ _ _ _ _
-    PER0 _ _ OSMC _ RPECTL _ _ _ _ _ _ _ _ BCDADJ _
+    PER0 _ _ OSMC ESFR244 RPECTL _ _ _ _ _ _ _ _ BCDADJ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     SE0L _ SS0L _ ST0L _ _ _ _ _ SOE0L _ _ _ _ _
@@ -112,7 +112,7 @@ attach variables [ ext_sfrw ] [
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    _ _ _ _ _ _ _ _ ESFR184 _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     MDCL _ MDCH _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -169,7 +169,7 @@ attach variables [ ext_sfrw ] [
 
 attach variables [ ext_sfr ] [
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    ADM2 ADUL ADLL ADTES _ _ _ SFR2_23 _ _ _ _ _ _ _ _
+    ADM2 ADUL ADLL ADTES _ _ _ ESFR23 _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     PU0 PU1 _ PU3 PU4 PU5 PU6 PU7 PU8 PU9 PU10 PU11 PU12 _ PU14 _
     PIM0 PIM1 _ _ PIM4 PIM5 _ _ PIM8 _ _ _ _ _ PIM14 _
@@ -178,12 +178,12 @@ attach variables [ ext_sfr ] [
     NFEN0 NFEN1 NFEN2 ISC TIS0 _ ADPC PIOR IAWCTL _ _ _ _ GDIDIS _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     DFLCTL _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    HIOTRM _ _ _ _ _ _ _ HOCODIV _ _ _ _ _ _ _
-    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    HIOTRM ESFR161 _ _ _ _ _ _ HOCODIV _ _ _ _ _ _ _
+    _ _ _ _ _ _ _ _ _ _ ESFR186 _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ MDUC _ _ _ _ _ _ _
-    PER0 _ _ OSMC _ RPECTL _ _ _ _ _ _ _ _ BCDADJ _
+    PER0 _ _ OSMC ESFR244 RPECTL _ _ _ _ _ _ _ _ BCDADJ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     SE0L _ SS0L _ ST0L _ _ _ _ _ SOE0L _ _ _ _ _

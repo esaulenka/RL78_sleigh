@@ -108,68 +108,68 @@
 
 # SET1 saddr.n
 :SET1 saddr"."0 is opcode=0x71; op_l=0x2 & op_h=0x0; saddr {
-    saddr[0, 1] = 1;
+    saddr = saddr | 0x1;
 }
 
 :SET1 saddr"."1 is opcode=0x71; op_l=0x2 & op_h=0x1; saddr {
-    saddr[1, 1] = 1;
+    saddr = saddr | 0x2;
 }
 
 :SET1 saddr"."2 is opcode=0x71; op_l=0x2 & op_h=0x2; saddr {
-    saddr[2, 1] = 1;
+    saddr = saddr | 0x4;
 }
 
 :SET1 saddr"."3 is opcode=0x71; op_l=0x2 & op_h=0x3; saddr {
-    saddr[3, 1] = 1;
+    saddr = saddr | 0x8;
 }
 
 :SET1 saddr"."4 is opcode=0x71; op_l=0x2 & op_h=0x4; saddr {
-    saddr[4, 1] = 1;
+    saddr = saddr | 0x10;
 }
 
 :SET1 saddr"."5 is opcode=0x71; op_l=0x2 & op_h=0x5; saddr {
-    saddr[5, 1] = 1;
+    saddr = saddr | 0x20;
 }
 
 :SET1 saddr"."6 is opcode=0x71; op_l=0x2 & op_h=0x6; saddr {
-    saddr[6, 1] = 1;
+    saddr = saddr | 0x40;
 }
 
 :SET1 saddr"."7 is opcode=0x71; op_l=0x2 & op_h=0x7; saddr {
-    saddr[7, 1] = 1;
+    saddr = saddr | 0x80;
 }
 
 # SET1 [HL].n
 :SET1 AddrHL"."0 is opcode=0x71 & AddrHL; op_l=0x2 & op_h=0x8 {
-    AddrHL[0, 1] = 1;
+    AddrHL = AddrHL | 0x1;
 }
 
 :SET1 AddrHL"."1 is opcode=0x71 & AddrHL; op_l=0x2 & op_h=0x9 {
-    AddrHL[1, 1] = 1;
+    AddrHL = AddrHL | 0x2;
 }
 
 :SET1 AddrHL"."2 is opcode=0x71 & AddrHL; op_l=0x2 & op_h=0xA {
-    AddrHL[2, 1] = 1;
+    AddrHL = AddrHL | 0x4;
 }
 
 :SET1 AddrHL"."3 is opcode=0x71 & AddrHL; op_l=0x2 & op_h=0xB {
-    AddrHL[3, 1] = 1;
+    AddrHL = AddrHL | 0x8;
 }
 
 :SET1 AddrHL"."4 is opcode=0x71 & AddrHL; op_l=0x2 & op_h=0xC {
-    AddrHL[4, 1] = 1;
+    AddrHL = AddrHL | 0x10;
 }
 
 :SET1 AddrHL"."5 is opcode=0x71 & AddrHL; op_l=0x2 & op_h=0xD {
-    AddrHL[5, 1] = 1;
+    AddrHL = AddrHL | 0x20;
 }
 
 :SET1 AddrHL"."6 is opcode=0x71 & AddrHL; op_l=0x2 & op_h=0xE {
-    AddrHL[6, 1] = 1;
+    AddrHL = AddrHL | 0x40;
 }
 
 :SET1 AddrHL"."7 is opcode=0x71 & AddrHL; op_l=0x2 & op_h=0xF {
-    AddrHL[7, 1] = 1;
+    AddrHL = AddrHL | 0x80;
 }
 
 # CLR1 saddr.n
@@ -646,35 +646,35 @@
 
 # SET1 sfr.n
 :SET1 sfr"."0 is opcode=0x71; op_l=0xA & op_h=0x0; sfr {
-    sfr[0, 1] = 1;
+    sfr = sfr | 0x1;
 }
 
 :SET1 sfr"."1 is opcode=0x71; op_l=0xA & op_h=0x1; sfr {
-    sfr[1, 1] = 1;
+    sfr = sfr | 0x2;
 }
 
 :SET1 sfr"."2 is opcode=0x71; op_l=0xA & op_h=0x2; sfr {
-    sfr[2, 1] = 1;
+    sfr = sfr | 0x4;
 }
 
 :SET1 sfr"."3 is opcode=0x71; op_l=0xA & op_h=0x3; sfr {
-    sfr[3, 1] = 1;
+    sfr = sfr | 0x8;
 }
 
 :SET1 sfr"."4 is opcode=0x71; op_l=0xA & op_h=0x4; sfr {
-    sfr[4, 1] = 1;
+    sfr = sfr | 0x10;
 }
 
 :SET1 sfr"."5 is opcode=0x71; op_l=0xA & op_h=0x5; sfr {
-    sfr[5, 1] = 1;
+    sfr = sfr | 0x20;
 }
 
 :SET1 sfr"."6 is opcode=0x71; op_l=0xA & op_h=0x6; sfr {
-    sfr[6, 1] = 1;
+    sfr = sfr | 0x40;
 }
 
 :SET1 sfr"."7 is opcode=0x71; op_l=0xA & op_h=0x7; sfr {
-    sfr[7, 1] = 1;
+    sfr = sfr | 0x80;
 }
 
 :SET1 "CY" is opcode=0x71; op_l=0xA & op_h=0x0; sfr_byte=0xFA {
@@ -697,35 +697,35 @@
 
 # SET1 A.n
 :SET1 A"."0 is opcode=0x71 & A; op_l=0xA & op_h=0x8 {
-    A[0, 1] = 1;
+    A = A | 0x1;
 }
 
 :SET1 A"."1 is opcode=0x71 & A; op_l=0xA & op_h=0x9 {
-    A[1, 1] = 1;
+    A = A | 0x2;
 }
 
 :SET1 A"."2 is opcode=0x71 & A; op_l=0xA & op_h=0xA {
-    A[2, 1] = 1;
+    A = A | 0x4;
 }
 
 :SET1 A"."3 is opcode=0x71 & A; op_l=0xA & op_h=0xB {
-    A[3, 1] = 1;
+    A = A | 0x8;
 }
 
 :SET1 A"."4 is opcode=0x71 & A; op_l=0xA & op_h=0xC {
-    A[4, 1] = 1;
+    A = A | 0x10;
 }
 
 :SET1 A"."5 is opcode=0x71 & A; op_l=0xA & op_h=0xD {
-    A[5, 1] = 1;
+    A = A | 0x20;
 }
 
 :SET1 A"."6 is opcode=0x71 & A; op_l=0xA & op_h=0xE {
-    A[6, 1] = 1;
+    A = A | 0x40;
 }
 
 :SET1 A"."7 is opcode=0x71 & A; op_l=0xA & op_h=0xF {
-    A[7, 1] = 1;
+    A = A | 0x80;
 }
 
 # CLR1 sfr.n

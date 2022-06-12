@@ -144,8 +144,8 @@ macro inst_btclr(src, bit, target) {
 }
 
 macro call_indirect(target) {
-    *[near]:4 SP = inst_next;
     SP = SP - 4;
+    *[near]:3 SP = inst_next;
     call [target];
 }
 

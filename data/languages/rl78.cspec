@@ -64,6 +64,14 @@
         <register name="SP"/>
         <register name="PSW"/>
         <register name="HL0"/>
+        <register name="CY"/>
+        <register name="ISP0"/>
+        <register name="ISP1"/>
+        <register name="RBS0"/>
+        <register name="AC"/>
+        <register name="RBS1"/>
+        <register name="Z"/>
+        <register name="IE"/>
       </unaffected>
     </prototype>
   </default_proto>

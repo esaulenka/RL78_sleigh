@@ -7,9 +7,6 @@
     <property key="customDisassemblerClass" value="ghidra.rl78.disassembly.RL78Disassembler"/>
   </properties>
   <programcounter register="PC"/>
-  <incidentalcopy>
-    <register name="HL0"/>
-  </incidentalcopy>
   <segmentop space="ram" userop="segment" farpointer="yes">
     <pcode>
       <input name="seg" size="1"/>
@@ -34,12 +31,6 @@
     <register name="rsb" hidden="true"/>
     <register name="CES" hidden="true"/>
   </register_data>
-  <inferptrbounds>
-    <range space="ram" first="0x10000" last="0xffee0"/>   <!-- Don't try to infer pointers from constants in the body of a function -->
-  </inferptrbounds>
-  <volatile outputop="reg_write" inputop="reg_read">
-    <range space="ram" first="0xe0000" last="0xe00ff"/> <!-- xcbase xdbase -->
-  </volatile>
   <default_memory_blocks>
     <memory_block name="iram" start_address="near:0x0000" length="0xFFFF" initialized="false" mode="rw"/>
   </default_memory_blocks>
