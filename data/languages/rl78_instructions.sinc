@@ -65,16 +65,40 @@
 # MOV PSW, #byte
 :MOV PSW, u8 is opcode=0x9F & PSW; opcode=0xFA; u8 {
     PSW = u8;
+    CY = PSW[0, 1];
+    ISP0 = PSW[1, 1];
+    ISP1 = PSW[2, 1];
+    RBS0 = PSW[3, 1];
+    AC = PSW[4, 1];
+    RBS1 = PSW[5, 1];
+    Z = PSW[6, 1];
+    IE = PSW[7, 1];
 }
 
 # MOV A, PSW
 :MOV A, PSW is opcode=0x8E & A & PSW; opcode=0xFA {
+    PSW[0, 1] = CY;
+    PSW[1, 1] = ISP0;
+    PSW[2, 1] = ISP1;
+    PSW[3, 1] = RBS0;
+    PSW[4, 1] = AC;
+    PSW[5, 1] = RBS1;
+    PSW[6, 1] = Z;
+    PSW[7, 1] = IE;
     A = PSW;
 }
 
 # MOV PSW, A
 :MOV PSW, A is opcode=0x9E & A & PSW; opcode=0xFA {
     PSW = A;
+    CY = PSW[0, 1];
+    ISP0 = PSW[1, 1];
+    ISP1 = PSW[2, 1];
+    RBS0 = PSW[3, 1];
+    AC = PSW[4, 1];
+    RBS1 = PSW[5, 1];
+    Z = PSW[6, 1];
+    IE = PSW[7, 1];
 }
 
 # MOV ES, #byte
@@ -1099,22 +1123,22 @@
 
 # BC $addr20
 :BC jdisp8 is opcode=0xDC; jdisp8 {
-    if ($(CY)) goto jdisp8;
+    if (CY) goto jdisp8;
 }
 
 # BNC $addr20
 :BNC jdisp8 is opcode=0xDE; jdisp8 {
-    if (!$(CY)) goto jdisp8;
+    if (!CY) goto jdisp8;
 }
 
 # BZ $addr20
 :BZ jdisp8 is opcode=0xDD; jdisp8 {
-    if ($(Z)) goto jdisp8;
+    if (Z) goto jdisp8;
 }
 
 # BNZ $addr20
 :BNZ jdisp8 is opcode=0xDF; jdisp8 {
-    if (!$(Z)) goto jdisp8;
+    if (!Z) goto jdisp8;
 }
 
 

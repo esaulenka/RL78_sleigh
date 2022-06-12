@@ -20,7 +20,9 @@ public class RL78Disassembler extends Disassembler {
 
 	private static final byte MAP2 = 0x61;
 	private static final byte SKIP_OP_1 = (byte) 0xC8;
+	private static final byte SKIP_MASK_1 = (byte) 0xCF;
 	private static final byte SKIP_OP_2 = (byte) 0xE3;
+	private static final byte SKIP_MASK_2 = (byte) 0xEF;
 
 	private final Register skipReg;
 
@@ -51,7 +53,7 @@ public class RL78Disassembler extends Disassembler {
 				return;
 			}
 			byte b = instrMemBuffer.getByte(1);
-			if ((b & SKIP_OP_1) != SKIP_OP_1 && (b & SKIP_OP_2) != SKIP_OP_2) {
+			if ((b & SKIP_MASK_1) != SKIP_OP_1 && (b & SKIP_MASK_2) != SKIP_OP_2) {
 				return;
 			}
 			Program program = instrMemBuffer.getMemory().getProgram();

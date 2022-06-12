@@ -21,6 +21,7 @@
   </data_organization>
   <global>
     <range space="ram"/>
+    <range space="near"/>
   </global>
   <stackpointer register="SP" space="near" growth="negative"/>
   <funcptr align="2"/>
@@ -64,9 +65,6 @@
         <register name="PSW"/>
         <register name="HL0"/>
       </unaffected>
-      <localrange>
-        <range space="stack" first="0x8000" last="0xffff"/>
-      </localrange>
     </prototype>
   </default_proto>
 </compiler_spec>

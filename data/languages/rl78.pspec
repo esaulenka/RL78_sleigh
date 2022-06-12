@@ -26,6 +26,7 @@
   <context_data>
     <tracked_set space="ram">
       <set name="CES" val="0xf"/>
+      <set name="bank" val="0x18"/>
     </tracked_set>
   </context_data>
   <register_data>
@@ -40,6 +41,6 @@
     <range space="ram" first="0xe0000" last="0xe00ff"/> <!-- xcbase xdbase -->
   </volatile>
   <default_memory_blocks>
-    <memory_block name="iram" start_address="0xf0000" length="0x10000" initialized="false" mode="rw"/>
+    <memory_block name="iram" start_address="near:0x0000" length="0xFFFF" initialized="false" mode="rw"/>
   </default_memory_blocks>
 </processor_spec>

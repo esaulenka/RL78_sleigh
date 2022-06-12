@@ -130,34 +130,34 @@
 
 # BTCLR PSW.n, $addr20
 :BTCLR "CY", jdisp8 is opcode=0x31; op_l=0x0 & op_h=0x8; sfr_byte=0xFA; jdisp8 {
-    if ($(CY)) goto <clear>;
+    if ($(CY_)) goto <clear>;
     goto inst_next;
     <clear>
-    $(CY) = 0;
+    $(CY_) = 0;
     goto jdisp8;
 }
 
 :BTCLR "AC", jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xB; sfr_byte=0xFA; jdisp8 {
-    if ($(AC)) goto <clear>;
+    if ($(AC_)) goto <clear>;
     goto inst_next;
     <clear>
-    $(AC) = 0;
+    $(AC_) = 0;
     goto jdisp8;
 }
 
 :BTCLR "Z", jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xE; sfr_byte=0xFA; jdisp8 {
-    if ($(Z)) goto <clear>;
+    if ($(Z_)) goto <clear>;
     goto inst_next;
     <clear>
-    $(Z) = 0;
+    $(Z_) = 0;
     goto jdisp8;
 }
 
 :BTCLR "IE", jdisp8 is opcode=0x31; op_l=0x0 & op_h=0xF; sfr_byte=0xFA; jdisp8 {
-    if ($(IE)) goto <clear>;
+    if ($(IE_)) goto <clear>;
     goto inst_next;
     <clear>
-    $(IE) = 0;
+    $(IE_) = 0;
     goto jdisp8;
 }
 
@@ -365,20 +365,20 @@
 }
 
 :BT "AC", jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xB; sfr_byte=0xFA; jdisp8 {
-    if ($(AC)) goto jdisp8;
+    if ($(AC_)) goto jdisp8;
 }
 
 :BT "IE", jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xF; sfr_byte=0xFA; jdisp8 {
-    if ($(IE)) goto jdisp8;
+    if ($(IE_)) goto jdisp8;
 }
 
 # BF PSW.n, $addr20
 :BC jdisp8 is opcode=0x31; op_l=0x2 & op_h=0x8 & mov1_sreg=1; sfr_byte=0xFA; jdisp8 {
-    if ($(CY)) goto jdisp8;
+    if ($(CY_)) goto jdisp8;
 }
 
 :BZ jdisp8 is opcode=0x31; op_l=0x2 & op_h=0xE & mov1_sreg=1; sfr_byte=0xFA; jdisp8 {
-    if ($(Z)) goto jdisp8;
+    if ($(Z_)) goto jdisp8;
 }
 
 # BT A.n, $addr20
@@ -530,22 +530,22 @@
 }
 
 :BF "AC", jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xB; sfr_byte=0xFA; jdisp8 {
-    if ($(AC)) goto inst_next;
+    if ($(AC_)) goto inst_next;
     goto jdisp8;
 }
 
 :BF "IE", jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xF; sfr_byte=0xFA; jdisp8 {
-    if ($(IE)) goto inst_next;
+    if ($(IE_)) goto inst_next;
     goto jdisp8;
 }
 
 # BF PSW.n, $addr20
 :BNC jdisp8 is opcode=0x31; op_l=0x4 & op_h=0x8 & mov1_sreg=1; sfr_byte=0xFA; jdisp8 {
-    if (!$(CY)) goto jdisp8;
+    if (!$(CY_)) goto jdisp8;
 }
 
 :BNZ jdisp8 is opcode=0x31; op_l=0x4 & op_h=0xE & mov1_sreg=1; sfr_byte=0xFA; jdisp8 {
-    if (!$(Z)) goto jdisp8;
+    if (!$(Z_)) goto jdisp8;
 }
 
 # BF A.n, $addr20
@@ -636,108 +636,108 @@ ABC: A is op_l=0x9 & A { export A; }
 
 # SHL ABC, n
 :SHL ABC, 1 is opcode=0x31; ABC & op_h=0x1 {
-    $(CY) = ABC[7, 1];
+    $(CY_) = ABC[7, 1];
     ABC = ABC << 1;
 }
 
 :SHL ABC, 2 is opcode=0x31; ABC & op_h=0x2 {
-    $(CY) = ABC[6, 1];
+    $(CY_) = ABC[6, 1];
     ABC = ABC << 2;
 }
 
 :SHL ABC, 3 is opcode=0x31; ABC & op_h=0x3 {
-    $(CY) = ABC[5, 1];
+    $(CY_) = ABC[5, 1];
     ABC = ABC << 3;
 }
 
 :SHL ABC, 4 is opcode=0x31; ABC & op_h=0x4 {
-    $(CY) = ABC[4, 1];
+    $(CY_) = ABC[4, 1];
     ABC = ABC << 4;
 }
 
 :SHL ABC, 5 is opcode=0x31; ABC & op_h=0x5 {
-    $(CY) = ABC[3, 1];
+    $(CY_) = ABC[3, 1];
     ABC = ABC << 5;
 }
 
 :SHL ABC, 6 is opcode=0x31; ABC & op_h=0x6 {
-    $(CY) = ABC[2, 1];
+    $(CY_) = ABC[2, 1];
     ABC = ABC << 6;
 }
 
 :SHL ABC, 7 is opcode=0x31; ABC & op_h=0x7 {
-    $(CY) = ABC[1, 1];
+    $(CY_) = ABC[1, 1];
     ABC = ABC << 7;
 }
 
 # SHR A, n
 :SHR A, 1 is opcode=0x31 & A; op_l=0xA & op_h=0x1 {
-    $(CY) = A[0, 1];
+    $(CY_) = A[0, 1];
     A = A >> 1;
 }
 
 :SHR A, 2 is opcode=0x31 & A; op_l=0xA & op_h=0x2 {
-    $(CY) = A[1, 1];
+    $(CY_) = A[1, 1];
     A = A >> 2;
 }
 
 :SHR A, 3 is opcode=0x31 & A; op_l=0xA & op_h=0x3 {
-    $(CY) = A[2, 1];
+    $(CY_) = A[2, 1];
     A = A >> 3;
 }
 
 :SHR A, 4 is opcode=0x31 & A; op_l=0xA & op_h=0x4 {
-    $(CY) = A[3, 1];
+    $(CY_) = A[3, 1];
     A = A >> 4;
 }
 
 :SHR A, 5 is opcode=0x31 & A; op_l=0xA & op_h=0x5 {
-    $(CY) = A[4, 1];
+    $(CY_) = A[4, 1];
     A = A >> 5;
 }
 
 :SHR A, 5 is opcode=0x31 & A; op_l=0xA & op_h=0x6 {
-    $(CY) = A[5, 1];
+    $(CY_) = A[5, 1];
     A = A >> 6;
 }
 
 :SHR A, 6 is opcode=0x31 & A; op_l=0xA & op_h=0x7 {
-    $(CY) = A[6, 1];
+    $(CY_) = A[6, 1];
     A = A >> 7;
 }
 
 :SAR A, 1 is opcode=0x31 & A; op_l=0xB & op_h=0x1 {
-    $(CY) = A[0, 1];
+    $(CY_) = A[0, 1];
     A = A s>> 1;
 }
 
 :SAR A, 2 is opcode=0x31 & A; op_l=0xB & op_h=0x2 {
-    $(CY) = A[1, 1];
+    $(CY_) = A[1, 1];
     A = A s>> 2;
 }
 
 :SAR A, 3 is opcode=0x31 & A; op_l=0xB & op_h=0x3 {
-    $(CY) = A[2, 1];
+    $(CY_) = A[2, 1];
     A = A s>> 3;
 }
 
 :SAR A, 4 is opcode=0x31 & A; op_l=0xB & op_h=0x4 {
-    $(CY) = A[3, 1];
+    $(CY_) = A[3, 1];
     A = A s>> 4;
 }
 
 :SAR A, 5 is opcode=0x31 & A; op_l=0xB & op_h=0x5 {
-    $(CY) = A[4, 1];
+    $(CY_) = A[4, 1];
     A = A s>> 5;
 }
 
 :SAR A, 5 is opcode=0x31 & A; op_l=0xB & op_h=0x6 {
-    $(CY) = A[5, 1];
+    $(CY_) = A[5, 1];
     A = A s>> 6;
 }
 
 :SAR A, 6 is opcode=0x31 & A; op_l=0xB & op_h=0x7 {
-    $(CY) = A[6, 1];
+    $(CY_) = A[6, 1];
     A = A s>> 7;
 }
 
@@ -746,227 +746,227 @@ AXBC: AX is op_l=0xD & AX { export AX; }
 
 # SHLW AX, n
 :SHLW AXBC, 1 is opcode=0x31; AXBC & op_h=0x1 {
-    $(CY) = AXBC[15, 1];
+    $(CY_) = AXBC[15, 1];
     AXBC = AXBC << 1;
 }
 
 :SHLW AXBC, 2 is opcode=0x31; AXBC & op_h=0x2 {
-    $(CY) = AXBC[14, 1];
+    $(CY_) = AXBC[14, 1];
     AXBC = AXBC << 2;
 }
 
 :SHLW AXBC, 3 is opcode=0x31; AXBC & op_h=0x3 {
-    $(CY) = AXBC[13, 1];
+    $(CY_) = AXBC[13, 1];
     AXBC = AXBC << 3;
 }
 
 :SHLW AXBC, 4 is opcode=0x31; AXBC & op_h=0x4 {
-    $(CY) = AXBC[12, 1];
+    $(CY_) = AXBC[12, 1];
     AXBC = AXBC << 4;
 }
 
 :SHLW AXBC, 5 is opcode=0x31; AXBC & op_h=0x5 {
-    $(CY) = AXBC[11, 1];
+    $(CY_) = AXBC[11, 1];
     AXBC = AXBC << 5;
 }
 
 :SHLW AXBC, 6 is opcode=0x31; AXBC & op_h=0x6 {
-    $(CY) = AXBC[10, 1];
+    $(CY_) = AXBC[10, 1];
     AXBC = AXBC << 6;
 }
 
 :SHLW AXBC, 7 is opcode=0x31; AXBC & op_h=0x7 {
-    $(CY) = AXBC[9, 1];
+    $(CY_) = AXBC[9, 1];
     AXBC = AXBC << 7;
 }
 
 :SHLW AXBC, 8 is opcode=0x31; AXBC & op_h=0x8 {
-    $(CY) = AXBC[8, 1];
+    $(CY_) = AXBC[8, 1];
     AXBC = AXBC << 8;
 }
 
 :SHLW AXBC, 9 is opcode=0x31; AXBC & op_h=0x9 {
-    $(CY) = AXBC[7, 1];
+    $(CY_) = AXBC[7, 1];
     AXBC = AXBC << 9;
 }
 
 :SHLW AXBC, 10 is opcode=0x31; AXBC & op_h=0xA {
-    $(CY) = AXBC[6, 1];
+    $(CY_) = AXBC[6, 1];
     AXBC = AXBC << 10;
 }
 
 :SHLW AXBC, 11 is opcode=0x31; AXBC & op_h=0xB {
-    $(CY) = AXBC[5, 1];
+    $(CY_) = AXBC[5, 1];
     AXBC = AXBC << 11;
 }
 
 :SHLW AXBC, 12 is opcode=0x31; AXBC & op_h=0xC {
-    $(CY) = AXBC[4, 1];
+    $(CY_) = AXBC[4, 1];
     AXBC = AXBC << 12;
 }
 
 :SHLW AXBC, 13 is opcode=0x31; AXBC & op_h=0xD {
-    $(CY) = AXBC[3, 1];
+    $(CY_) = AXBC[3, 1];
     AXBC = AXBC << 13;
 }
 
 :SHLW AXBC, 14 is opcode=0x31; AXBC & op_h=0xE {
-    $(CY) = AXBC[2, 1];
+    $(CY_) = AXBC[2, 1];
     AXBC = AXBC << 14;
 }
 
 :SHLW AXBC, 15 is opcode=0x31; AXBC & op_h=0xF {
-    $(CY) = AXBC[1, 1];
+    $(CY_) = AXBC[1, 1];
     AXBC = AXBC << 15;
 }
 
 # SHRW AX, n
 :SHRW AX, 1 is opcode=0x31 & AX; op_l=0xE & op_h=0x1 {
-    $(CY) = AX[0, 1];
+    $(CY_) = AX[0, 1];
     AX = AX >> 1;
 }
 
 :SHRW AX, 2 is opcode=0x31 & AX; op_l=0xE & op_h=0x2 {
-    $(CY) = AX[1, 1];
+    $(CY_) = AX[1, 1];
     AX = AX >> 2;
 }
 
 :SHRW AX, 3 is opcode=0x31 & AX; op_l=0xE & op_h=0x3 {
-    $(CY) = AX[2, 1];
+    $(CY_) = AX[2, 1];
     AX = AX >> 3;
 }
 
 :SHRW AX, 4 is opcode=0x31 & AX; op_l=0xE & op_h=0x4 {
-    $(CY) = AX[3, 1];
+    $(CY_) = AX[3, 1];
     AX = AX >> 4;
 }
 
 :SHRW AX, 5 is opcode=0x31 & AX; op_l=0xE & op_h=0x5 {
-    $(CY) = AX[4, 1];
+    $(CY_) = AX[4, 1];
     AX = AX >> 5;
 }
 
 :SHRW AX, 6 is opcode=0x31 & AX; op_l=0xE & op_h=0x6 {
-    $(CY) = AX[5, 1];
+    $(CY_) = AX[5, 1];
     AX = AX >> 6;
 }
 
 :SHRW AX, 7 is opcode=0x31 & AX; op_l=0xE & op_h=0x7 {
-    $(CY) = AX[6, 1];
+    $(CY_) = AX[6, 1];
     AX = AX >> 7;
 }
 
 :SHRW AX, 8 is opcode=0x31 & AX; op_l=0xE & op_h=0x8 {
-    $(CY) = AX[7, 1];
+    $(CY_) = AX[7, 1];
     AX = AX >> 8;
 }
 
 :SHRW AX, 9 is opcode=0x31 & AX; op_l=0xE & op_h=0x9 {
-    $(CY) = AX[8, 1];
+    $(CY_) = AX[8, 1];
     AX = AX >> 9;
 }
 
 :SHRW AX, 10 is opcode=0x31 & AX; op_l=0xE & op_h=0xA {
-    $(CY) = AX[9, 1];
+    $(CY_) = AX[9, 1];
     AX = AX >> 10;
 }
 
 :SHRW AX, 11 is opcode=0x31 & AX; op_l=0xE & op_h=0xB {
-    $(CY) = AX[10, 1];
+    $(CY_) = AX[10, 1];
     AX = AX >> 11;
 }
 
 :SHRW AX, 12 is opcode=0x31 & AX; op_l=0xE & op_h=0xC {
-    $(CY) = AX[11, 1];
+    $(CY_) = AX[11, 1];
     AX = AX >> 12;
 }
 
 :SHRW AX, 13 is opcode=0x31 & AX; op_l=0xE & op_h=0xD {
-    $(CY) = AX[12, 1];
+    $(CY_) = AX[12, 1];
     AX = AX >> 13;
 }
 
 :SHRW AX, 14 is opcode=0x31 & AX; op_l=0xE & op_h=0xE {
-    $(CY) = AX[13, 1];
+    $(CY_) = AX[13, 1];
     AX = AX >> 14;
 }
 
 :SHRW AX, 15 is opcode=0x31 & AX; op_l=0xE & op_h=0xF {
-    $(CY) = AX[14, 1];
+    $(CY_) = AX[14, 1];
     AX = AX >> 15;
 }
 
 :SARW AX, 1 is opcode=0x31 & AX; op_l=0xF & op_h=0x1 {
-    $(CY) = AX[0, 1];
+    $(CY_) = AX[0, 1];
     AX = AX s>> 1;
 }
 
 :SARW AX, 2 is opcode=0x31 & AX; op_l=0xF & op_h=0x2 {
-    $(CY) = AX[1, 1];
+    $(CY_) = AX[1, 1];
     AX = AX s>> 2;
 }
 
 :SARW AX, 3 is opcode=0x31 & AX; op_l=0xF & op_h=0x3 {
-    $(CY) = AX[2, 1];
+    $(CY_) = AX[2, 1];
     AX = AX s>> 3;
 }
 
 :SARW AX, 4 is opcode=0x31 & AX; op_l=0xF & op_h=0x4 {
-    $(CY) = AX[3, 1];
+    $(CY_) = AX[3, 1];
     AX = AX s>> 4;
 }
 
 :SARW AX, 5 is opcode=0x31 & AX; op_l=0xF & op_h=0x5 {
-    $(CY) = AX[4, 1];
+    $(CY_) = AX[4, 1];
     AX = AX s>> 5;
 }
 
 :SARW AX, 6 is opcode=0x31 & AX; op_l=0xF & op_h=0x6 {
-    $(CY) = AX[5, 1];
+    $(CY_) = AX[5, 1];
     AX = AX s>> 6;
 }
 
 :SARW AX, 7 is opcode=0x31 & AX; op_l=0xF & op_h=0x7 {
-    $(CY) = AX[6, 1];
+    $(CY_) = AX[6, 1];
     AX = AX s>> 7;
 }
 
 :SARW AX, 8 is opcode=0x31 & AX; op_l=0xF & op_h=0x8 {
-    $(CY) = AX[7, 1];
+    $(CY_) = AX[7, 1];
     AX = AX s>> 8;
 }
 
 :SARW AX, 9 is opcode=0x31 & AX; op_l=0xF & op_h=0x9 {
-    $(CY) = AX[8, 1];
+    $(CY_) = AX[8, 1];
     AX = AX s>> 9;
 }
 
 :SARW AX, 10 is opcode=0x31 & AX; op_l=0xF & op_h=0xA {
-    $(CY) = AX[9, 1];
+    $(CY_) = AX[9, 1];
     AX = AX s>> 10;
 }
 
 :SARW AX, 11 is opcode=0x31 & AX; op_l=0xF & op_h=0xB {
-    $(CY) = AX[10, 1];
+    $(CY_) = AX[10, 1];
     AX = AX s>> 11;
 }
 
 :SARW AX, 12 is opcode=0x31 & AX; op_l=0xF & op_h=0xC {
-    $(CY) = AX[11, 1];
+    $(CY_) = AX[11, 1];
     AX = AX s>> 12;
 }
 
 :SARW AX, 13 is opcode=0x31 & AX; op_l=0xF & op_h=0xD {
-    $(CY) = AX[12, 1];
+    $(CY_) = AX[12, 1];
     AX = AX s>> 13;
 }
 
 :SARW AX, 14 is opcode=0x31 & AX; op_l=0xF & op_h=0xE {
-    $(CY) = AX[13, 1];
+    $(CY_) = AX[13, 1];
     AX = AX s>> 14;
 }
 
 :SARW AX, 15 is opcode=0x31 & AX; op_l=0xF & op_h=0xF {
-    $(CY) = AX[14, 1];
+    $(CY_) = AX[14, 1];
     AX = AX s>> 15;
 }

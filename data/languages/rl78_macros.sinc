@@ -1,10 +1,10 @@
 
 macro aux_carry(dst, src) {
-    $(AC) = ((dst & 0xf) + (src & 0xf)) > 0xf;
+    AC = ((dst & 0xf) + (src & 0xf)) > 0xf;
 }
 
 macro aux_borrow(dst, src) {
-    $(AC) = (dst & 0xf) < (src & 0xf);
+    AC = (dst & 0xf) < (src & 0xf);
 }
 
 macro inst_xch(dst, src) {
@@ -22,52 +22,52 @@ macro swap(dst, src) {
 macro inst_inc(dst) {
     aux_carry(dst, 1);
     dst = dst + 1;
-    $(Z) = dst == 0;
+    Z = dst == 0;
 }
 
 macro inst_dec(dst) {
     aux_borrow(dst, 1);
     dst = dst - 1;
-    $(Z) = dst == 0;
+    Z = dst == 0;
 }
 
 macro inst_add(dst, src) {
     aux_carry(dst, src);
-    $(CY) = carry(dst, src);
+    CY = carry(dst, src);
     dst = dst + src;
-    $(Z) = dst == 0;
+    Z = dst == 0;
 }
 
 macro inst_addc(dst, src) {
-    tmp = src + $(CY);
+    tmp = src + CY;
     inst_add(dst, tmp);
 }
 
 macro inst_sub(dst, src) {
     aux_borrow(dst, src);
-    $(CY) = dst < src;
+    CY = dst < src;
     dst = dst - src;
-    $(Z) = dst == 0;
+    Z = dst == 0;
 }
 
 macro inst_subc(dst, src) {
-    tmp = src - $(CY);
+    tmp = src - CY;
     inst_sub(dst, tmp);
 }
 
 macro inst_and(dst, src) {
     dst = dst & src;
-    $(Z) = dst == 0;
+    Z = dst == 0;
 }
 
 macro inst_or(dst, src) {
     dst = dst | src;
-    $(Z) = dst == 0;
+    Z = dst == 0;
 }
 
 macro inst_xor(dst, src) {
     dst = dst ^ src;
-    $(Z) = dst == 0;
+    Z = dst == 0;
 }
 
 macro inst_incw(dst) {
@@ -80,12 +80,12 @@ macro inst_decw(dst) {
 
 macro inst_shr(dst, n) {
     local tmp = dst >> (n-1);
-    $(CY) = (tmp & 1) == 1;
+    CY = (tmp & 1) == 1;
     dst = tmp >> 1;
 }
 
 macro inst_shl(dst, n) {
-    $(CY) = (dst & (1 << (n-1))) != 0;
+    CY = (dst & (1 << (n-1))) != 0;
     dst = dst << n;
 }
 
@@ -95,7 +95,7 @@ macro inst_shlw(dst, n) {
 
 macro inst_sar(dst, n) {
     local tmp = dst s>> (n-1);
-    $(CY) = (tmp & 1) == 1;
+    CY = (tmp & 1) == 1;
     dst = tmp s>> 1;
 }
 
@@ -104,32 +104,32 @@ macro inst_sarw(dst, n) {
 }
 
 macro inst_cmp(dst, src) {
-    $(Z) = dst == src;
-    $(CY) = dst < src;
+    Z = dst == src;
+    CY = dst < src;
     aux_borrow(dst, src);
 }
 
 macro inst_cmp0(dst) {
-    $(Z) = dst == 0;
-    $(AC) = 0;
-    $(CY) = 0;
+    Z = dst == 0;
+    AC = 0;
+    CY = 0;
 }
 
 macro inst_addw(dst, src) {
-    $(CY) = carry(dst, src);
+    CY = carry(dst, src);
     dst = dst + src;
-    $(Z) = dst == 0;
+    Z = dst == 0;
 }
 
 macro inst_subw(dst, src) {
-    $(CY) = dst < src;
+    CY = dst < src;
     dst = dst - src;
-    $(Z) = dst == 0;
+    Z = dst == 0;
 }
 
 macro inst_cmpw(dst, src) {
-    $(Z) = dst == src;
-    $(CY) = dst < src;
+    Z = dst == src;
+    CY = dst < src;
 }
 
 macro inst_clr1(dst, bit) {
