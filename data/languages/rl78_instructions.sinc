@@ -1068,8 +1068,8 @@
 
 # POP rp
 :POP DREG_WORD is op_h=0xC & DREG_WORD & rp_source=0 {
-    SP = SP + 2;
     DREG_WORD = *[near] SP;
+    SP = SP + 2;
 }
 
 # MOVW SP, #word

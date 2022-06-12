@@ -293,8 +293,9 @@
 }
 
 :POP PSW is opcode=0x61 & PSW; opcode=0xCD {
-    SP = SP + 2;
+    SP = SP + 1;
     PSW = *[near] SP;
+    SP = SP + 1;
     CY = PSW[0, 1];
     ISP0 = PSW[1, 1];
     ISP1 = PSW[2, 1];
