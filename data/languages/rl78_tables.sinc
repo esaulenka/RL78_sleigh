@@ -113,19 +113,34 @@ DREG_WORD:^BC is BC & dreg_word=1 { export BC; }
 DREG_WORD:^DE is DE & dreg_word=2 { export DE; }
 DREG_WORD:^HL is HL & dreg_word=3 { export HL; }
 
-CALL_RP:^AX is AX & CS & call_rp=4 { local target:3 = segment(CS, AX); export target; }
-CALL_RP:^BC is BC & CS & call_rp=5 { local target:3 = segment(CS, BC); export target; }
-CALL_RP:^DE is DE & CS & call_rp=6 { local target:3 = segment(CS, DE); export target; }
-CALL_RP:^HL is HL & CS & call_rp=7 { local target:3 = segment(CS, HL); export target; }
+SREG2_BYTE:^X is X & sreg_byte=0 { export X; }
+SREG2_BYTE:^A is A & sreg_byte=1 { export A; }
+SREG2_BYTE:^C is C & sreg_byte=2 { export C; }
+SREG2_BYTE:^B is B & sreg_byte=3 { export B; }
+SREG2_BYTE:^E is E & sreg_byte=4 { export E; }
+SREG2_BYTE:^D is D & sreg_byte=5 { export D; }
+SREG2_BYTE:^L is L & sreg_byte=6 { export L; }
+SREG2_BYTE:^H is H & sreg_byte=7 { export H; }
 
-SREG2_BYTE:^X is X & sreg2_byte=0 { export X; }
-SREG2_BYTE:^A is A & sreg2_byte=1 { export A; }
-SREG2_BYTE:^C is C & sreg2_byte=2 { export C; }
-SREG2_BYTE:^B is B & sreg2_byte=3 { export B; }
-SREG2_BYTE:^E is E & sreg2_byte=4 { export E; }
-SREG2_BYTE:^D is D & sreg2_byte=5 { export D; }
-SREG2_BYTE:^L is L & sreg2_byte=6 { export L; }
-SREG2_BYTE:^H is H & sreg2_byte=7 { export H; }
+SKIP_TARGET: loc is skip_mode=1 [ loc = inst_next + 1; ] {
+    export *[ram]:3 loc;
+}
+
+SKIP_TARGET: loc is skip_mode=2 [ loc = inst_next + 2; ] {
+    export *[ram]:3 loc;
+}
+
+SKIP_TARGET: loc is skip_mode=3 [ loc = inst_next + 3; ] {
+    export *[ram]:3 loc;
+}
+
+SKIP_TARGET: loc is skip_mode=4 [ loc = inst_next + 4; ] {
+    export *[ram]:3 loc;
+}
+
+SKIP_TARGET: loc is skip_mode=5 [ loc = inst_next + 5; ] {
+    export *[ram]:3 loc;
+}
 
 is_sfr2: is bit16_8_9=0 & a16_bits_10_15=0 {}
 is_sfr2: is bit16_8_9=1 & a16_bits_10_15=0 {}
@@ -223,14 +238,6 @@ jaddr16: "!"uaddr16 is uaddr16 {
 
 jdisp16: "$!"loc is saddr16 [ loc = inst_next + saddr16; ] {
     export *[ram]:3 loc;
-}
-
-brk_addr: loc is opcode [ loc = 0x007F7E; ] {
-    export *[ram]:3 loc;
-}
-
-ret_addr: is epsilon {
-    export *[near]:3 SP;
 }
 
 # Register Ponter tokens - [r]
@@ -473,7 +480,4 @@ AddrSPOffsetW: [SP+uaddr8] is uaddr8 & SP {
     export *[near]:2 loc;
 }
 
-ct_entry: val is op2_callt_low & op2_callt_hi
-        [ val = 0x80 | ((op2_callt_hi << 4) | op2_callt_low << 1); ] {
-    export *[const]:3 val;
-}
+

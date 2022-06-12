@@ -13,6 +13,12 @@ macro inst_xch(dst, src) {
     src = tmp;
 }
 
+macro swap(dst, src) {
+    local tmp = dst;
+    dst = src;
+    src = tmp;
+}
+
 macro inst_inc(dst) {
     aux_carry(dst, 1);
     dst = dst + 1;
@@ -27,14 +33,14 @@ macro inst_dec(dst) {
 
 macro inst_add(dst, src) {
     aux_carry(dst, src);
-    $(CY) = (0xff - dst) < src;
+    $(CY) = carry(dst, src);
     dst = dst + src;
     $(Z) = dst == 0;
 }
 
 macro inst_addc(dst, src) {
-    dst = dst + $(CY);
-    inst_add(dst, src);
+    tmp = src + $(CY);
+    inst_add(dst, tmp);
 }
 
 macro inst_sub(dst, src) {
@@ -45,8 +51,8 @@ macro inst_sub(dst, src) {
 }
 
 macro inst_subc(dst, src) {
-    dst = dst - $(CY);
-    inst_sub(dst, src);
+    tmp = src - $(CY);
+    inst_sub(dst, tmp);
 }
 
 macro inst_and(dst, src) {
@@ -110,7 +116,7 @@ macro inst_cmp0(dst) {
 }
 
 macro inst_addw(dst, src) {
-    $(CY) = (0xffff - dst) < src;
+    $(CY) = carry(dst, src);
     dst = dst + src;
     $(Z) = dst == 0;
 }
@@ -135,4 +141,16 @@ macro inst_btclr(src, bit, target) {
     if (!(src & (1 << bit))) goto inst_next;
     inst_clr1(src, bit);
     goto target;
+}
+
+macro call_indirect(target) {
+    *[near]:4 SP = inst_next;
+    SP = SP - 4;
+    call [target];
+}
+
+macro callt(tbl) {
+    addr = *[ram]:2 tbl;
+    dst:3 = zext(addr);
+    call_indirect(dst);
 }

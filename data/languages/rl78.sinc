@@ -88,7 +88,8 @@ define token base (8)
     dreg_word = (1, 2)
     dreg_byte = (0, 2)
     dreg_axbc = (0, 1)
-    sreg_byte = (0, 2);
+    sreg_byte = (0, 2)
+    base_3_3 = (3, 3);
 
 define token base2 (8)
     # Bits 2, 7 is set and Bit 3 is unset for CALLT instructions

@@ -1,0 +1,530 @@
+
+:ADD SREG2_BYTE, A is opcode=0x61 & A; op_h=0x0 & base_3_3=0x0 & SREG2_BYTE {
+    inst_add(SREG2_BYTE, A);
+}
+
+:ADDW AX, AddrHLOffsetW is opcode=0x61 & AX; opcode=0x09; AddrHLOffsetW {
+    inst_addw(AX, AddrHLOffsetW);
+}
+
+:ADD A, SREG2_BYTE is opcode=0x61 & A; op_h=0x0 & base_3_3=0x1 & SREG2_BYTE {
+    inst_add(A, SREG2_BYTE);
+}
+
+:ADDC SREG2_BYTE, A is opcode=0x61 & A; op_h=0x1 & base_3_3=0x0 & SREG2_BYTE {
+    inst_addc(SREG2_BYTE, A);
+}
+
+:ADDC A, SREG2_BYTE is opcode=0x61 & A; op_h=0x1 & base_3_3=0x1 & SREG2_BYTE {
+    inst_addc(A, SREG2_BYTE);
+}
+
+:SUB SREG2_BYTE, A is opcode=0x61 & A; op_h=0x2 & base_3_3=0x0 & SREG2_BYTE {
+    inst_sub(SREG2_BYTE, A);
+}
+
+:SUBW AX, AddrHLOffsetW is opcode=0x61 & AX; opcode=0x29; AddrHLOffsetW {
+    inst_subw(AX, AddrHLOffsetW);
+}
+
+:SUB A, SREG2_BYTE is opcode=0x61 & A; op_h=0x2 & base_3_3=0x1 & SREG2_BYTE {
+    inst_sub(A, SREG2_BYTE);
+}
+
+:SUBC SREG2_BYTE, A is opcode=0x61 & A; op_h=0x3 & base_3_3=0x0 & SREG2_BYTE {
+    inst_subc(SREG2_BYTE, A);
+}
+
+:SUBC A, SREG2_BYTE is opcode=0x61 & A; op_h=0x3 & base_3_3=0x1 & SREG2_BYTE {
+    inst_subc(A, SREG2_BYTE);
+}
+
+:CMP SREG2_BYTE, A is opcode=0x61 & A; op_h=0x4 & base_3_3=0x0 & SREG2_BYTE {
+    inst_cmp(SREG2_BYTE, A);
+}
+
+:CMPW AX, AddrHLOffsetW is opcode=0x61 & AX; opcode=0x49; AddrHLOffsetW {
+    inst_cmpw(AX, AddrHLOffsetW);
+}
+
+:CMP A, SREG2_BYTE is opcode=0x61 & A; op_h=0x4 & base_3_3=0x1 & SREG2_BYTE {
+    inst_cmp(A, SREG2_BYTE);
+}
+
+:AND SREG2_BYTE, A is opcode=0x61 & A; op_h=0x5 & base_3_3=0x0 & SREG2_BYTE {
+    SREG2_BYTE = SREG2_BYTE & A;
+    $(Z) = SREG2_BYTE == 0;
+}
+
+:INC AddrHLOffset is opcode=0x61; opcode=0x59; AddrHLOffset {
+    inst_inc(AddrHLOffset);
+}
+
+:AND A, SREG2_BYTE is opcode=0x61 & A; op_h=0x5 & base_3_3=0x1 & SREG2_BYTE {
+    A = A & SREG2_BYTE;
+    $(Z) = A == 0;
+}
+
+:OR SREG2_BYTE, A is opcode=0x61 & A; op_h=0x6 & base_3_3=0x0 & SREG2_BYTE {
+    SREG2_BYTE = SREG2_BYTE | A;
+    $(Z) = SREG2_BYTE == 0;
+}
+
+:DEC AddrHLOffset is opcode=0x61; opcode=0x69; AddrHLOffset {
+    inst_dec(AddrHLOffset);
+}
+
+:OR A, SREG2_BYTE is opcode=0x61 & A; op_h=0x6 & base_3_3=0x1 & SREG2_BYTE {
+    A = A | SREG2_BYTE;
+    $(Z) = A == 0;
+}
+
+:XOR SREG2_BYTE, A is opcode=0x61 & A; op_h=0x7 & base_3_3=0x0 & SREG2_BYTE {
+    SREG2_BYTE = SREG2_BYTE ^ A;
+    $(Z) = SREG2_BYTE == 0;
+}
+
+:INCW AddrHLOffsetW is opcode=0x61; opcode=0x79; AddrHLOffsetW {
+    inst_incw(AddrHLOffsetW);
+}
+
+:XOR A, SREG2_BYTE is opcode=0x61 & A; op_h=0x7 & base_3_3=0x1 & SREG2_BYTE {
+    A = A ^ SREG2_BYTE;
+    $(Z) = A == 0;
+}
+
+:ADD A, AddrHLOffsetB is opcode=0x61 & A; opcode=0x80 & AddrHLOffsetB {
+    inst_add(A, AddrHLOffsetB);
+}
+
+:ADD A, AddrHLOffsetC is opcode=0x61 & A; opcode=0x82; AddrHLOffsetC {
+    inst_add(A, AddrHLOffsetC);
+}
+
+:CALLT ["0080h"] is opcode=0x61; opcode=0x84 {
+    callt(0x80:3);
+}
+
+:CALLT ["0090h"] is opcode=0x61; opcode=0x85 {
+    callt(0x90:3);
+}
+
+:CALLT ["00A0h"] is opcode=0x61; opcode=0x86 {
+    callt(0xA0:3);
+}
+
+:CALLT ["00B0h"] is opcode=0x61; opcode=0x87 {
+    callt(0xB0:3);
+}
+
+:DECW AddrHLOffsetW is opcode=0x61; opcode=0x89; AddrHLOffsetW {
+    inst_decw(AddrHLOffsetW);
+}
+
+:XCH A, SREG2_BYTE is opcode=0x61 & A; op_h=0x8 & base_3_3=0x1 & SREG2_BYTE {
+    swap(A, SREG2_BYTE);
+}
+
+:ADDC A, AddrHLOffsetB is opcode=0x61 & A; opcode=0x90; AddrHLOffsetB {
+    inst_addc(A, AddrHLOffsetB);
+}
+
+:ADDC A, AddrHLOffsetC is opcode=0x61 & A; opcode=0x92; AddrHLOffsetC {
+    inst_addc(A, AddrHLOffsetC);
+}
+
+:CALLT ["0082h"] is opcode=0x61; opcode=0x94 {
+    callt(0x82:3);
+}
+
+:CALLT ["0092h"] is opcode=0x61; opcode=0x95 {
+    callt(0x92:3);
+}
+
+:CALLT ["00A2h"] is opcode=0x61; opcode=0x96 {
+    callt(0xA2:3);
+}
+
+:CALLT ["00B2h"] is opcode=0x61; opcode=0x97 {
+    callt(0xB2:3);
+}
+
+:SUB A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xA0 & AddrHLOffsetB {
+    inst_sub(A, AddrHLOffsetB);
+}
+
+:SUB A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xA2; AddrHLOffsetC {
+    inst_sub(A, AddrHLOffsetC);
+}
+
+:CALLT ["0084h"] is opcode=0x61; opcode=0xA4 {
+    callt(0x84:3);
+}
+
+:CALLT ["0094h"] is opcode=0x61; opcode=0xA5 {
+    callt(0x94:3);
+}
+
+:CALLT ["00A4h"] is opcode=0x61; opcode=0xA6 {
+    callt(0xA4:3);
+}
+
+:CALLT ["00B4h"] is opcode=0x61; opcode=0xA7 {
+    callt(0xB4:3);
+}
+
+:XCH A, saddr is opcode=0x61 & A; opcode=0xA8; saddr {
+    swap(A, saddr);
+}
+
+:XCH A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xA9 & AddrHLOffsetC {
+    swap(A, AddrHLOffsetC);
+}
+
+:XCH A, addr16 is opcode=0x61 & A; opcode=0xAA; addr16 {
+    swap(A, addr16);
+}
+
+:XCH A, sfr is opcode=0x61 & A; opcode=0xAB; sfr {
+    swap(A, sfr);
+}
+
+:XCH A, AddrHL is opcode=0x61 & A; opcode=0xAC & AddrHL {
+    swap(A, AddrHL);
+}
+
+:XCH A, AddrHLOffset is opcode=0x61 & A; opcode=0xAD; AddrHLOffset {
+    swap(A, AddrHLOffset);
+}
+
+:XCH A, AddrDE is opcode=0x61 & A; opcode=0xAE & AddrDE {
+    swap(A, AddrDE);
+}
+
+:XCH A, AddrDEOffset is opcode=0x61 & A; opcode=0xAF; AddrDEOffset {
+    swap(A, AddrDEOffset);
+}
+
+:SUBC A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xB0 & AddrHLOffsetB {
+    inst_subc(A, AddrHLOffsetB);
+}
+
+:SUBC A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xB2; AddrHLOffsetC {
+    inst_subc(A, AddrHLOffsetC);
+}
+
+:CALLT ["0086h"] is opcode=0x61; opcode=0xB4 {
+    callt(0x86:3);
+}
+
+:CALLT ["0096h"] is opcode=0x61; opcode=0xB5 {
+    callt(0x96:3);
+}
+
+:CALLT ["00A6h"] is opcode=0x61; opcode=0xB6 {
+    callt(0xA6:3);
+}
+
+:CALLT ["00B6h"] is opcode=0x61; opcode=0xB7 {
+    callt(0xB6:3);
+}
+
+:MOV ES, saddr is opcode=0x61 & ES; opcode=0xB8; saddr {
+    ES = saddr & 0xf;
+}
+
+:XCH A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xB9 & AddrHLOffsetB {
+    swap(A, AddrHLOffsetB);
+}
+
+:CMP A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xC0 & AddrHLOffsetB {
+    inst_cmp(A, AddrHLOffsetB);
+}
+
+:CMP A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xC2; AddrHLOffsetC {
+    inst_cmp(A, AddrHLOffsetC);
+}
+
+:BH jdisp8 is opcode=0x61; opcode=0xC3; jdisp8 {
+    if (!($(Z) | $(CY))) goto jdisp8;
+}
+
+:CALLT ["0088h"] is opcode=0x81; opcode=0xC4 {
+    callt(0x88:3);
+}
+
+:CALLT ["0098h"] is opcode=0x81; opcode=0xC5 {
+    callt(0x98:3);
+}
+
+:CALLT ["00A8h"] is opcode=0x81; opcode=0xC6 {
+    callt(0xA8:3);
+}
+
+:CALLT ["00B8h"] is opcode=0x81; opcode=0xC7 {
+    callt(0xB8:3);
+}
+
+:SKC is SKIP_TARGET & opcode=0x61; opcode=0xC8 {
+    if ($(CY)) goto <skip>;
+    goto inst_next;
+    <skip>
+    goto SKIP_TARGET;
+}
+
+:MOV A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xC9 & AddrHLOffsetB {
+    A = AddrHLOffsetB;
+}
+
+:CALL AX is opcode=0x61 & AX & CS; opcode=0xCA {
+    dst:3 = segment(CS, AX);
+    call_indirect(dst);
+}
+
+:BR AX is opcode=0x61 & AX & CS; opcode=0xCB {
+    addr:3 = segment(CS, AX);
+    goto [addr];
+}
+
+:BRK is opcode=0x61; opcode=0xCC {
+    $(IE) = 0;
+    disable_interrupts();
+    callt(0x7E:3);
+}
+
+:POP PSW is opcode=0x61 & PSW; opcode=0xCD {
+    SP = SP + 1;
+    PSW = *[near] SP;
+    SP = SP + 1;
+}
+
+:MOVS AddrHLOffset, X is opcode=0x61 & X & A; opcode=0xCE; AddrHLOffset {
+    AddrHLOffset = X;
+    $(Z) = (X == 0);
+    $(CY) = (X == 0) | (A == 0);
+}
+
+:AND A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xD0 & AddrHLOffsetB {
+    A = A & AddrHLOffsetB;
+    $(Z) = A == 0;
+}
+
+:AND A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xD2; AddrHLOffsetC {
+    A = A & AddrHLOffsetC;
+    $(Z) = A == 0;
+}
+
+:BNH jdisp8 is opcode=0x61; opcode=0xD3; jdisp8 {
+    if (($(Z) | $(CY))) goto jdisp8;
+}
+
+:CALLT ["008Ah"] is opcode=0x81; opcode=0xD4 {
+    callt(0x8A:3);
+}
+
+:CALLT ["009Ah"] is opcode=0x81; opcode=0xD5 {
+    callt(0x9A:3);
+}
+
+:CALLT ["00AAh"] is opcode=0x81; opcode=0xD6 {
+    callt(0xAA:3);
+}
+
+:CALLT ["00BAh"] is opcode=0x81; opcode=0xD7 {
+    callt(0xBA:3);
+}
+
+:SKNC is SKIP_TARGET & opcode=0x61; opcode=0xD8 {
+    if (!$(CY)) goto <skip>;
+    goto inst_next;
+    <skip>
+    goto SKIP_TARGET;
+}
+
+:MOV AddrHLOffsetB, A is opcode=0x61 & A; opcode=0xD9 & AddrHLOffsetB {
+    AddrHLOffsetB = A;
+}
+
+:CALL BC is opcode=0x61 & BC & CS; opcode=0xDA {
+    dst:3 = segment(CS, BC);
+    call_indirect(dst);
+}
+
+:ROR A, 1 is opcode=0x61 & A; opcode=0xDB {
+    b:1 = A[0, 1];
+    A = A >> 1;
+    A[7, 1] = b;
+    $(CY) = b;
+}
+
+:ROLC A, 1 is opcode=0x61 & A; opcode=0xDC {
+    b:1 = A[7, 1];
+    A = A << 1;
+    A[0, 1] = $(CY);
+    $(CY) = b;
+}
+
+:PUSH PSW is opcode=0x61 & PSW; opcode=0xDD {
+    SP = SP - 1;
+    *[near] SP = PSW;
+    SP = SP - 1;
+}
+
+
+:CMPS X, AddrHLOffset is opcode=0x61 & X & A; opcode=0xDE; AddrHLOffset {
+    $(Z) = X == AddrHLOffset;
+    $(CY) = ($(Z) != 0) | (A == 0) | (X == 0);
+    aux_borrow(X, AddrHLOffset);
+}
+
+:OR A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xE0 & AddrHLOffsetB {
+    A = A | AddrHLOffsetB;
+    $(Z) = A == 0;
+}
+
+:OR A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xE2; AddrHLOffsetC {
+    A = A | AddrHLOffsetC;
+    $(Z) = A == 0;
+}
+
+:SKH is SKIP_TARGET & opcode=0x61; opcode=0xE3 {
+    if ($(Z) | $(CY)) goto <skip>;
+    goto inst_next;
+    <skip>
+    goto SKIP_TARGET;
+}
+
+:CALLT ["008Ch"] is opcode=0x81; opcode=0xE4 {
+    callt(0x8C:3);
+}
+
+:CALLT ["009Ch"] is opcode=0x81; opcode=0xE5 {
+    callt(0x9C:3);
+}
+
+:CALLT ["00ACh"] is opcode=0x81; opcode=0xE6 {
+    callt(0xAC:3);
+}
+
+:CALLT ["00BCh"] is opcode=0x81; opcode=0xE7 {
+    callt(0xBC:3);
+}
+
+:SKZ is SKIP_TARGET & opcode=0x61; opcode=0xE8 {
+    if ($(Z)) goto <skip>;
+    goto inst_next;
+    <skip>
+    goto SKIP_TARGET;
+}
+
+:MOV A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xE9 & AddrHLOffsetC {
+    A = AddrHLOffsetC;
+}
+
+:CALL DE is opcode=0x61 & DE & CS; opcode=0xEA {
+    dst:3 = segment(CS, DE);
+    call_indirect(dst);
+}
+
+:ROL A, 1 is opcode=0x61 & A; opcode=0xEB {
+    b:1 = A[7, 1];
+    A = A << 1;
+    A[0, 1] = b;
+    $(CY) = b;
+}
+
+:RETB (PC) is opcode=0x61 & PC; opcode=0xEC {
+    PC = *[near] SP;
+    SP = SP + 3;
+    PSW = *[near] SP;
+    SP = SP + 1;
+    return [PC];
+}
+
+:HALT is opcode=0x61; opcode=0xED { halt(); }
+
+:ROLWC AX, 1 is opcode=0x61 & AX; opcode=0xEE {
+    b:1 = AX[15, 1];
+    AX = AX << 1;
+    AX[0, 1] = $(CY);
+    $(CY) = b;
+}
+
+:XOR A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xF0 & AddrHLOffsetB {
+    A = A ^ AddrHLOffsetB;
+    $(Z) = A == 0;
+}
+
+:XOR A, AddrHLOffsetC is opcode=0x61 & A; opcode=0xF2; AddrHLOffsetC {
+    A = A ^ AddrHLOffsetC;
+    $(Z) = A == 0;
+}
+
+:SKNH is SKIP_TARGET & opcode=0x61; opcode=0xF3 {
+    if (!($(Z) | $(CY))) goto <skip>;
+    goto inst_next;
+    <skip>
+    goto SKIP_TARGET;
+}
+
+:CALLT ["008Eh"] is opcode=0x81; opcode=0xF4 {
+    callt(0x8E:3);
+}
+
+:CALLT ["009Eh"] is opcode=0x81; opcode=0xF5 {
+    callt(0x9E:3);
+}
+
+:CALLT ["00AEh"] is opcode=0x81; opcode=0xF6 {
+    callt(0xAE:3);
+}
+
+:CALLT ["00BEh"] is opcode=0x81; opcode=0xF7 {
+    callt(0xBE:3);
+}
+
+:SKNZ is SKIP_TARGET & opcode=0x61; opcode=0xF8 {
+    if (!$(Z)) goto <skip>;
+    goto inst_next;
+    <skip>
+    goto SKIP_TARGET;
+}
+
+:MOV AddrHLOffsetC, A is opcode=0x61 & A; opcode=0xF9 & AddrHLOffsetC {
+    AddrHLOffsetC = A;
+}
+
+:CALL HL is opcode=0x61 & HL & CS; opcode=0xFA {
+    dst:3 = segment(CS, HL);
+    call_indirect(dst);
+}
+
+:RORC A, 1 is opcode=0x61 & A; opcode=0xFB {
+    b:1 = A[0, 1];
+    A = A >> 1;
+    A[7, 1] = $(CY);
+    $(CY) = b;
+}
+
+:RETI (PC) is opcode=0x61; opcode=0xFC & PC {
+    PC = *[near] SP;
+    SP = SP + 3;
+    PSW = *[near] SP;
+    SP = SP + 1;
+    return [PC];
+}
+
+:STOP is opcode=0x61; opcode=0xFD { stop(); }
+
+:ROLWC BC, 1 is opcode=0x61 & BC; opcode=0xFE {
+    b:1 = BC[15, 1];
+    BC = BC << 1;
+    BC[0, 1] = $(CY);
+    $(CY) = b;
+}
+
+:SEL rbs_op_n is opcode=0x61; op_l=0xF & rbs_op_n & mov1_sreg=1 [
+    rsb = rbs_op_n;
+    globalset(inst_next, rsb);
+    # see if some indirect register address space pointers can work here
+] {}
