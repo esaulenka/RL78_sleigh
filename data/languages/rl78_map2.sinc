@@ -471,7 +471,7 @@
 :ROLWC AX, 1 is opcode=0x61 & AX; opcode=0xEE {
     b:1 = AX[15, 1];
     AX = AX << 1;
-    AX[0, 1] = CY;
+    AX = AX | zext(CY);
     CY = b;
 }
 
