@@ -103,22 +103,22 @@
 
 # MOV ES, #byte
 :MOV ES, u8 is opcode=0x41 & ES; u8 {
-    ES = u8[0, 4];
+    ES = u8;
 }
 
 # MOV A, ES
 :MOV A, ES is opcode=0x8E & A & ES; opcode=0xFD {
-    A = ES;
+    A = ES & 0xf;
 }
 
 # MOV ES = A
 :MOV ES, A is opcode=0x9E & A & ES; opcode=0xFD {
-    ES = A[0, 4];
+    ES = A;
 }
 
 # MOV CS, #byte
 :MOV CS, u8 is opcode=0xCE & CS; opcode=0xFC; u8 {
-    CS = u8[0, 4];
+    CS = u8;
 }
 
 #
@@ -127,12 +127,12 @@
 
 # MOV A, CS
 :MOV A, CS is opcode=0x8E & A & CS; opcode=0xFC {
-    A = CS;
+    A = CS & 0xf;
 }
 
 # MOV CS, A
 :MOV CS, A is opcode=0x9E & A & CS; opcode=0xFC {
-    CS = A[0, 4];
+	CS = A;
 }
 
 # MOV A, [DE]

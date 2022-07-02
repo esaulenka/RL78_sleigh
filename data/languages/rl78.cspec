@@ -61,6 +61,7 @@
       </killedbycall>
       <unaffected>
         <varnode space="stack" offset="0" size="4"/>
+		<register name="HL0"/>
         <register name="SP"/>
         <register name="PSW"/>
         <register name="CY"/>

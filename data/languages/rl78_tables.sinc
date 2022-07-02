@@ -107,8 +107,12 @@ u16: "#"dataw is dataw {
     export *[const]:2 dataw;
 }
 
-offset8: uaddr8 is uaddr8 {
-    export *[const]:1 uaddr8;
+near_offset8: uaddr8 is uaddr8 {
+    export *[const]:2 uaddr8;
+}
+
+far_offset8: uaddr8 is uaddr8 {
+    export *[const]:3 uaddr8;
 }
 
 saddr_val: val is uaddr8 [val = 0xFE00 + uaddr8;] { export *[const]:3 val; }
@@ -218,18 +222,18 @@ AddrDEOffsetW: [DE] is es_prefix=0 & DE & uaddr8=0 {
     export *[near]:2 DE;
 }
 
-AddrDEOffset: [DE+offset8] is es_prefix=0 & DE & offset8 {
-    loc = DE + zext(offset8);
+AddrDEOffset: [DE+near_offset8] is es_prefix=0 & DE & near_offset8 {
+    loc = DE + near_offset8;
     export *[near]:1 loc;
 }
 
-AddrDEOffset: ES:[DE+offset8] is es_prefix=1 & DE & offset8 & ES {
-    local loc:3 = segment(ES, DE) + zext(offset8);
+AddrDEOffset: ES:[DE+far_offset8] is es_prefix=1 & DE & far_offset8 & ES {
+    local loc:3 = segment(ES, DE) + far_offset8;
     export *[ram]:1 loc;
 }
 
-AddrDEOffsetW: [DE+offset8] is es_prefix=0 & DE & offset8 {
-    loc = DE + zext(offset8);
+AddrDEOffsetW: [DE+near_offset8] is es_prefix=0 & DE & near_offset8 {
+    loc = DE + near_offset8;
     export *[near]:2 loc;
 }
 
@@ -238,8 +242,8 @@ AddrDEOffsetW: ES:[DE] is es_prefix=1 & DE & data=0 & ES {
     export *[ram]:2 loc;
 }
 
-AddrDEOffsetW: ES:[DE+offset8] is es_prefix=1 & DE & offset8 & data!=0 & ES {
-    local loc:3 = segment(ES, DE) + zext(offset8);
+AddrDEOffsetW: ES:[DE+far_offset8] is es_prefix=1 & DE & far_offset8 & data!=0 & ES {
+    local loc:3 = segment(ES, DE) + far_offset8;
     export *[ram]:2 loc;
 }
 
@@ -270,13 +274,13 @@ AddrHLOffset: ES:[HL] is es_prefix=1 & HL & uaddr8=0 & ES {
     export *[ram]:1 loc;
 }
 
-AddrHLOffset: [HL+offset8] is es_prefix=0 & HL & offset8 {
-    loc = HL + zext(offset8);
+AddrHLOffset: [HL+near_offset8] is es_prefix=0 & HL & near_offset8 {
+    loc = HL + near_offset8;
     export *[near]:1 loc;
 }
 
-AddrHLOffset: ES:[HL+offset8] is es_prefix=1 & HL & offset8 & ES {
-    local loc:3 = segment(ES, HL) + zext(offset8);
+AddrHLOffset: ES:[HL+far_offset8] is es_prefix=1 & HL & far_offset8 & ES {
+    local loc:3 = segment(ES, HL) + far_offset8;
     export *[ram]:1 loc;
 }
 
@@ -284,13 +288,13 @@ AddrHLOffsetW: [HL] is es_prefix=0 & HL & uaddr8=0 {
     export *[near]:2 HL;
 }
 
-AddrHLOffsetW: [HL+offset8] is es_prefix=0 & HL & offset8 {
-    loc = HL + zext(offset8);
+AddrHLOffsetW: [HL+near_offset8] is es_prefix=0 & HL & near_offset8 {
+    loc = HL + near_offset8;
     export *[near]:2 loc;
 }
 
-AddrHLOffsetW: ES:[HL+offset8] is es_prefix=1 & HL & offset8 & ES {
-    local loc:3 = segment(ES, HL) + zext(offset8);
+AddrHLOffsetW: ES:[HL+far_offset8] is es_prefix=1 & HL & far_offset8 & ES {
+    local loc:3 = segment(ES, HL) + far_offset8;
     export *[ram]:2 loc;
 }
 
@@ -387,13 +391,13 @@ AddrSPOffsetW: [SP] is uaddr8=0 & SP {
     export *[near]:2 SP;
 }
 
-AddrSPOffset: [SP+offset8] is offset8 & SP {
-    local loc:2 = SP + zext(offset8);
+AddrSPOffset: [SP+near_offset8] is near_offset8 & SP {
+    local loc:2 = SP + near_offset8;
     export *[near]:1 loc;
 }
 
-AddrSPOffsetW: [SP+offset8] is offset8 & SP {
-    local loc:2 = SP + zext(offset8);
+AddrSPOffsetW: [SP+near_offset8] is near_offset8 & SP {
+    local loc:2 = SP + near_offset8;
     export *[near]:2 loc;
 }
 

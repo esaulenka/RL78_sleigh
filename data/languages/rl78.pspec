@@ -13,7 +13,7 @@
       <input name="addr" size="2"/>
       <output name="res" size="3"/>
       <body><![CDATA[
-        res = (zext(seg) << 16) + zext(addr);
+        res = (zext(seg & 0xf:1) << 16) + zext(addr);
       ]]></body>
     </pcode>
     <constresolve>

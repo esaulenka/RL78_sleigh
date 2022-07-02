@@ -230,7 +230,7 @@
 }
 
 :MOV ES, saddr is opcode=0x61 & ES; opcode=0xB8; saddr {
-    ES = saddr & 0xf;
+    ES = saddr;
 }
 
 :XCH A, AddrHLOffsetB is opcode=0x61 & A; opcode=0xB9 & AddrHLOffsetB {
